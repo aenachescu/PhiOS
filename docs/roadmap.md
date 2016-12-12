@@ -34,6 +34,7 @@ Version 0.0.0.3
 * Networking
 * USB
 * Sound
+* API
 
 Version 0.0.0.4
 
