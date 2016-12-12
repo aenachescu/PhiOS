@@ -37,11 +37,13 @@ Version 0.0.0.3
 * API
 
 Version 0.0.0.4
+------
 
 * Porting GCC & C library
 * Testing
 
 Version 0.0.0.5
+------
 
 * Porting software
 * Drivers support
