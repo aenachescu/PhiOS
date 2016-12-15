@@ -1,0 +1,71 @@
+cmake_minimum_required(VERSION 3.5.1)
+
+project (PhiOS C ASM)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Enable languages
+enable_language(C)
+enable_language(ASM)
+set(can_use_assembler TRUE)
+
+# Set paths
+set(PRJ_PATH ${CMAKE_SOURCE_DIR})
+
+# Set compilers for target architecture
+if (DEFINED ARCH)
+    if (ARCH STREQUAL "x86_32")
+        set(CMAKE_ASM_COMPILER "i686-elf-as")
+        set(CMAKE_C_COMPILER "i686-elf-gcc")
+        set(CMAKE_LINKER "i686-elf-ld")
+        set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/ia32/linker.ld")
+        set(ARCH_PATH "kernel/src/arch/ia32")
+    elseif (ARCH STREQUAL "x86_64")
+        set(CMAKE_ASM_COMPILER "x86_64-elf-as")
+        set(CMAKE_C_COMPILER "x86_64-elf-gcc")
+        set(CMAKE_LINKER "x86_64-elf-ld")
+        set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/ia64/linker.ld")
+        set(ARCH_PATH "kernel/src/arch/ia64")
+    else ()
+        message(FATAL_ERROR "Architecture not supported")
+    endif(ARCH STREQUAL "x86_32")
+else ()
+    # Use defaults if user doesn't specify any architecture
+    set(CMAKE_ASM_COMPILER "x86_64-elf-as")
+    set(CMAKE_C_COMPILER "x86_64-elf-gcc")
+    set(CMAKE_LINKER "x86_64-elf-ld")
+    set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/ia32/linker.ld")
+    set(ARCH_PATH "kernel/src/arch/ia32")
+endif(DEFINED ARCH)
+
+# Set flags
+set(CMAKE_ASM_FLAGS "")
+set(CMAKE_C_FLAGS "-std=gnu11 -ffreestanding -O2 -Wall -Wextra")
+set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib")
+
+# Set linker rule
+set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> ${CMAKE_LINKER_FLAGS} <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+
+# Set sources
+set(C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
+set(ASM_SOURCES "${PRJ_PATH}/${ARCH_PATH}/boot.s")
+
+# Add subdirectories (NOT READY YET)
+
+# Add OS image
+add_executable(phios.elf ${C_SOURCES} ${ASM_SOURCES})
+
+# Set custom commands
+add_custom_command(
+    OUTPUT
+        phios.iso
+    COMMAND
+        mkdir -p isodir/boot/grub &&
+        cp phios.elf isodir/boot/phios.elf &&
+        cp ${PRJ_PATH}/grub.cfg isodir/boot/grub/grub.cfg &&
+        grub-mkrescue -o phios.iso isodir
+    DEPENDS
+        phios.elf
+    )
+    
+# Set custom targets
+add_custom_target(iso DEPENDS phios.iso)
