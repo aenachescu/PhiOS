@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # if parameter $1 doesn't exists then the script will compile the OS and it will
-# generate the iso file for ia64.
+# generate the iso file for x86_64.
 
 # if $1 is "build" then the script will compile the OS and it will generate the
-# iso file for ia64.
+# iso file for x86_64.
 
 # if $1 is "build" and $2 is not equal with "" then the script will compile the
 # OS and it will generate the iso file for the architecture from $2 parameter.
@@ -14,7 +14,7 @@
 # if $1 is "clean" and $2 is not equal with "" then the script will delete the
 # bin/architecture_name directory.
 
-# $2 can take the following values: ia32, ia64
+# $2 can take the following values: x86_32, x86_64
 
 function create_bin {
     if ! [ -d "bin" ];
@@ -24,20 +24,20 @@ function create_bin {
     cd bin
 }
 
-function create_ia32 {
+function create_x86_32 {
     if ! [ -d "ia32" ];
     then
-        mkdir ia32
+        mkdir x86_32
     fi
-    cd ia32
+    cd x86_32
 }
 
-function create_ia64 {
+function create_x86_64 {
     if ! [ -d "ia64" ];
     then
-        mkdir ia64
+        mkdir x86_64
     fi
-    cd ia64
+    cd x86_64
 }
 
 function remove_dir {
@@ -47,12 +47,28 @@ function remove_dir {
     fi
 }
 
-export PATH=$PWD/build/linux:$PATH
+if [ "$1" == "" ];
+then
+    export PATH=$PWD/build/linux/x86_64:$PATH
+fi
+
+if [ "$1" == "build" ];
+then
+    if [ "$2" == "x86_32" ];
+    then
+        export PATH=$PWD/build/linux/x86_32:$PATH
+    fi
+
+    if [ "$2" == "x86_64" ];
+    then
+        export PATH=$PWD/build/linux/x86_64:$PATH
+    fi
+fi
 
 if [ "$1" == "" ];
 then
     create_bin
-    create_ia64
+    create_x86_64
     cmake ../.. -DARCH:STRING=x86_64
     make
     make iso
@@ -60,19 +76,19 @@ fi
 
 if [ "$1" == "build" ];
 then
-    if [ "$2" == "ia32" ];
+    if [ "$2" == "x86_64" ];
     then
         create_bin
-        create_ia64
+        create_x86_64
         cmake ../.. -DARCH:STRING=x86_64
         make
         make iso
     fi
 
-    if [ "$2" == "ia64" ];
+    if [ "$2" == "x86_32" ];
     then
         create_bin
-        create_ia32
+        create_x86_32
         cmake ../.. -DARCH:STRING=x86_32
         make
         make iso
@@ -86,13 +102,13 @@ fi
 
 if [ "$1" == "clean" ];
 then
-    if [ "$2" == "ia32" ];
+    if [ "$2" == "x86_32" ];
     then
-        remove_dir bin/ia32
+        remove_dir bin/x86_32
     fi
 
-    if [ "$2" == "ia64" ];
+    if [ "$2" == "x86_64" ];
     then
-        remove_dir bin/ia64
+        remove_dir bin/x86_64
     fi
 fi
