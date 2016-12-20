@@ -25,7 +25,7 @@ function create_bin {
 }
 
 function create_x86_32 {
-    if ! [ -d "ia32" ];
+    if ! [ -d "x86_32" ];
     then
         mkdir x86_32
     fi
@@ -33,7 +33,7 @@ function create_x86_32 {
 }
 
 function create_x86_64 {
-    if ! [ -d "ia64" ];
+    if ! [ -d "x86_64" ];
     then
         mkdir x86_64
     fi
