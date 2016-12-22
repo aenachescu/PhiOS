@@ -11,6 +11,7 @@ How to add a new module?
 -----
 
 Following steps must be followed to add a new module to one of the components:
+
 1. Add a new directory to component's directory (`PhiOS/component/module`)
 2. Create `src` and `include` directories in module directory
 3. Create a CMakeLists.txt file
