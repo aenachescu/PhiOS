@@ -1,4 +1,4 @@
-#include "../include/asm_io.h"
+#include <arch/x86/asm_io.h>
 
 void io_outb(uint16_t a_port, uint8_t a_val)
 {
