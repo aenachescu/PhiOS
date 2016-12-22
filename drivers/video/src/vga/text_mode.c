@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "../../include/vga/text_mode.h"
-#include "../../../../kernel/include/asm_io.h"
+#include <vga/text_mode.h>
+#include <arch/x86/asm_io.h>
 
 uint32_t g_VGA_row;
 uint32_t g_VGA_column;

@@ -1,12 +1,24 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project (PhiOS C ASM)
- set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Enable languages
 enable_language(C)
 enable_language(ASM)
 set(can_use_assembler TRUE)
+
+# Define macros
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
 
 # Set paths
 set(PRJ_PATH ${CMAKE_SOURCE_DIR})
@@ -16,26 +28,29 @@ if (DEFINED ARCH)
     if (ARCH STREQUAL "x86_32")
         set(CMAKE_ASM_COMPILER "i686-elf-as")
         set(CMAKE_C_COMPILER "i686-elf-gcc")
+        set(CMAKE_AR "i686-elf-ar")
         set(CMAKE_LINKER "i686-elf-ld")
         set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
         set(ARCH_PATH "kernel/src/arch/x86")
     elseif (ARCH STREQUAL "x86_64")
         set(CMAKE_ASM_COMPILER "x86_64-elf-as")
         set(CMAKE_C_COMPILER "x86_64-elf-gcc")
+        set(CMAKE_AR "x86_64-elf-ar")
         set(CMAKE_LINKER "x86_64-elf-ld")
         set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
         set(ARCH_PATH "kernel/src/arch/x86")
     else ()
         message(FATAL_ERROR "Architecture not supported")
-    endif(ARCH STREQUAL "x86_32")
+    endif()
 else ()
     # Use defaults if user doesn't specify any architecture
     set(CMAKE_ASM_COMPILER "x86_64-elf-as")
     set(CMAKE_C_COMPILER "x86_64-elf-gcc")
+    set(CMAKE_AR "x86_64-elf-ar")
     set(CMAKE_LINKER "x86_64-elf-ld")
     set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
     set(ARCH_PATH "kernel/src/arch/x86")
-endif(DEFINED ARCH)
+endif()
 
 # Set flags
 set(CMAKE_ASM_FLAGS "")
@@ -46,13 +61,26 @@ set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib")
 set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> ${CMAKE_LINKER_FLAGS} <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 
 # Set sources
-set(C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
-set(ASM_SOURCES "${PRJ_PATH}/${ARCH_PATH}/boot.s")
+list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
+list(APPEND ASM_SOURCES "")
+list(APPEND STATIC_LIBS "")
 
-# Add subdirectories (NOT READY YET)
+# Set include paths
+list(APPEND INCLUDE_PATH "${PRJ_PATH}/include")
+list(APPEND INCLUDE_PATH "${PRJ_PATH}/kernel/include")
+
+# Add subdirectories
+add_subdirectory("${PRJ_PATH}/kernel")
+add_subdirectory("${PRJ_PATH}/${ARCH_PATH}")
+add_subdirectory("${PRJ_PATH}/drivers")
+add_subdirectory("${PRJ_PATH}/util")
+
+# Add include paths
+include_directories(${INCLUDE_PATH})
 
 # Add OS image
 add_executable(phios.elf ${C_SOURCES} ${ASM_SOURCES})
+target_link_libraries(phios.elf ${STATIC_LIBS})
 
 # Set custom commands
 add_custom_command(
@@ -66,6 +94,6 @@ add_custom_command(
     DEPENDS
         phios.elf
     )
-    
+
 # Set custom targets
 add_custom_target(iso DEPENDS phios.iso)
