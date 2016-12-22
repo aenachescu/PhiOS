@@ -1,0 +1,10 @@
+# Set current path
+set(MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Add C and ASM sources
+list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/asm_io.c")
+list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot.s")
+
+# Update parent scope
+set(C_SOURCES "${C_SOURCES};${ARCH_C_SOURCES}" PARENT_SCOPE)
+set(ASM_SOURCES "${ASM_SOURCES};${ARCH_ASM_SOURCES}" PARENT_SCOPE)
