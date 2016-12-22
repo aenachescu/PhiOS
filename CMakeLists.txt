@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project (PhiOS C ASM)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Enable languages
 enable_language(C)
@@ -41,7 +41,7 @@ if (DEFINED ARCH)
         set(ARCH_PATH "kernel/src/arch/x86")
     else ()
         message(FATAL_ERROR "Architecture not supported")
-    endif(ARCH STREQUAL "x86_32")
+    endif()
 else ()
     # Use defaults if user doesn't specify any architecture
     set(CMAKE_ASM_COMPILER "x86_64-elf-as")
@@ -50,7 +50,7 @@ else ()
     set(CMAKE_LINKER "x86_64-elf-ld")
     set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
     set(ARCH_PATH "kernel/src/arch/x86")
-endif(DEFINED ARCH)
+endif()
 
 # Set flags
 set(CMAKE_ASM_FLAGS "")
@@ -62,12 +62,12 @@ set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> ${CMAKE_LINKER_FLAGS} <OBJECTS> -o <
 
 # Set sources
 list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
-list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/asm_io.c")
-list(APPEND ASM_SOURCES "${PRJ_PATH}/${ARCH_PATH}/boot.s")
+list(APPEND ASM_SOURCES "")
 list(APPEND STATIC_LIBS "")
 
 # Set include paths
 list(APPEND INCLUDE_PATH "${PRJ_PATH}/include")
+list(APPEND INCLUDE_PATH "${PRJ_PATH}/kernel/include")
 
 # Add subdirectories
 add_subdirectory("${PRJ_PATH}/kernel")
