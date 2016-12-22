@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "../../include/vga/text_mode.h"
+#include <vga/text_mode.h>
 #include "../../../../kernel/include/asm_io.h"
 
 uint32_t g_VGA_row;
