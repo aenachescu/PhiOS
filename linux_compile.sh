@@ -49,19 +49,19 @@ function remove_dir {
 
 if [ "$1" == "" ];
 then
-    export PATH=$PWD/build/linux/x86_64:$PATH
+    export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
 fi
 
 if [ "$1" == "build" ];
 then
     if [ "$2" == "x86_32" ];
     then
-        export PATH=$PWD/build/linux/x86_32:$PATH
+        export PATH=$PWD/build/linux-x86_64/gcc-x86_32/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
     fi
 
     if [ "$2" == "x86_64" ];
     then
-        export PATH=$PWD/build/linux/x86_64:$PATH
+        export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
     fi
 fi
 
