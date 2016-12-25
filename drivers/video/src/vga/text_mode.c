@@ -1,14 +1,11 @@
-#include <stdint.h>
-#include <stddef.h>
-
-#include <vga/text_mode.h>
+#include "vga/text_mode.h"
 #include <arch/x86/asm_io.h>
 
-uint32_t g_VGA_row;
-uint32_t g_VGA_column;
+uint32 g_VGA_row;
+uint32 g_VGA_column;
 enum VGA_Colors g_VGA_backgroundColor;
 enum VGA_Colors g_VGA_foregroundColor;
-uint16_t *g_VGA_buffer;
+uint16 *g_VGA_buffer;
 
 void VGA_Init()
 {
@@ -18,21 +15,21 @@ void VGA_Init()
     g_VGA_foregroundColor = VGA_ColorLightGrey;
     g_VGA_backgroundColor = VGA_ColorBlack;
 
-    g_VGA_buffer = (uint16_t*) VGA_MEM_ADDR;
+    g_VGA_buffer = (uint16*) VGA_MEM_ADDR;
 
     VGA_Clear();
 }
 
-void VGA_MoveCursor(int a_column, int a_row)
+void VGA_MoveCursor(uint16 a_column, uint16 a_row)
 {
-    unsigned short position = (a_row * 80) + a_column;
+    uint16 position = (a_row * 80) + a_column;
     g_VGA_row = a_row;
     g_VGA_column = a_column;
 
     io_outb(0x3D4, 0x0F);
-    io_outb(0x3D5, (unsigned char) (position & 0xFF));
+    io_outb(0x3D5, (uint8) (position & 0xFF));
     io_outb(0x3D4, 0x0E);
-    io_outb(0x3D5, (unsigned char ) ((position >> 8) & 0xFF));
+    io_outb(0x3D5, (uint8) ((position >> 8) & 0xFF));
 }
 
 void VGA_SetBackgroundColor(enum VGA_Colors a_bg)
@@ -45,9 +42,9 @@ void VGA_SetForegroundColor(enum VGA_Colors a_fg)
     g_VGA_foregroundColor = a_fg;
 }
 
-uint16_t VGA_CreateEntry(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
+uint16 VGA_CreateEntry(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
 {
-    return (uint16_t) a_c | (uint16_t) (a_fg | a_bg << 4) << 8;
+    return (uint16) a_c | ((uint16) (a_fg | (a_bg << 4)) << 8);
 }
 
 void VGA_WriteChar(char a_c)
@@ -70,7 +67,7 @@ void VGA_WriteBuffer(char *a_buffer, size_t a_len)
 void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
 {
     size_t index;
-    uint16_t entry;
+    uint16 entry;
 
     switch (a_c)
     {
@@ -114,7 +111,7 @@ void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
 }
 
 void VGA_WriteColoredString(char *a_str, enum VGA_Colors a_bg,
-                                        enum VGA_Colors a_fg)
+                            enum VGA_Colors a_fg)
 {
     for (size_t i = 0; a_str[i] != '\0'; i++)
     {
@@ -122,8 +119,8 @@ void VGA_WriteColoredString(char *a_str, enum VGA_Colors a_bg,
     }
 }
 
-void VGA_WriteColoredBuffer(char *a_buffer, size_t a_len, enum VGA_Colors a_bg,
-                                                        enum VGA_Colors a_fg)
+void VGA_WriteColoredBuffer(char *a_buffer, size_t a_len,
+                            enum VGA_Colors a_bg, enum VGA_Colors a_fg)
 {
     for (size_t i = 0; i < a_len; i++)
     {
@@ -144,7 +141,7 @@ void VGA_Clear()
         {
             size_t index = y * VGA_WIDTH + x;
             g_VGA_buffer[index] = VGA_CreateEntry(' ', g_VGA_backgroundColor,
-                                                        g_VGA_foregroundColor);
+                                                  g_VGA_foregroundColor);
         }
     }
 }

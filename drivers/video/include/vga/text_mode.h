@@ -1,8 +1,7 @@
 #ifndef _PhiOS_drivers_text_mode
 #define _PhiOS_drivers_text_mode
 
-#include <stdint.h>
-#include <stddef.h>
+#include "types.h"
 
 #define VGA_WIDTH    80
 #define VGA_HEIGHT   25
@@ -28,18 +27,18 @@ enum VGA_Colors {
 };
 
 void VGA_Init();
-void VGA_MoveCursor(int a_column, int a_row);
+void VGA_MoveCursor(uint16 a_column, uint16 a_row);
 void VGA_SetBackgroundColor(enum VGA_Colors a_bg);
 void VGA_SetForegroundColor(enum VGA_Colors a_fg);
-uint16_t VGA_CreateEntry(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg);
+uint16 VGA_CreateEntry(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg);
 void VGA_WriteChar(char a_c);
 void VGA_WriteString(char *a_str);
 void VGA_WriteBuffer(char *a_buffer, size_t a_len);
 void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg);
 void VGA_WriteColoredString(char *a_str, enum VGA_Colors a_bg,
-                                        enum VGA_Colors a_fg);
-void VGA_WriteColoredBuffer(char *a_buffer, size_t a_len, enum VGA_Colors a_bg,
-                                                        enum VGA_Colors a_fg);
+                            enum VGA_Colors a_fg);
+void VGA_WriteColoredBuffer(char *a_buffer, size_t a_len,
+                            enum VGA_Colors a_bg, enum VGA_Colors a_fg);
 void VGA_Scroll();
 void VGA_Clear();
 
