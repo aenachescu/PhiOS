@@ -39,6 +39,21 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
+    jmp entry
+
+    .align 8
+    multiboot_header_begin:
+        .long 0xe85250d6
+        .long 0
+        .long multiboot_header_end - multiboot_header_begin
+        .long -(0xe85250d6 + (multiboot_header_end - multiboot_header_begin))
+        .short 0
+        .short 0
+        .long 8
+    multiboot_header_end:
+
+    entry:
+
 	# The bootloader has loaded us into 32-bit protected mode on a x86
 	# machine. Interrupts are disabled. Paging is disabled. The processor
 	# state is as defined in the multiboot standard. The kernel has full
@@ -53,7 +68,19 @@ _start:
 	# To set up a stack, we set the esp register to point to the top of our
 	# stack (as it grows downwards on x86 systems). This is necessarily done
 	# in assembly as languages such as C cannot function without a stack.
-	mov $stack_top, %esp
+
+    # set the stack pointer
+    movl $stack_top, %esp
+
+    # reset EFLAGS
+    pushl $0
+    popf
+
+    # push the pointer to the multiboot information structure
+    pushl %ebx
+
+    # push the magic value
+    pushl %eax
 
 	# This is a good place to initialize crucial processor state before the
 	# high-level kernel is entered. It's best to minimize the early
