@@ -52,13 +52,13 @@ void VGA_WriteChar(char a_c)
     VGA_WriteColoredChar(a_c, g_VGA_backgroundColor, g_VGA_foregroundColor);
 }
 
-void VGA_WriteString(char *a_str)
+void VGA_WriteString(const char *a_str)
 {
     VGA_WriteColoredString(a_str, g_VGA_backgroundColor,
                                 g_VGA_foregroundColor);
 }
 
-void VGA_WriteBuffer(char *a_buffer, size_t a_len)
+void VGA_WriteBuffer(const char *a_buffer, size_t a_len)
 {
     VGA_WriteColoredBuffer(a_buffer, a_len, g_VGA_backgroundColor,
                                             g_VGA_foregroundColor);
@@ -110,7 +110,7 @@ void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
     VGA_MoveCursor(g_VGA_column, g_VGA_row);
 }
 
-void VGA_WriteColoredString(char *a_str, enum VGA_Colors a_bg,
+void VGA_WriteColoredString(const char *a_str, enum VGA_Colors a_bg,
                             enum VGA_Colors a_fg)
 {
     for (size_t i = 0; a_str[i] != '\0'; i++)
@@ -119,7 +119,7 @@ void VGA_WriteColoredString(char *a_str, enum VGA_Colors a_bg,
     }
 }
 
-void VGA_WriteColoredBuffer(char *a_buffer, size_t a_len,
+void VGA_WriteColoredBuffer(const char *a_buffer, size_t a_len,
                             enum VGA_Colors a_bg, enum VGA_Colors a_fg)
 {
     for (size_t i = 0; i < a_len; i++)
