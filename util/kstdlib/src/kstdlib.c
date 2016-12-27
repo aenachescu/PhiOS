@@ -11,8 +11,6 @@ size_t kitoa(sint32 a_value, char *a_buffer, size_t *a_length, size_t a_base)
         return ERROR_NULL_POINTER;
     }
 
-    uint32 value = -a_value;
-
     if (a_value < 0 && a_base == 10)
     {
         size_t length = *a_length;
@@ -24,17 +22,14 @@ size_t kitoa(sint32 a_value, char *a_buffer, size_t *a_length, size_t a_base)
             a_buffer++;
         }
 
-        size_t error = kutoa(value, a_buffer, &length, a_base);
-        if (error == ERROR_INSUFFICIENT_BUFFER)
-        {
-            *a_length = length + 1;
-        }
+        size_t error = kutoa(-a_value, a_buffer, &length, a_base);
+        *a_length = length + 1; // +1 from '-'
 
         return error;
     }
     else
     {
-        return kutoa(value, a_buffer, a_length, a_base);
+        return kutoa(a_value, a_buffer, a_length, a_base);
     }
 
     return ERROR_SUCCESS;
@@ -120,8 +115,6 @@ size_t kitoa(sint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
         return ERROR_NULL_POINTER;
     }
 
-    uint64 value = -a_value;
-
     if (a_value < 0 && a_base == 10)
     {
         size_t length = *a_length;
@@ -133,17 +126,14 @@ size_t kitoa(sint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
             a_buffer++;
         }
 
-        size_t error = kutoa(value, a_buffer, &length, a_base);
-        if (error == ERROR_INSUFFICIENT_BUFFER)
-        {
-            *a_length = length + 1;
-        }
+        size_t error = kutoa(-a_value, a_buffer, &length, a_base);
+        *a_length = length + 1; // +1 from '-'
 
         return error;
     }
     else
     {
-        return kutoa(value, a_buffer, a_length, a_base);
+        return kutoa(a_value, a_buffer, a_length, a_base);
     }
 
     return ERROR_SUCCESS;
