@@ -7,6 +7,8 @@ list(APPEND KERNEL_ASM_SOURCES "")
 list(APPEND KERNEL_STATIC_LIBS "")
 list(APPEND KERNEL_INCLUDE_PATH "")
 
+list(APPEND INCLUDE_PATH "${PRJ_PATH}/util/kstdlib/include")
+
 # Add include paths
 include_directories(${INCLUDE_PATH})
 
