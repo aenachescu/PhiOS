@@ -3,11 +3,13 @@
 
 #ifdef PhiOS_ARCH_x86_32
 #define WORDSIZE 32
+#define WORDSIZE_BYTES 4
 #define PhiOS32
 #endif
 
 #ifdef PhiOS_ARCH_x86_64
 #define WORDSIZE 64
+#define WORDSIZE_BYTES 8
 #define PhiOS64
 #endif
 
