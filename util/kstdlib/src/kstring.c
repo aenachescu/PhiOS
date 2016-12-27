@@ -2,172 +2,218 @@
 #include "kstring.h"
 #include "errors.h"
 
-size_t kmemchr(const void *str, sint32 c, size_t n, void **chr)
+size_t kmemchr(const void *a_buffer, uint8 a_value,
+               size_t a_length, void **a_result)
 {
-    if (str == NULL || chr == NULL)
+    if (a_buffer == NULL || a_result == NULL)
     {
         return ERROR_NULL_POINTER;
     }
 
-    if (n != 0)
+    *a_result = NULL;
+
+    if (a_length != 0)
     {
-        register cuint8 *p = str;
-        do
+        register cuint8 *p = (cuint8*) a_buffer;
+        while (a_length != 0)
         {
-            if (*p++ == c)
+            if (*p == a_value)
             {
-                *chr = (void*) (p - 1);
+                *a_result = (void*) p;
                 return ERROR_SUCCESS;
             }
-        } while (--n != 0);
+
+            --a_length;
+            ++p;
+        }
     }
     else
     {
-        return ERROR_INSUFFICIENT_BUFFER;
+        return ERROR_EMPTY_BUFFER;
     }
 
-    return ERROR_UNKNOWN;
+    return ERROR_NOT_FOUND;
 }
 
-size_t kmemcmp(const void *str1, const void *str2, size_t n, sint32 *ret)
+size_t kmemcmp(const void *a_buffer1, const void *a_buffer2,
+               size_t a_length, sint32 *a_result)
 {
-    if (str1 == NULL || str2 == NULL || ret == NULL)
+    if (a_buffer1 == NULL || a_buffer2 == NULL || a_result == NULL)
     {
         return ERROR_NULL_POINTER;
     }
 
-    if (n != 0)
-    {
-        register cuint8 *p1 = str1;
-        register cuint8 *p2 = str2;
-        do
-        {
-            if (*p1++ != *p2++)
-            {
-                *ret = *--p1 - *--p2;
-                return ERROR_SUCCESS;
-            }
-        } while (--n != 0);
-    }
-    else
-    {
-        return ERROR_INSUFFICIENT_BUFFER;
-    }
-
-    return ERROR_UNKNOWN;
-}
-
-size_t kmemcpy(void *dest, const void *src, size_t n)
-{
-    if (dest == NULL || src == NULL)
-    {
-        return ERROR_NULL_POINTER;
-    }
-
-    if (dest == src)
+    if (a_buffer1 == a_buffer2)
     {
         return ERROR_SAME_POINTERS;
     }
 
-    if (n == 0)
+    if (a_length != 0)
+    {
+        register cuint8 *p1 = a_buffer1;
+        register cuint8 *p2 = a_buffer2;
+        while (a_length != 0)
+        {
+            if ((*p1) != (*p2))
+            {
+                *a_result = (*p1) - (*p2);
+                return ERROR_SUCCESS;
+            }
+
+            p1++;
+            p2++;
+            a_length--;
+        }
+
+        *a_result = 0;
+        return ERROR_SUCCESS;
+    }
+    else
+    {
+        return ERROR_EMPTY_BUFFER;
+    }
+
+    return ERROR_UNKNOWN;
+}
+
+size_t kmemcpy(void *a_dest, const void *a_src, size_t a_length)
+{
+    if (a_dest == NULL || a_src == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (a_dest == a_src)
+    {
+        return ERROR_SAME_POINTERS;
+    }
+
+    if (a_length == 0)
     {
         return ERROR_INSUFFICIENT_BUFFER;
     }
 
     // TODO: optimize to use WORDS
-    register char *pDest = (char*) dest;
-    register char *pSrc = (char*) src;
+    register char *pDest = (char*) a_dest;
+    register char *pSrc = (char*) a_src;
 
-    while (n--)
+    while (a_length != 0)
     {
-        *pDest++ = *pSrc++;
+        *pDest = *pSrc;
+        pDest++;
+        pSrc++;
+        a_length--;
     }
 
     return ERROR_SUCCESS;
 }
 
-size_t kmemmove(void *dest, const void *src, size_t n)
+size_t kmemmove(void *a_dest, const void *a_src, size_t a_length)
 {
-    if (dest == NULL || src == NULL)
+    if (a_dest == NULL || a_src == NULL)
     {
         return ERROR_NULL_POINTER;
     }
 
-    if (dest == src)
+    if (a_dest == a_src)
     {
         return ERROR_SAME_POINTERS;
     }
 
-    if (n == 0)
+    if (a_length == 0)
     {
-        return ERROR_INSUFFICIENT_BUFFER;
+        return ERROR_EMPTY_BUFFER;
     }
 
     // TODO: optimize to use WORDS
-    register char *pDest = dest;
-    register const char *pSrc = src;
+    register char *pDest = a_dest;
+    register const char *pSrc = a_src;
 
     // TODO: remove naive implementation for p1 < p2
     if (((pSrc) < (pDest)))
     {
-        for (pDest += n, pSrc += n; n--;)
+        pSrc  += a_length;
+        pDest += a_length;
+
+        while (a_length != 0)
         {
-            *--pDest = *--pSrc;
+            *pDest = *pSrc;
+            pDest--;
+            pSrc--;
+            a_length--;
         }
     }
     else
     {
-        while (n--)
+        while (a_length != 0)
         {
-            *pDest++ = *pSrc++;
+            *pDest = *pSrc;
+            pDest++;
+            pSrc++;
+            a_length--;
         }
     }
 
     return ERROR_SUCCESS;
 }
 
-size_t kmemset(void *str, sint32 c, size_t n)
+size_t kmemset(void *a_buffer, sint8 a_value, size_t a_length)
 {
-    if (str == NULL)
+    if (a_buffer == NULL)
     {
         return ERROR_NULL_POINTER;
     }
 
-    if (n == 0)
+    if (a_length == 0)
     {
-        return ERROR_INSUFFICIENT_BUFFER;
+        return ERROR_EMPTY_BUFFER;
     }
 
     // TODO: optimize to use WORDS
-    register char *p = str;
+    register char *p = a_buffer;
 
     do
     {
-        *p++ = c;
-    } while (n--);
+        *p = a_value;
+        p++;
+        a_length--;
+    } while (a_length != 0);
 
     return ERROR_SUCCESS;
 }
 
-size_t kstrcmp(csint8 *str1, csint8 *str2, sint32 *ret)
+size_t kstrcmp(const char *a_str1, const char *a_str2, sint32 *a_result)
 {
-    if (str1 == NULL || str2 == NULL || ret == NULL)
+    if (a_str1 == NULL || a_str2 == NULL || a_result == NULL)
     {
         return ERROR_NULL_POINTER;
     }
 
-    if (str1 == str2)
+    if (a_str1 == a_str2)
     {
         return ERROR_SAME_POINTERS;
     }
 
-    register sint8 c1, c2;
-    do
+    *a_result = 0;
+    while (*a_result == 0 && *a_str1 != '\0' && *a_str2 != '\0')
     {
-        c1 = *str1++;
-        c2 = *str2++;
-        *ret = c1 - c2;
-    } while ((*ret == 0) && (c1 != '\0'));
+        *a_result = (*a_str1) - (*a_str2);
+        a_str1++;
+        a_str2++;
+    }
+
+    if (*a_result == 0 && (*a_str1) != (*a_str2))
+    {
+        if (*a_str1 == '\0')
+        {
+            *a_result = -1;
+        }
+
+        if (*a_str2 == '\0')
+        {
+            *a_result = 1;
+        }
+    }
 
     return ERROR_SUCCESS;
 }
