@@ -15,7 +15,7 @@ include_directories(${INCLUDE_PATH})
 # Add subdirectories
 foreach(subdir ${SUBDIRS})
     if (NOT (${subdir} STREQUAL "arch"))
-        add_subdirectory(${subdir})
+        add_subdirectory(src/${subdir})
     endif()
 endforeach()
 
