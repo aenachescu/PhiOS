@@ -2,8 +2,13 @@
 #include "kstring.h"
 #include "errors.h"
 
-void* kmemchr(const void *str, sint32 c, size_t n)
+size_t kmemchr(const void *str, sint32 c, size_t n, void **chr)
 {
+    if (str == NULL || chr == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
     if (n != 0)
     {
         register cuint8 *p = str;
@@ -11,16 +16,26 @@ void* kmemchr(const void *str, sint32 c, size_t n)
         {
             if (*p++ == c)
             {
-                return ((void*) (p - 1));
+                *chr = (void*) (p - 1);
+                return ERROR_SUCCESS;
             }
         } while (--n != 0);
     }
+    else
+    {
+        return ERROR_INSUFFICIENT_BUFFER;
+    }
 
-    return NULL;
+    return ERROR_UNKNOWN;
 }
 
-int kmemcmp(const void *str1, const void *str2, size_t n)
+size_t kmemcmp(const void *str1, const void *str2, size_t n, sint32 *ret)
 {
+    if (str1 == NULL || str2 == NULL || ret == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
     if (n != 0)
     {
         register cuint8 *p1 = str1;
@@ -29,30 +44,58 @@ int kmemcmp(const void *str1, const void *str2, size_t n)
         {
             if (*p1++ != *p2++)
             {
-                return (*--p1 - *--p2);
+                *ret = *--p1 - *--p2;
+                return ERROR_SUCCESS;
             }
-        } while (-- n != 0);
+        } while (--n != 0);
+    }
+    else
+    {
+        return ERROR_INSUFFICIENT_BUFFER;
     }
 
-    return 0;
+    return ERROR_UNKNOWN;
 }
 
-void* kmemcpy(void *dest, const void *src, size_t n)
+size_t kmemcpy(void *dest, const void *src, size_t n)
+{
+    if (dest == NULL || src == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (dest == src)
+    {
+        return ERROR_SAME_POINTERS;
+    }
+
+    if (n == 0)
+    {
+        return ERROR_INSUFFICIENT_BUFFER;
+    }
+
+    register char *pDest = (char*) dest;
+    register char *pSrc = (char*) src;
+
+    while (n--)
+    {
+        *pDest++ = *pSrc++;
+    }
+
+    return ERROR_SUCCESS;
+}
+
+size_t kmemmove(void *dest, const void *src, size_t n)
 {
 
 }
 
-void* kmemmove(void *dest, const void *src, size_t n)
+size_t kmemset(void *str, sint32 c, size_t n)
 {
 
 }
 
-void* kmemset(void *str, sint32 c, size_t n)
-{
-
-}
-
-int kstrcmp(csint8 *str1, csint8 *str2)
+size_t kstrcmp(csint8 *str1, csint8 *str2, sint32 *ret)
 {
 
 }
@@ -147,4 +190,3 @@ size_t kstrrev(char *a_str, size_t a_length)
 
     return ERROR_SUCCESS;
 }
-
