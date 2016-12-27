@@ -6,6 +6,7 @@
 #define ERROR_INSUFFICIENT_BUFFER   2
 #define ERROR_UNKNOWN               3
 #define ERROR_UNSUPPORTED           4
+#define ERROR_SAME_POINTERS         5
 
 #endif
 
