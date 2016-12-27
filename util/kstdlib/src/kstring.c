@@ -128,7 +128,25 @@ size_t kmemmove(void *dest, const void *src, size_t n)
 
 size_t kmemset(void *str, sint32 c, size_t n)
 {
+    if (str == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
 
+    if (n == 0)
+    {
+        return ERROR_INSUFFICIENT_BUFFER;
+    }
+
+    // TODO: optimize to use WORDS
+    register char *p = str;
+
+    do
+    {
+        *p++ = c;
+    } while (n--);
+
+    return ERROR_SUCCESS;
 }
 
 size_t kstrcmp(csint8 *str1, csint8 *str2, sint32 *ret)
