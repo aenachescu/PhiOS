@@ -9,7 +9,24 @@ void* kmemcpy(void *dest, const void *src, size_t n);
 void* kmemmove(void *dest, const void *src, size_t n);
 void* kmemset(void *str, sint32 c, size_t n);
 int kstrcmp(csint8 *str1, csint8 *str2);
-char* kstrcpy(sint8 *dest, csint8 *src);
+
+/*
+ * @brief Copies a_src into a_dest.
+ *
+ * @param a_dest Pointer to the destination where the content will be copied.
+ * @param a_destLength The length of a_dest.
+ * @param a_src The string which will be copied.
+ *
+ * @return
+ *  ERROR_SUCCESS - if the function ends successfully and in a_destLength will
+ *      be stored the string length.
+ *  ERROR_INSUFFICIENT_BUFFER - if the length of a_dest is too small and in
+ *      a_destLength will be stored the required size.
+ *  ERROR_SAME_POINTER - if a_dest and a_src are equal (as addresses, not as
+ *      strings).
+ *  ERROR_NULL_POINTER - if at least one pointer is null.
+ */
+size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src);
 
 /*
  * @brief Computes the string length.
