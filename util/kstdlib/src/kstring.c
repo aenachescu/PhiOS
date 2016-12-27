@@ -57,9 +57,43 @@ int kstrcmp(csint8 *str1, csint8 *str2)
 
 }
 
-char* kstrcpy(sint8 *dest, csint8 *src)
+size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src)
 {
+    if (a_dest == NULL || a_destLength == NULL || a_src == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
 
+    if (a_dest == a_src)
+    {
+        return ERROR_SAME_POINTERS;
+    }
+
+    size_t length = 0;
+    while (*a_src != '\0')
+    {
+        if (length < *a_destLength)
+        {
+            *a_dest = *a_src;
+            ++a_dest;
+        }
+
+        ++a_src;
+        ++length;
+    }
+
+    if (length < *a_destLength)
+    {
+        *a_dest = '\0';
+        *a_destLength = length;
+    }
+    else
+    {
+        *a_destLength = length + 1;
+        return ERROR_INSUFFICIENT_BUFFER;
+    }
+
+    return ERROR_SUCCESS;
 }
 
 size_t kstrlen(const char *a_str, size_t *a_length)
