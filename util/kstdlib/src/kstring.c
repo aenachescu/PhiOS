@@ -184,7 +184,7 @@ size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src)
         return ERROR_SAME_POINTERS;
     }
 
-    size_t length = 0;
+    register size_t length = 0;
     while (*a_src != '\0')
     {
         if (length < *a_destLength)
@@ -246,9 +246,9 @@ size_t kstrrev(char *a_str, size_t a_length)
         }
     }
 
-    char *left = a_str;
-    char *right = a_str + (length - 1);
-    char tmp;
+    register char *left = a_str;
+    register char *right = a_str + (length - 1);
+    register char tmp;
 
     while (left < right)
     {
