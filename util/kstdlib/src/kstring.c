@@ -151,7 +151,25 @@ size_t kmemset(void *str, sint32 c, size_t n)
 
 size_t kstrcmp(csint8 *str1, csint8 *str2, sint32 *ret)
 {
+    if (str1 == NULL || str2 == NULL || ret == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
 
+    if (str1 == str2)
+    {
+        return ERROR_SAME_POINTERS;
+    }
+
+    register sint8 c1, c2;
+    do
+    {
+        c1 = *str1++;
+        c2 = *str2++;
+        *ret = c1 - c2;
+    } while ((*ret == 0) && (c1 != '\0'));
+
+    return ERROR_SUCCESS;
 }
 
 size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src)
