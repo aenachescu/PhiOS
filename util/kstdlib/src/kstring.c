@@ -74,6 +74,7 @@ size_t kmemcpy(void *dest, const void *src, size_t n)
         return ERROR_INSUFFICIENT_BUFFER;
     }
 
+    // TODO: optimize to use WORDS
     register char *pDest = (char*) dest;
     register char *pSrc = (char*) src;
 
@@ -87,7 +88,42 @@ size_t kmemcpy(void *dest, const void *src, size_t n)
 
 size_t kmemmove(void *dest, const void *src, size_t n)
 {
+    if (dest == NULL || src == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
 
+    if (dest == src)
+    {
+        return ERROR_SAME_POINTERS;
+    }
+
+    if (n == 0)
+    {
+        return ERROR_INSUFFICIENT_BUFFER;
+    }
+
+    // TODO: optimize to use WORDS
+    register char *pDest = dest;
+    register const char *pSrc = src;
+
+    // TODO: remove naive implementation for p1 < p2
+    if (((pSrc) < (pDest)))
+    {
+        for (pDest += n, pSrc += n; n--;)
+        {
+            *--pDest = *--pSrc;
+        }
+    }
+    else
+    {
+        while (n--)
+        {
+            *pDest++ = *pSrc++;
+        }
+    }
+
+    return ERROR_SUCCESS;
 }
 
 size_t kmemset(void *str, sint32 c, size_t n)
