@@ -32,12 +32,12 @@ void VGA_SetBackgroundColor(enum VGA_Colors a_bg);
 void VGA_SetForegroundColor(enum VGA_Colors a_fg);
 uint16 VGA_CreateEntry(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg);
 void VGA_WriteChar(char a_c);
-void VGA_WriteString(char *a_str);
-void VGA_WriteBuffer(char *a_buffer, size_t a_len);
+void VGA_WriteString(const char *a_str);
+void VGA_WriteBuffer(const char *a_buffer, size_t a_len);
 void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg);
-void VGA_WriteColoredString(char *a_str, enum VGA_Colors a_bg,
+void VGA_WriteColoredString(const char *a_str, enum VGA_Colors a_bg,
                             enum VGA_Colors a_fg);
-void VGA_WriteColoredBuffer(char *a_buffer, size_t a_len,
+void VGA_WriteColoredBuffer(const char *a_buffer, size_t a_len,
                             enum VGA_Colors a_bg, enum VGA_Colors a_fg);
 void VGA_Scroll();
 void VGA_Clear();
