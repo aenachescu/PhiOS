@@ -3,12 +3,12 @@
 
 #include "types.h"
 
-void* kmemchr(const void *str, sint32 c, size_t n);
-int kmemcmp(const void *str1, const void *str2, size_t n);
-void* kmemcpy(void *dest, const void *src, size_t n);
-void* kmemmove(void *dest, const void *src, size_t n);
-void* kmemset(void *str, sint32 c, size_t n);
-int kstrcmp(csint8 *str1, csint8 *str2);
+size_t kmemchr(const void *str, sint32 c, size_t n, void **chr);
+size_t kmemcmp(const void *str1, const void *str2, size_t n, sint32 *ret);
+size_t kmemcpy(void *dest, const void *src, size_t n);
+size_t kmemmove(void *dest, const void *src, size_t n);
+size_t kmemset(void *str, sint32 c, size_t n);
+size_t kstrcmp(csint8 *str1, csint8 *str2, sint32 *ret);
 
 /*
  * @brief Copies a_src into a_dest.
