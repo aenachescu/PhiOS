@@ -1,6 +1,7 @@
 #include "pmm.h"
 #include "paa.h"
 
+
 /*
  * This function doesn't checks if the input is correct because is a helper
  * function and it expects the input to be correct.
@@ -19,6 +20,37 @@ static void helper_MarksBits(struct PhysicalMemoryAllocator *a_pma,
 
             // set bit
             a_pma->bitmap[indexBitmap] |= (((size_t) 1) << indexBits);
+
+            // checks if all the bits was marked
+            requiredFrames--;
+            if (requiredFrames == 0)
+            {
+                return;
+            }
+        } while(indexBits > 0); // iterates through bits
+
+        indexBits = WORDSIZE; // reset indexBits
+    } while (true); // iterates through bitmap
+}
+
+/*
+ * This function doesn't checks if the input is correct because is a helper
+ * function and it expects the input to be correct.
+ */
+ static void helper_FreesBits(struct PhysicalMemoryAllocator *a_pma,
+                              size_t indexBitmap, size_t indexBits,
+                              size_t requiredFrames)
+{
+    indexBits++;
+
+    do
+    {
+        do
+        {
+            indexBits--;
+
+            // frees bit
+            a_pma->bitmap[indexBitmap] &= (~(((size_t) 1) << indexBits));
 
             // checks if all the bits was marked
             requiredFrames--;
@@ -81,7 +113,7 @@ size_t PMM_CreateAllocator(struct PhysicalMemoryAllocator *a_pma, size_t a_frame
     a_pma->bitmapSize = bitmapSize;
     for (size_t i = 0; i < bitmapSize; i++)
     {
-        a_pma->bitmap[i] = 0;
+        a_pma->bitmap[i] = (size_t) 0;
     }
 
     // if framesNumber is not multiple of WORDSIZE, marks the bits from bitmap
@@ -161,7 +193,7 @@ Searching:
         do
         {
             j--;
-            if ((a_pma->bitmap[i] & (1 << j)) == 0)
+            if ((a_pma->bitmap[i] & (((size_t) 1) << j)) == 0)
             {
                 SET_PROCESSING
 
@@ -173,7 +205,7 @@ Searching:
 
                     // computes the physical address
                     size_t frames = i_start * WORDSIZE;
-                    frames += j_start;
+                    frames += (WORDSIZE - 1 - j_start);
                     *a_physicalAddress = frames * a_pma->frameSize;
 
                     // set the last position
@@ -235,6 +267,42 @@ size_t PMM_Free(struct PhysicalMemoryAllocator *a_pma,
     {
         return ERROR_INVALID_STATE;
     }
+
+    // computes indexBitmap and indexBits
+    framesNumber = a_physicalAddress / a_pma->frameSize;
+    size_t startIndexBitmap = framesNumber / WORDSIZE;
+    size_t startIndexBits   = WORDSIZE - 1 - framesNumber % WORDSIZE;
+
+    size_t indexBitmap = startIndexBitmap;
+    size_t indexBits   = startIndexBits;
+
+    // checks if the all a_framesNumber frames are marked
+    framesNumber = a_framesNumber;
+    indexBits++;
+    do
+    {
+        do
+        {
+            indexBits--;
+
+            // checks if bit is 0
+            if ((a_pma->bitmap[indexBitmap] & (((size_t) 1) << indexBits)) != 0)
+            {
+                return ERROR_INVALID_STATE;
+            }
+
+            framesNumber--;
+            if (framesNumber == 0)
+            {
+                goto FreesBits;
+            }
+        } while(indexBits != 0);
+
+        indexBits = WORDSIZE;
+    } while (true);
+
+FreesBits:
+    helper_FreesBits(a_pma, startIndexBitmap, startIndexBits, a_framesNumber);
 
     return ERROR_SUCCESS;
 }
