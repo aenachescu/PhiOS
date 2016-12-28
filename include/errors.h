@@ -13,7 +13,6 @@
 #define ERROR_INVALID_PARAMETER     9
 #define ERROR_ALREADY_INITIALIZED   10
 #define ERROR_NO_FREE_MEMORY        11
-#define ERROR_INVALI_STATE          12
+#define ERROR_INVALID_STATE         12
 
 #endif
-
