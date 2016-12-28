@@ -60,7 +60,7 @@ size_t kutoa(uint32 a_value, char *a_buffer, size_t *a_length, size_t a_base)
             break;
 
         case 10:
-            while (a_value)
+            do
             {
                 if (length < (*a_length))
                 {
@@ -69,11 +69,11 @@ size_t kutoa(uint32 a_value, char *a_buffer, size_t *a_length, size_t a_base)
 
                 a_value /= 10;
                 length++;
-            }
+            } while (a_value);
             break;
 
         case 16:
-            while (a_value)
+            do
             {
                 if (length < (*a_length))
                 {
@@ -82,7 +82,7 @@ size_t kutoa(uint32 a_value, char *a_buffer, size_t *a_length, size_t a_base)
 
                 a_value /= 16;
                 length++;
-            }
+            } while (a_value);
             break;
 
         default:
@@ -164,7 +164,7 @@ size_t kutoa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
             break;
 
         case 10:
-            while (a_value)
+            do
             {
                 if (length < (*a_length))
                 {
@@ -173,11 +173,11 @@ size_t kutoa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
 
                 a_value /= 10;
                 length++;
-            }
+            } while (a_value);
             break;
 
         case 16:
-            while (a_value)
+            do
             {
                 if (length < (*a_length))
                 {
@@ -186,7 +186,7 @@ size_t kutoa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
 
                 a_value /= 16;
                 length++;
-            }
+            } while (a_value);
             break;
 
         default:
@@ -209,4 +209,3 @@ size_t kutoa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
 }
 
 #endif
-
