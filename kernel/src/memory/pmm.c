@@ -30,6 +30,7 @@ static void helper_MarksBits(struct PhysicalMemoryAllocator *a_pma,
         } while(indexBits > 0); // iterates through bits
 
         indexBits = WORDSIZE; // reset indexBits
+        indexBitmap++;
     } while (true); // iterates through bitmap
 }
 
@@ -61,6 +62,7 @@ static void helper_MarksBits(struct PhysicalMemoryAllocator *a_pma,
         } while(indexBits > 0); // iterates through bits
 
         indexBits = WORDSIZE; // reset indexBits
+        indexBitmap++;
     } while (true); // iterates through bitmap
 }
 
@@ -211,6 +213,8 @@ Searching:
                     // set the last position
                     a_pma->positionLastAllocatedFrame = i;
 
+                    a_pma->freeFramesNumber -= a_framesNumber;
+
                     return ERROR_SUCCESS;
                 }
             }
@@ -286,7 +290,7 @@ size_t PMM_Free(struct PhysicalMemoryAllocator *a_pma,
             indexBits--;
 
             // checks if bit is 0
-            if ((a_pma->bitmap[indexBitmap] & (((size_t) 1) << indexBits)) != 0)
+            if ((a_pma->bitmap[indexBitmap] & (((size_t) 1) << indexBits)) == 0)
             {
                 return ERROR_INVALID_STATE;
             }
@@ -299,10 +303,13 @@ size_t PMM_Free(struct PhysicalMemoryAllocator *a_pma,
         } while(indexBits != 0);
 
         indexBits = WORDSIZE;
+        indexBitmap++;
     } while (true);
 
 FreesBits:
     helper_FreesBits(a_pma, startIndexBitmap, startIndexBits, a_framesNumber);
+
+    a_pma->freeFramesNumber += a_framesNumber;
 
     return ERROR_SUCCESS;
 }
