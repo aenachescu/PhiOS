@@ -9,6 +9,8 @@ struct PhysicalMemoryAllocator
     size_t startAddress;
     size_t endAddress;
     size_t frameSize; // in bytes
+    size_t positionLastAllocatedFrame;
+    size_t freeFramesNumber;
     size_t *bitmap;
 };
 
