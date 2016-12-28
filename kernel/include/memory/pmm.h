@@ -11,6 +11,7 @@ struct PhysicalMemoryAllocator
     size_t frameSize; // in bytes
     size_t positionLastAllocatedFrame;
     size_t freeFramesNumber;
+    size_t bitmapSize;
     size_t *bitmap;
 };
 
@@ -24,9 +25,10 @@ struct PhysicalMemoryAllocator
  *
  * @return
  *  ERROR_NULL_POINTER - if a_pma is null.
- *  ERROR_INVALID_PARAMETER - if a_frameSize is 0. If a_startAddress is equal
- *      with a_endAddress or a_endAddress < a_startAddress. If a_startAddress
- *      or a_endAddress is not aligned at a_frameSize.
+ *  ERROR_INVALID_PARAMETER - If a_startAddress is equal with a_endAddress or
+ *      a_endAddress < a_startAddress.
+ *      If a_startAddress or a_endAddress is not aligned at a_frameSize.
+ *      If a_frameSize is not a multiple of 2 or it's less than 2.
  *  ERROR_UNINITIALIZED - if placement address allocator is not initialized.
  */
 size_t PMM_CreateAllocator(struct PhysicalMemoryAllocator *a_pma, size_t a_frameSize,
@@ -42,6 +44,7 @@ size_t PMM_CreateAllocator(struct PhysicalMemoryAllocator *a_pma, size_t a_frame
  * @return
  *  ERROR_SUCCESS - if the function ends succesfully.
  *  ERROR_UNINITIALIZED - if the physical memory allocator is not initialized.
+ *      (a_pma->bitmap is null)
  *  ERROR_NO_FREE_MEMORY - if the free frames number is less than a_framesNumber.
  *  ERROR_NOT_FOUND - if there is not the required number of free frames
  *      continuous.
@@ -61,13 +64,17 @@ size_t PMM_Alloc(struct PhysicalMemoryAllocator *a_pma,
  *  ERROR_SUCCESS - if the function ends successfully.
  *  ERROR_UNINITIALIZED - if the physical memory allocator is not initialized.
  *  ERROR_INVALID_PARAMETER - if a_framesNumber is 0 or a_physicalAddress is
- *      invalid (it is not aligned or it is bigger than RAM size).
+ *      not aligned.
+ *      If a_physicalAddress is less than the starting address or is bigger
+ *      than the ending address.
+ *      If a_framesNumber is bigger than the frames number from the memory area.
  *  ERROR_INVALID_STATE - if at least one frame is not allocated (from the
  *      memory area to be freed).
+ *      If a_framesNumber is bigger than the frames number between
+ *      a_physicalAddress and the ending address.
  *  ERROR_NULL_POINTER - if a_pma is null.
  */
 size_t PMM_Free(struct PhysicalMemoryAllocator *a_pma,
                 size_t a_framesNumber, size_t a_physicalAddress);
 
 #endif
-
