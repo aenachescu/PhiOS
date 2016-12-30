@@ -11,10 +11,10 @@ GDT_Table g_GDTTable;
 size_t GDT_init32()
 {
     GDT_setStruct(&g_GDTStruct[0], 0, 0, 0);
-    GDT_setStruct(&g_GDTStruct[1], 0, 0x000FFFFF, GDT_CODE_PL0);
-    GDT_setStruct(&g_GDTStruct[2], 0, 0x000FFFFF, GDT_CODE_PL0);
-    GDT_setStruct(&g_GDTStruct[3], 0, 0x000FFFFF, GDT_CODE_PL3);
-    GDT_setStruct(&g_GDTStruct[4], 0, 0x000FFFFF, GDT_CODE_PL3);
+    GDT_setStruct(&g_GDTStruct[1], 0, 0xFFFFFFFF, GDT_CODE_PL0);
+    GDT_setStruct(&g_GDTStruct[2], 0, 0xFFFFFFFF, GDT_CODE_PL0);
+    GDT_setStruct(&g_GDTStruct[3], 0, 0xFFFFFFFF, GDT_CODE_PL3);
+    GDT_setStruct(&g_GDTStruct[4], 0, 0xFFFFFFFF, GDT_CODE_PL3);
     GDT_createEntries(g_GDTStruct);
 
     g_GDTTable.limit = sizeof(GDT_Entry) * GDT_ENTRIES - 1;
