@@ -6,7 +6,7 @@
 
 GDT g_GDTStruct[GDT_ENTRIES];
 GDT_Entry g_GDTEntries[GDT_ENTRIES];
-GDT_Table g_GDTTable;
+GDT_Pointer g_GDTPointer;
 
 size_t GDT_init32()
 {
@@ -17,10 +17,10 @@ size_t GDT_init32()
     GDT_setStruct(&g_GDTStruct[4], 0, 0xFFFFFFFF, GDT_DATA_PL3);
     GDT_createEntries(g_GDTStruct);
 
-    g_GDTTable.limit = sizeof(GDT_Entry) * GDT_ENTRIES - 1;
-    g_GDTTable.base = (uint32) &g_GDTEntries;
+    g_GDTPointer.limit = sizeof(GDT_Entry) * GDT_ENTRIES - 1;
+    g_GDTPointer.base = (uint32) &g_GDTEntries;
 
-    GDT_Load((uint32) &g_GDTTable);
+    GDT_Load((uint32) &g_GDTPointer);
 
     return ERROR_SUCCESS;
 }
