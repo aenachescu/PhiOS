@@ -48,7 +48,7 @@
 
 struct GDT_Table {
     uint16 limit;
-    uint16 base;
+    uint32 base;
 } __attribute__((packed));
 typedef struct GDT_Table GDT_Table;
 
