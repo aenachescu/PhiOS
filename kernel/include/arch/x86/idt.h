@@ -6,7 +6,7 @@
 
 #define IDT_ENTRIES 256
 
-typedef struct IDT_Entry32 {
+struct IDT_Entry32 {
     uint16 lowOffset;
     uint16 selector;
     uint8 alwaysZero;
@@ -15,7 +15,7 @@ typedef struct IDT_Entry32 {
 } __attribute__((packed));
 typedef struct IDT_Entry32 IDT_Entry32;
 
-typedef struct IDT_Entry64 {
+struct IDT_Entry64 {
     uint16 lowOffset;
     uint16 selector;
     uint8 IST;
@@ -26,13 +26,13 @@ typedef struct IDT_Entry64 {
 } __attribute__((packed));
 typedef struct IDT_Pointer64 IDT_Entry64;
 
-typedef struct IDT_Pointer32 {
+struct IDT_Pointer32 {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
 typedef struct IDT_Pointer32 IDT_Pointer32;
 
-typedef struct IDT_Pointer64 {
+struct IDT_Pointer64 {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
