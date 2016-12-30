@@ -3,10 +3,10 @@
 #include "errors.h"
 #include "cpu.h"
 
-IDT_Entry32 IDTEntries32[IDT_ENTRIES];
-IDT_Entry64 IDTEntries64[IDT_ENTRIES];
-IDT_Pointer32 IDTPointer32;
-IDT_Pointer64 IDTPointer64;
+IDT_Entry32 g_IDTEntries32[IDT_ENTRIES];
+IDT_Entry64 g_IDTEntries64[IDT_ENTRIES];
+IDT_Pointer32 g_IDTPointer32;
+IDT_Pointer64 g_IDTPointer64;
 
 size_t IDT_init32()
 {
