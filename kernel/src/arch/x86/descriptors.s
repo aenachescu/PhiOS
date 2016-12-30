@@ -3,8 +3,6 @@
 .type GDT_Load, @function
 
 GDT_Load:
-    ret
-
     mov 4(%esp), %eax
     lgdt (%eax)
 
