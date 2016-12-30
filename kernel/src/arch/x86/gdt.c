@@ -74,7 +74,6 @@ size_t GDT_createEntries(GDT *a_gdtArray)
         uint32 base = a_gdtArray[i].base;
         uint32 limit = a_gdtArray[i].limit;
         uint16 type = a_gdtArray[i].type;
-        kprintf("GDT %d: %u %u %u\n", i, base, limit, type);
 
         descriptor  = limit        & 0x000F0000;
         descriptor |= (type << 8)  & 0x00F0FF00;
@@ -87,8 +86,6 @@ size_t GDT_createEntries(GDT *a_gdtArray)
         descriptor |= limit  & 0x0000FFFF;
 
         g_GDTEntries[i] = descriptor;
-        kprintf("Entry: %u == %u?\n", descriptor, g_GDTEntries[i]);
-
     }
 
     return ERROR_SUCCESS;
