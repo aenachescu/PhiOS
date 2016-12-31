@@ -1,8 +1,8 @@
 .section .text
-.global GDT_Load
-.type GDT_Load, @function
+.global GDT_Load32
+.type GDT_Load32, @function
 
-GDT_Load:
+GDT_Load32:
     mov 4(%esp), %eax
     lgdt (%eax)
 
@@ -15,4 +15,13 @@ GDT_Load:
 
     jmp $0x08, $flush
 flush:
+    ret
+
+.global IDT_Load32
+.type IDT_Load32, @function
+
+IDT_Load32:
+    mov 4(%esp), %eax
+    lidt (%eax)
+
     ret

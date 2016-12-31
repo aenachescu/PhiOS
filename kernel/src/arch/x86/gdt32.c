@@ -1,8 +1,6 @@
 #include "types.h"
-#include "arch/x86/gdt.h"
+#include "arch/x86/gdt32.h"
 #include "errors.h"
-
-#include "kstdio.h"
 
 GDT g_GDTStruct[GDT_ENTRIES];
 GDT_Entry g_GDTEntries[GDT_ENTRIES];
@@ -20,13 +18,8 @@ size_t GDT_init32()
     g_GDTPointer.limit = sizeof(GDT_Entry) * GDT_ENTRIES - 1;
     g_GDTPointer.base = (uint32) &g_GDTEntries;
 
-    GDT_Load((uint32) &g_GDTPointer);
+    GDT_Load32((uint32) &g_GDTPointer);
 
-    return ERROR_SUCCESS;
-}
-
-size_t GDT_init64()
-{
     return ERROR_SUCCESS;
 }
 
