@@ -1,7 +1,7 @@
 Roadmap
 =========
 
-The first time the operating system will be just for IA64.
+The first time the operating system will be just for x86 and x86_64.
 
 Version 0.0.0.1
 ------
