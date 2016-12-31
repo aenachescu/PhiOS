@@ -1,5 +1,5 @@
-#ifndef _PhiOS_gdt
-#define _PhiOS_gdt
+#ifndef _PhiOS_gdt32
+#define _PhiOS_gdt32
 
 #include "types.h"
 
@@ -61,11 +61,10 @@ typedef struct GDT {
 } GDT;
 
 size_t GDT_init32();
-size_t GDT_init64();
 size_t GDT_setStruct(GDT *a_gdt, uint32 a_base,
                     uint32 a_limit, uint16 a_type);
 size_t GDT_getStruct(uint32 a_num, GDT **a_gdt);
 size_t GDT_createEntries(GDT *a_gdtArray);
-extern void GDT_Load(uint32 a_table);
+extern void GDT_Load32(uint32 a_table);
 
 #endif
