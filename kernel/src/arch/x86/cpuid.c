@@ -1,5 +1,4 @@
 #include "arch/x86/cpuid.h"
-#include "kstdio.h"
 #include "kstring.h"
 
 /*
