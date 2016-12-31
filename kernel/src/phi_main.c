@@ -2,9 +2,12 @@
 #include "types.h"
 #include "memory/paa.h"
 #include "kstdio.h"
+#include "arch/x86/cpuid.h"
 #include "arch/x86/gdt32.h"
 
 #include "multiboot2.h"
+
+#define PRINT(x) kprintf("%s - %u\n", #x, CPUID_HasFeature(x))
 
 void kernel_main(unsigned long magic, size_t addr)
 {
@@ -48,6 +51,26 @@ void kernel_main(unsigned long magic, size_t addr)
 
     kprintf("%u\n%u\n%u\n%u\n", p1, p2, c1, c2);
     GDT_init32();
+
+    size_t error = CPUID_Init();
+    kprintf("error: %u\n", error);
+
+    PRINT(CPU_FEATURE_FPU);
+    PRINT(CPU_FEATURE_MMX);
+    PRINT(CPU_FEATURE_SSE);
+    PRINT(CPU_FEATURE_SSE2);
+    PRINT(CPU_FEATURE_SSE3);
+    PRINT(CPU_FEATURE_SSE4_1);
+    PRINT(CPU_FEATURE_SSE4_2);
+    PRINT(CPU_FEATURE_PAE);
+    PRINT(CPU_FEATURE_PSE);
+    PRINT(CPU_FEATURE_APIC);
+    PRINT(CPU_FEATURE_SEP);
+    PRINT(CPU_FEATURE_MTRR);
+    PRINT(CPU_FEATURE_PSE_36);
+    const char *vendor = NULL;
+    CPUID_GetVendorName(&vendor);
+    kprintf("Vendor: %s\n", vendor);
 
     return ;
 }
