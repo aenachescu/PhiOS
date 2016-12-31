@@ -8,6 +8,7 @@ list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/idt32.c")
 list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/handlers.c")
 list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot.s")
 list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/descriptors32.s")
+list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/interrupts32.s")
 
 # Update parent scope
 set(C_SOURCES "${C_SOURCES};${ARCH_C_SOURCES}" PARENT_SCOPE)
