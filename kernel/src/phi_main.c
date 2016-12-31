@@ -3,6 +3,7 @@
 #include "memory/paa.h"
 #include "kstdio.h"
 #include "arch/x86/cpuid.h"
+#include "arch/x86/gdt32.h"
 
 #include "multiboot2.h"
 
@@ -49,6 +50,7 @@ void kernel_main(unsigned long magic, size_t addr)
     PAA_Alloc(sizeof(char) * 15, (size_t*) &c2);
 
     kprintf("%u\n%u\n%u\n%u\n", p1, p2, c1, c2);
+    GDT_init32();
 
     size_t error = CPUID_Init();
     kprintf("error: %u\n", error);
