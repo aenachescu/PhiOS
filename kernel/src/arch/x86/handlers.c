@@ -1,4 +1,5 @@
-#include "arch/x86/idt.h"
+#include "arch/x86/idt32.h"
+#include "arch/x86/idt64.h"
 #include "arch/x86/handlers.h"
 #include "kstdio.h"
 #include "cpu.h"
