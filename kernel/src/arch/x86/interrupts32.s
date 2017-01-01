@@ -6,7 +6,7 @@
     isr_32_\n:
         cli
         pushl $0
-        pushl \n
+        pushl $\n
         jmp isr_common_stub_32
 .endm
 
@@ -15,7 +15,7 @@
     .type isr_32_\n, @function
     isr_32_\n:
         cli
-        pushl \n
+        pushl $\n
         jmp isr_common_stub_32
 .endm
 
@@ -25,7 +25,7 @@
   irq_32_\n:
     cli
     pushl $0
-    pushl \m
+    pushl $\m
     jmp irq_common_stub_32
 .endm
 
@@ -84,28 +84,28 @@ IRQ_32  15,    47
 .extern IDT_isrHandler32
 
 isr_common_stub_32:
-    push %eax
-    push %ebx
-    push %ecx
-    push %edx
-    push %esp
-    push %ebp
-    push %esi
-    push %edi
+    pushl %eax
+    pushl %ebx
+    pushl %ecx
+    pushl %edx
+    pushl %esp
+    pushl %ebp
+    pushl %esi
+    pushl %edi
 
-    push %ds
-    push %es
-    push %fs
-    push %gs
+    pushw %ds
+    pushw %es
+    pushw %fs
+    pushw %gs
 
     mov %cr2, %eax
-    push %eax
+    pushl %eax
 
     mov %cr3, %eax
-    push %eax
+    pushl %eax
 
     lea (%esp), %eax
-    push %eax
+    pushl %eax
 
     mov $0x10, %ax
     mov %ax, %ds
@@ -115,55 +115,55 @@ isr_common_stub_32:
 
     call IDT_isrHandler32
 
-    pop %ebx
+    popl %ebx
 
-    pop %ebx
+    popl %ebx
     mov %ebx, %cr3
 
-    pop %ebx
+    popl %ebx
     mov %ebx, %cr2
 
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
+    popw %gs
+    popw %fs
+    popw %es
+    popw %ds
 
-    pop %edi
-    pop %esi
-    pop %ebp
-    pop %esp
-    pop %ebx
-    pop %edx
-    pop %ecx
-    pop %eax
+    popl %edi
+    popl %esi
+    popl %ebp
+    popl %esp
+    popl %ebx
+    popl %edx
+    popl %ecx
+    popl %eax
 
     add $8, %esp
     sti
     iret
 
 irq_common_stub_32:
-    push %eax
-    push %ebx
-    push %ecx
-    push %edx
-    push %esp
-    push %ebp
-    push %esi
-    push %edi
+    pushl %eax
+    pushl %ebx
+    pushl %ecx
+    pushl %edx
+    pushl %esp
+    pushl %ebp
+    pushl %esi
+    pushl %edi
 
-    push %ds
-    push %es
-    push %fs
-    push %gs
+    pushw %ds
+    pushw %es
+    pushw %fs
+    pushw %gs
 
     mov %cr2, %eax
-    push %eax
+    pushl %eax
 
     mov %cr3, %eax
-    push %eax
+    pushl %eax
 
     lea (%esp), %eax
-    push %eax
+    pushl %eax
 
     mov $0x10, %ax
     mov %ax, %ds
@@ -171,29 +171,29 @@ irq_common_stub_32:
     mov %ax, %fs
     mov %ax, %gs
 
-    call %eax
+    call IDT_irqHandler32
 
-    pop %ebx
+    popl %ebx
 
-    pop %ebx
+    popl %ebx
     mov %ebx, %cr3
 
-    pop %ebx
+    popl %ebx
     mov %ebx, %cr2
 
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
+    popw %gs
+    popw %fs
+    popw %es
+    popw %ds
 
-    pop %edi
-    pop %esi
-    pop %ebp
-    pop %esp
-    pop %ebx
-    pop %edx
-    pop %ecx
-    pop %eax
+    popl %edi
+    popl %esi
+    popl %ebp
+    popl %esp
+    popl %ebx
+    popl %edx
+    popl %ecx
+    popl %eax
 
     add $8, %esp
     sti
