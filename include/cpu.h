@@ -3,16 +3,26 @@
 
 #include "types.h"
 
+#if defined PhiOS_ARCH_x86_32 || defined PhiOS_ARCH_x86_64
+
 // Set interrupts bit to 1
 #define turnOnInts() asm volatile("sti")
+
 // Set interrupts bit to 0
 #define turnOffInts() asm volatile("cli")
+
 // Pause CPU until next interrupt occurs
 #define pauseCpu() asm volatile("hlt")
+
 // Stop CPU execution and turn off interrupts
 #define stopCpu() turnOffInts(); while(true) { pauseCpu(); }
+
 // Stop CPU exectuion, but interrupts remain turned on
 #define freezeCpu() while(true) { pauseCpu(); }
+
+#endif // PhiOS_ARCH_x86_32 || PhiOS_ARCH_x86_64
+
+#ifdef PhiOS_ARCH_x86_32
 
 typedef struct IntCpuState32 {
     uint32 cr3;
@@ -37,6 +47,10 @@ typedef struct IntCpuState32 {
     uint32 uesp;
     uint16 ss;
 } IntCpuState32;
+
+#endif // PhiOS_ARCH_x86_32
+
+#ifdef PhiOS_ARCH_x86_64
 
 typedef struct IntCpuState64 {
     uint64 cr3;
@@ -70,4 +84,6 @@ typedef struct IntCpuState64 {
     uint16 ss;
 } IntCpuState64;
 
-#endif
+#endif // PhiOS_ARCH_x86_64
+
+#endif // PhiOS_cpu
