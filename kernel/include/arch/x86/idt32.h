@@ -24,13 +24,7 @@ typedef struct IDT_Pointer32 IDT_Pointer32;
 typedef void (*ISRfunc32)(IntCpuState32*);
 
 size_t IDT_init32();
-size_t IDT_SetEntry32(uint32 a_n, uint32 a_base,
-                    uint16 a_selector, uint8 a_flags);
-size_t IDT_RegisterHandler32(uint32 a_n, ISRfunc32 a_handler);
-extern void IDT_Load32(uint32 a_table);
-
-void IDT_isrHandler32(IntCpuState32 *a_state);
-void IDT_irqHandler32(IntCpuState32 *a_state);
+size_t IDT_registerHandler32(uint32 a_n, ISRfunc32 a_handler);
 
 extern void isr_32_0 ();
 extern void isr_32_1 ();
