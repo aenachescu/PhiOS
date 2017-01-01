@@ -3,7 +3,7 @@
 #include "kstdio.h"
 #include "cpu.h"
 
-void handlers_default(IntCpuState32 *a_state)
+void handlers32_default(IntCpuState32 *a_state)
 {
     kprintf("--- KERNEL PANIC ---\n");
     kprintf("This interrupt is not supported.\n");
