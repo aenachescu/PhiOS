@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "cpu.h"
 #include "kstring.h"
+#include "keyboard.h"
 
 static IDT_Entry32 g_IDTEntries32[IDT_ENTRIES];
 static IDT_Pointer32 g_IDTPointer32;
@@ -42,6 +43,7 @@ size_t IDT_init32()
     }
 
     // ADD HERE OTHER HANDLERS
+    IDT_registerHandler32(IRQ1, &keyboard_intHandler32);
 
     // Initialize PIC
     io_outb(0x20, 0x11);
