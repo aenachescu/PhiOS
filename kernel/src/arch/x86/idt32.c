@@ -38,7 +38,7 @@ size_t IDT_init32()
 
     for (uint32 i = 0; i < IDT_ENTRIES; i++)
     {
-        IDT_registerHandler32(i, &handlers_default);
+        IDT_registerHandler32(i, &handlers32_default);
     }
 
     // ADD HERE OTHER HANDLERS
