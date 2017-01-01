@@ -5,6 +5,7 @@
 #include "arch/x86/cpuid.h"
 #include "arch/x86/gdt32.h"
 #include "arch/x86/idt32.h"
+#include "arch/x86/pit.h"
 
 #include "multiboot2.h"
 
@@ -41,6 +42,9 @@ void kernel_main(unsigned long magic, size_t addr)
     PAA_Init();
     GDT_init32();
     IDT_init32();
+    PIT_init((uint16) -1);
+
+    turnOnInts();
 
     return ;
 }
