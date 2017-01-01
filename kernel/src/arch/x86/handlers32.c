@@ -5,7 +5,7 @@
 
 void handlers32_default(IntCpuState32 *a_state)
 {
-    kprintf("--- KERNEL PANIC ---\n");
+    /*kprintf("--- KERNEL PANIC ---\n");
     kprintf("This interrupt is not supported.\n");
     kprintf("cr3 = %u cr2 = %u\n", a_state->cr3, a_state->cr2);
     kprintf("gs = %u ds = %u fs = %u es = %u ds = %u\n",
@@ -18,6 +18,6 @@ void handlers32_default(IntCpuState32 *a_state)
     kprintf("intNo = %u errCode = %d\n", a_state->intNo, a_state->errCode);
     kprintf("eip = %u eflags = %u uesp = %u ss = %u\n",
             a_state->eip, a_state->eflags, a_state->uesp, a_state->ss);
-    kprintf("--------------------\n");
-    stopCpu();
+    kprintf("--------------------\n");*/
+    //stopCpu();
 }
