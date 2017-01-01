@@ -48,6 +48,8 @@ typedef struct IntCpuState32 {
     uint16 ss;
 } IntCpuState32;
 
+typedef IntCpuState32 CpuState;
+
 #endif // PhiOS_ARCH_x86_32
 
 #ifdef PhiOS_ARCH_x86_64
@@ -83,6 +85,8 @@ typedef struct IntCpuState64 {
     uint64 ursp;
     uint16 ss;
 } IntCpuState64;
+
+typedef IntCpuState64 CpuState;
 
 #endif // PhiOS_ARCH_x86_64
 
