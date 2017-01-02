@@ -27,7 +27,7 @@ KHOME, KUP, KPGUP, '-', KLEFT, '5', KRIGHT, '+', KEND, KDOWN, KPGDN, KINS, KDEL,
 char *g_layout;
 char *g_shiftLayout;
 uint8 g_keyboardBuffer[KEYBOARD_BUFFER_SIZE];
-uint32 g_keyboardBufferPos;
+volatile uint32 g_keyboardBufferPos;
 bool g_capsOn;
 
 void helper_keyboardReadScanCode()
@@ -117,26 +117,20 @@ size_t keyboard_setLayout(char *a_layout, char *a_shiftLayout)
     return ERROR_SUCCESS;
 }
 
-size_t keyboard_readKey(char *a_c)
+char keyboard_readKey()
 {
-    if (a_c == NULL)
-    {
-        return ERROR_SUCCESS;
-    }
-
     volatile uint8 cpos = g_keyboardBufferPos;
 
     while (true)
     {
         if (cpos != g_keyboardBufferPos &&
-            g_keyboardBuffer[g_keyboardBufferPos - 2])
+            g_keyboardBuffer[g_keyboardBufferPos - 1])
         {
             break;
         }
     }
 
-    *a_c = (char) g_keyboardBuffer[g_keyboardBufferPos - 2];
-    return ERROR_SUCCESS;
+    return (char) g_keyboardBuffer[g_keyboardBufferPos - 1];
 }
 
 void keyboard_intHandler32(__attribute__((unused)) IntCpuState32 *a_state)
