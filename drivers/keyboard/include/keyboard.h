@@ -69,7 +69,7 @@
 
 size_t keyboard_init();
 size_t keyboard_setLayout(char *a_layout, char *a_shiftLayout);
-size_t keyboard_readKey(char *a_c);
+char keyboard_readKey();
 void keyboard_intHandler32(__attribute__((unused)) IntCpuState32 *a_state);
 //void keyboard_intHandler64(__attribute__((unused)) IntCpuState64 *a_state);
 
