@@ -42,9 +42,6 @@ size_t IDT_init32()
         IDT_registerHandler32(i, &handlers32_default);
     }
 
-    // ADD HERE OTHER HANDLERS
-    IDT_registerHandler32(IRQ1, &keyboard_intHandler32);
-
     // Initialize PIC
     io_outb(0x20, 0x11);
     io_outb(0xA0, 0x11);
