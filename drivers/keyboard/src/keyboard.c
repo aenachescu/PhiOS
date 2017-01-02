@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "kstring.h"
 #include "arch/x86/asm_io.h"
+#include "arch/x86/idt32.h"
 #include "kstdio.h"
 
 char g_USasciiNonShift[] = {
@@ -100,6 +101,7 @@ size_t keyboard_init()
     kmemset(g_keyboardBuffer, 0, KEYBOARD_BUFFER_SIZE);
     g_keyboardBufferPos = 0;
     g_capsOn = false;
+    IDT_registerHandler32(IRQ1, &keyboard_intHandler32);
 
     return ERROR_SUCCESS;
 }
