@@ -45,7 +45,8 @@ bool g_shift;
 
 void helper_keyboardReadScanCode()
 {
-    if (g_keyboardBufferPos == KEYBOARD_BUFFER_SIZE) {
+    if (g_keyboardBufferPos == KEYBOARD_BUFFER_SIZE)
+    {
         kmemset(g_keyboardBuffer, 0, KEYBOARD_BUFFER_SIZE);
         g_keyboardBufferPos = 0;
     }
@@ -147,7 +148,7 @@ char keyboard_readKey()
     return (char) g_keyboardBuffer[g_keyboardBufferPos - 1];
 }
 
-void keyboard_intHandler32(__attribute__((unused)) IntCpuState32 *a_state)
+void keyboard_intHandler32(__attribute__((unused)) CpuState *a_state)
 {
     helper_keyboardReadScanCode();
 }
