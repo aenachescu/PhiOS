@@ -17,7 +17,7 @@ struct PageTable4KB_Entry
     uint32 cacheDisabled  :  1;
     uint32 accessed       :  1;
     uint32 dirty          :  1;
-    uint32 pat            :  1; // reserved
+    uint32 pat            :  1;
     uint32 global         :  1;
     uint32 ignored        :  3;
     uint32 address        : 20;
@@ -39,7 +39,7 @@ struct PageDirectory4KB_Entry
     uint32 cacheDisabled :  1;
     uint32 accessed      :  1;
     uint32 ignored1      :  1;
-    uint32 PS            :  1; // If CR4.PSE = 1, must be 0 otherwise, this entry
+    uint32 pageSize      :  1; // If CR4.PSE = 1, must be 0 otherwise, this entry
                                // maps a 4-MByte page; otherwise, ignored
     uint32 ignored2      :  4;
     uint32 address       : 20;
