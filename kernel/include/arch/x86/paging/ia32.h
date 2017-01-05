@@ -17,7 +17,7 @@ struct PageTable4KB_Entry
     uint32 cacheDisabled  :  1;
     uint32 accessed       :  1;
     uint32 dirty          :  1;
-    uint32 pat            :  1; // reserved
+    uint32 pat            :  1;
     uint32 global         :  1;
     uint32 ignored        :  3;
     uint32 address        : 20;
