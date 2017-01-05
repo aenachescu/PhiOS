@@ -7,8 +7,12 @@
 #define PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER       1024
 #define PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER   1024
 
+/*
+ * structs for page directory with page size 4KB
+ */
+
 // maps 4kb of virtual memory
-struct PageTable4KB_Entry
+struct IA32_PageTable4KB_Entry
 {
     uint32 present        :  1;
     uint32 write          :  1;
@@ -21,16 +25,16 @@ struct PageTable4KB_Entry
     uint32 global         :  1;
     uint32 ignored        :  3;
     uint32 address        : 20;
-};
+} __attribute__((packed));
 
 // maps 4mb of virtual memory
-struct PageTable4KB
+struct IA32_PageTable4KB
 {
-    struct PageTable4KB_Entry entries[PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER];
-};
+    struct IA32_PageTable4KB_Entry entries[PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER];
+} __attribute__((packed));
 
 // maps 4mb of virtual memory
-struct PageDirectory4KB_Entry
+struct IA32_PageDirectory4KB_Entry
 {
     uint32 present       :  1;
     uint32 write         :  1;
@@ -43,9 +47,21 @@ struct PageDirectory4KB_Entry
                                // maps a 4-MByte page; otherwise, ignored
     uint32 ignored2      :  4;
     uint32 address       : 20;
-};
+} __attribute__((packed));
 
-struct PageDirectory4MB_Entry
+// maps 4gb of virtual memory
+struct IA32_PageDirectory4KB
+{
+    struct IA32_PageDirectory4KB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct IA32_PageTable4KB *addresses[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+} __attribute__((packed));
+
+/*
+ * struct for page directory with page size 4MB
+ */
+
+// maps 4MB of virtual memory
+struct IA32_PageDirectory4MB_Entry
 {
     uint32 present       :  1;
     uint32 write         :  1;
@@ -60,17 +76,11 @@ struct PageDirectory4MB_Entry
     uint32 pat           :  1;
     uint32 unkown        :  9; // Unkown bits, must read Intel Docs
     uint32 highAddrBits  : 10; // Bits 31:22 of physical address
-};
+} __attribute__((packed));
 
-// maps 4gb of virtual memory
-struct PageDirectory_4KB
+struct IA32_PageDirectory4MB
 {
-    struct PageDirectory4KB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
-};
-
-struct PageDirectory_4MB
-{
-    struct PageDirectory4MB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
-};
+    struct IA32_PageDirectory4MB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+} __attribute__((packed));
 
 #endif
