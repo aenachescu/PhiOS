@@ -4,9 +4,9 @@
 #include "types.h"
 #include "errors.h"
 
-#define PAGING_PAE_PDPT_ENTRIES_NUMBER 4
-#define PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER 512
-#define PAGING_PAE_PAGE_TABLE_ENTRIES_NUMBER 512
+#define PAGING_PAE_PDPT_ENTRIES_NUMBER              4
+#define PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER    512
+#define PAGING_PAE_PAGE_TABLE_ENTRIES_NUMBER        512
 
 /*
  * structs for page directory with page size 2MB
@@ -87,7 +87,7 @@ struct PAE_PageDirectory4KB_Entry
 struct PAE_PageDirectory4KB
 {
     struct PAE_PageDirectory4KB_Entry entries[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
-    struct PAE_PageTable4KB addresses[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct PAE_PageTable4KB *addresses[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 /*
