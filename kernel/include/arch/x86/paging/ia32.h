@@ -60,7 +60,7 @@ struct PageDirectory4MB_Entry
     uint32 pat           :  1;
     uint32 unkown        :  9; // Unkown bits, must read Intel Docs
     uint32 highAddrBits  : 10; // Bits 31:22 of physical address
-}
+};
 
 // maps 4gb of virtual memory
 struct PageDirectory_4KB
