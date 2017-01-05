@@ -48,8 +48,7 @@ struct PageDirectory4KB_Entry
 // maps 4gb of virtual memory
 struct PageDirectory_4KB
 {
-    struct PageDirectory4KB_Entry *entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
-    void *physicalAddress; // physical address of this struct
+    struct PageDirectory4KB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
 };
 
 struct PageDirectory_4MB
