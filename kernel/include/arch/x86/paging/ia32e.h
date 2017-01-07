@@ -4,6 +4,11 @@
 #include "types.h"
 #include "errors.h"
 
+#define PAGING_IA32E_PTE_NUMBER     512
+#define PAGING_IA32E_PDE_NUMBER     512
+#define PAGING_IA32E_PDPTE_NUMBER   512
+#define PAGING_IA32E_PML4E_NUMBER   512
+
 /*
  * struct PML4 entry. It's independent of page size.
  */
