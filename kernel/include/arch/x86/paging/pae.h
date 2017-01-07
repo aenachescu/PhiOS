@@ -13,7 +13,7 @@
  */
 
 // maps 2MB
-struct PAE_PageDirectory2MB_Entry
+struct PAE_PageDirectory_2MB_Entry
 {
     uint32 present        :  1;
     uint32 write          :  1;
@@ -33,9 +33,9 @@ struct PAE_PageDirectory2MB_Entry
 } __attribute__((packed));
 
 // maps 1GB
-struct PAE_PageDirectory2MB
+struct PAE_PageDirectory_2MB
 {
-    struct PAE_PageDirectory2MB_Entry entries[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct PAE_PageDirectory_2MB_Entry entries[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 /*
@@ -43,7 +43,7 @@ struct PAE_PageDirectory2MB
  */
 
 // maps 4kb
-struct PAE_PageTable4KB_Entry
+struct PAE_PageTable_4KB_Entry
 {
     uint32 present        :  1;
     uint32 write          :  1;
@@ -61,13 +61,13 @@ struct PAE_PageTable4KB_Entry
 } __attribute__((packed));
 
 // maps 2mb
-struct PAE_PageTable4KB
+struct PAE_PageTable_4KB
 {
-    struct PAE_PageTable4KB_Entry entries[PAGING_PAE_PAGE_TABLE_ENTRIES_NUMBER];
+    struct PAE_PageTable_4KB_Entry entries[PAGING_PAE_PAGE_TABLE_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 // maps 2mb
-struct PAE_PageDirectory4KB_Entry
+struct PAE_PageDirectory_4KB_Entry
 {
     uint32 present        :  1;
     uint32 write          :  1;
@@ -84,14 +84,14 @@ struct PAE_PageDirectory4KB_Entry
 } __attribute__((packed));
 
 // maps 1GB with pages of 4KB
-struct PAE_PageDirectory4KB
+struct PAE_PageDirectory_4KB
 {
-    struct PAE_PageDirectory4KB_Entry entries[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
-    struct PAE_PageTable4KB *addresses[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct PAE_PageDirectory_4KB_Entry entries[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct PAE_PageTable_4KB *addresses[PAGING_PAE_PAGE_DIRECTORY_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 /*
- * structs for PDPT.
+ * structs for PDPT. PDPT entry is independent of page size.
  */
 
 // maps 1GB. It's same structure for both page sizes (4KB and 2MB).
@@ -108,17 +108,17 @@ struct PAE_PageDirectoryPointerTable_Entry
 } __attribute__((packed));
 
 // maps 4GB with pages of 4KB
-struct PAE_PageDirectoryPointerTable4KB
+struct PAE_PageDirectoryPointerTable_4KB
 {
     struct PAE_PageDirectoryPointerTable_Entry entries[PAGING_PAE_PDPT_ENTRIES_NUMBER];
-    struct PAE_PageDirectory4KB *addresses[PAGING_PAE_PDPT_ENTRIES_NUMBER];
+    struct PAE_PageDirectory_4KB *addresses[PAGING_PAE_PDPT_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 // maps 4GB with pages of 2MB
-struct PAE_PageDirectoryPointerTable2MB
+struct PAE_PageDirectoryPointerTable_2MB
 {
     struct PAE_PageDirectoryPointerTable_Entry entries[PAGING_PAE_PDPT_ENTRIES_NUMBER];
-    struct PAE_PageDirectory2MB *addresses[PAGING_PAE_PDPT_ENTRIES_NUMBER];
+    struct PAE_PageDirectory_2MB *addresses[PAGING_PAE_PDPT_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 #endif
