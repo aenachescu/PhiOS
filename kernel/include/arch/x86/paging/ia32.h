@@ -12,7 +12,7 @@
  */
 
 // maps 4kb of virtual memory
-struct IA32_PageTable4KB_Entry
+struct IA32_PageTable_4KB_Entry
 {
     uint32 present        :  1;
     uint32 write          :  1;
@@ -28,13 +28,13 @@ struct IA32_PageTable4KB_Entry
 } __attribute__((packed));
 
 // maps 4mb of virtual memory
-struct IA32_PageTable4KB
+struct IA32_PageTable_4KB
 {
-    struct IA32_PageTable4KB_Entry entries[PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER];
+    struct IA32_PageTable_4KB_Entry entries[PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 // maps 4mb of virtual memory
-struct IA32_PageDirectory4KB_Entry
+struct IA32_PageDirectory_4KB_Entry
 {
     uint32 present       :  1;
     uint32 write         :  1;
@@ -50,10 +50,10 @@ struct IA32_PageDirectory4KB_Entry
 } __attribute__((packed));
 
 // maps 4gb of virtual memory
-struct IA32_PageDirectory4KB
+struct IA32_PageDirectory_4KB
 {
-    struct IA32_PageDirectory4KB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
-    struct IA32_PageTable4KB *addresses[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct IA32_PageDirectory_4KB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct IA32_PageTable_4KB *addresses[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 /*
@@ -61,7 +61,7 @@ struct IA32_PageDirectory4KB
  */
 
 // maps 4MB of virtual memory
-struct IA32_PageDirectory4MB_Entry
+struct IA32_PageDirectory_4MB_Entry
 {
     uint32 present       :  1;
     uint32 write         :  1;
@@ -78,9 +78,9 @@ struct IA32_PageDirectory4MB_Entry
     uint32 highAddrBits  : 10; // Bits 31:22 of physical address
 } __attribute__((packed));
 
-struct IA32_PageDirectory4MB
+struct IA32_PageDirectory_4MB
 {
-    struct IA32_PageDirectory4MB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct IA32_PageDirectory_4MB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
 } __attribute__((packed));
 
 #endif
