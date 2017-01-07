@@ -4,8 +4,8 @@
 #include "types.h"
 #include "errors.h"
 
-#define PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER       1024
-#define PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER   1024
+#define PAGING_IA32_PTE_NUMBER   1024
+#define PAGING_IA32_PDE_NUMBER   1024
 
 /*
  * structs for page directory with page size 4KB
@@ -30,7 +30,7 @@ struct IA32_PageTable_4KB_Entry
 // maps 4mb of virtual memory
 struct IA32_PageTable_4KB
 {
-    struct IA32_PageTable_4KB_Entry entries[PAGING_IA32_PAGE_TABLE_ENTRIES_NUMBER];
+    struct IA32_PageTable_4KB_Entry entries[PAGING_IA32_PTE_NUMBER];
 } __attribute__((packed));
 
 // maps 4mb of virtual memory
@@ -52,8 +52,8 @@ struct IA32_PageDirectory_4KB_Entry
 // maps 4gb of virtual memory
 struct IA32_PageDirectory_4KB
 {
-    struct IA32_PageDirectory_4KB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
-    struct IA32_PageTable_4KB *addresses[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct IA32_PageDirectory_4KB_Entry entries[PAGING_IA32_PDE_NUMBER];
+    struct IA32_PageTable_4KB *addresses[PAGING_IA32_PDE_NUMBER];
 } __attribute__((packed));
 
 /*
@@ -80,7 +80,7 @@ struct IA32_PageDirectory_4MB_Entry
 
 struct IA32_PageDirectory_4MB
 {
-    struct IA32_PageDirectory_4MB_Entry entries[PAGING_IA32_PAGE_DIRECTORY_ENTRIES_NUMBER];
+    struct IA32_PageDirectory_4MB_Entry entries[PAGING_IA32_PDE_NUMBER];
 } __attribute__((packed));
 
 #endif
