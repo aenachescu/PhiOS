@@ -14,6 +14,9 @@
 #define PAGING_TYPE_IA32E_2MB   6
 #define PAGING_TYPE_IA32E_1GB   7
 
+#define PAGING_FLAG_USER        0x10000000
+#define PAGING_FLAG_KERNEL      0x20000000
+
 struct Paging
 {
     uint8 pagingType;
