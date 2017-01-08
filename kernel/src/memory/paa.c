@@ -10,7 +10,7 @@ static size_t g_placementAddress = 0;
         g_placementAddress += WORDSIZE_BYTES;               \
     }
 
-size_t PAA_Init(void)
+size_t PAA_init(void)
 {
     if (g_placementAddress != 0)
     {
@@ -24,7 +24,7 @@ size_t PAA_Init(void)
     return ERROR_SUCCESS;
 }
 
-size_t PAA_Alloc(size_t a_size, size_t *a_address)
+size_t PAA_alloc(size_t a_size, size_t *a_address)
 {
     *a_address = 0;
 
@@ -50,4 +50,3 @@ size_t PAA_Alloc(size_t a_size, size_t *a_address)
 
     return ERROR_SUCCESS;
 }
-
