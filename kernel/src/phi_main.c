@@ -39,7 +39,7 @@ void kernel_main(unsigned long magic, size_t addr)
         return;
     }
 
-    PAA_Init();
+    PAA_init();
     GDT_init32();
     IDT_init32();
     PIT_init((uint16) -1);
