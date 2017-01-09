@@ -65,18 +65,6 @@ size_t IDT_init32()
     IDT_registerHandler32(20, &handlers32_virtualization);
     IDT_registerHandler32(30, &handlers32_security);
 
-    // Initialize PIC
-    io_outb(0x20, 0x11);
-    io_outb(0xA0, 0x11);
-    io_outb(0x21, 0x20);
-    io_outb(0xA1, 0x28);
-    io_outb(0x21, 0x04);
-    io_outb(0xA1, 0x02);
-    io_outb(0x21, 0x01);
-    io_outb(0xA1, 0x01);
-    io_outb(0x21, 0x0);
-    io_outb(0xA1, 0x0);
-
     helper_setEntry32(IRQ0, (uint32) &irq_32_0, 0x08, 0x8E);
     helper_setEntry32(IRQ1, (uint32) &irq_32_1, 0x08, 0x8E);
     helper_setEntry32(IRQ2, (uint32) &irq_32_2, 0x08, 0x8E);
