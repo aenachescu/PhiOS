@@ -2,6 +2,7 @@
 #include "arch/x86/idt32.h"
 #include "arch/x86/asm_io.h"
 #include "arch/x86/handlers32.h"
+#include "arch/x86/pic.h"
 #include "errors.h"
 #include "cpu.h"
 #include "kstring.h"
