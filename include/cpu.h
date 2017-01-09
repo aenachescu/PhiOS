@@ -88,6 +88,8 @@ typedef struct IntCpuState64 {
 
 typedef IntCpuState64 CpuState;
 
+void cpu_printState(CpuState *a_state);
+
 #endif // PhiOS_ARCH_x86_64
 
 #endif // PhiOS_cpu
