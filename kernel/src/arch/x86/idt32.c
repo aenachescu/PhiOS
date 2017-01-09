@@ -43,6 +43,40 @@ size_t IDT_init32()
         IDT_registerHandler32(i, &handlers32_default);
     }
 
+    IDT_registerHandler32(0, &handlers32_zeroDivision);
+    IDT_registerHandler32(1, &handlers32_debug);
+    IDT_registerHandler32(2, &handlers32_NMI);
+    IDT_registerHandler32(3, &handlers32_breakpoint);
+    IDT_registerHandler32(4, &handlers32_overflow);
+    IDT_registerHandler32(5, &handlers32_boundRangeExceed);
+    IDT_registerHandler32(6, &handlers32_invaildOpcode);
+    IDT_registerHandler32(7, &handlers32_deviceNotAvailable);
+    IDT_registerHandler32(8, &handlers32_doubleFault);
+    IDT_registerHandler32(9, &handlers32_coprocessorSegmentOverrun);
+    IDT_registerHandler32(10, &handlers32_invalidTSS);
+    IDT_registerHandler32(11, &handlers32_segmentNotPresent);
+    IDT_registerHandler32(12, &handlers32_stackSegmentFault);
+    IDT_registerHandler32(13, &handlers32_generalProtectionFault);
+    IDT_registerHandler32(14, &handlers32_pageFault);
+    IDT_registerHandler32(16, &handlers32_FPUx87Exception);
+    IDT_registerHandler32(17, &handlers32_alignmentCheck);
+    IDT_registerHandler32(18, &handlers32_machineCheck);
+    IDT_registerHandler32(19, &handlers32_SIMDFloatingPoint);
+    IDT_registerHandler32(20, &handlers32_virtualization);
+    IDT_registerHandler32(30, &handlers32_security);
+
+    // Initialize PIC
+    io_outb(0x20, 0x11);
+    io_outb(0xA0, 0x11);
+    io_outb(0x21, 0x20);
+    io_outb(0xA1, 0x28);
+    io_outb(0x21, 0x04);
+    io_outb(0xA1, 0x02);
+    io_outb(0x21, 0x01);
+    io_outb(0xA1, 0x01);
+    io_outb(0x21, 0x0);
+    io_outb(0xA1, 0x0);
+
     helper_setEntry32(IRQ0, (uint32) &irq_32_0, 0x08, 0x8E);
     helper_setEntry32(IRQ1, (uint32) &irq_32_1, 0x08, 0x8E);
     helper_setEntry32(IRQ2, (uint32) &irq_32_2, 0x08, 0x8E);
