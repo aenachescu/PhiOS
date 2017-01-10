@@ -112,7 +112,7 @@ size_t keyboard_init()
     g_capsOn = false;
     g_shift = false;
     g_special = false;
-    IDT_registerHandler32(IRQ1, &keyboard_intHandler32);
+    IDT32_registerHandler(IRQ1, &keyboard_intHandler32);
 
     return ERROR_SUCCESS;
 }
