@@ -9,6 +9,9 @@
 
 #include "multiboot2.h"
 
+extern size_t linker_kernelStart;
+extern size_t linker_kernelEnd;
+
 #define PRINT(x) kprintf("%s - %u\n", #x, CPUID_HasFeature(x))
 
 void kernel_main(unsigned long magic, size_t addr)
@@ -39,7 +42,7 @@ void kernel_main(unsigned long magic, size_t addr)
         return;
     }
 
-    PAA_init();
+    PAA_init((size_t)&linker_kernelEnd);
     GDT_init32();
     IDT_init32();
     PIT_init((uint16) -1);
