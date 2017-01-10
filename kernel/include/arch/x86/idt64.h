@@ -4,7 +4,7 @@
 #include "types.h"
 #include "cpu.h"
 
-struct IDT_Entry64 {
+struct IDT64_Entry {
     uint16 lowOffset;
     uint16 selector;
     uint8 IST;
@@ -13,22 +13,22 @@ struct IDT_Entry64 {
     uint32 highOffset;
     uint32 alwaysZero;
 } __attribute__((packed));
-typedef struct IDT_Pointer64 IDT_Entry64;
+typedef struct IDT64_Pointer IDT64_Entry;
 
-struct IDT_Pointer64 {
+struct IDT64_Pointer {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct IDT_Pointer64 IDT_Pointer64;
+typedef struct IDT64_Pointer IDT64_Pointer;
 
 typedef void (*ISRfunc64)(IntCpuState64*);
 
-size_t IDT_init64();
-size_t IDT_SetEntry64(/* TODO: find sizes for args */);
-size_t IDT_RegisterHandler64(uint32 a_n, ISRfunc64 a_handler);
-extern void IDT_Load64(uint64 a_table);
+size_t IDT64_init();
+size_t IDT64_SetEntry(/* TODO: find sizes for args */);
+size_t IDT64_RegisterHandler(uint32 a_n, ISRfunc64 a_handler);
+extern void IDT64_Load(uint64 a_table);
 
-void IDT_isrHandler64(IntCpuState64 *a_state);
-void IDT_irqHandler64(IntCpuState64 *a_state);
+void IDT64_isrHandler(IntCpuState64 *a_state);
+void IDT64_irqHandler(IntCpuState64 *a_state);
 
 #endif
