@@ -14,5 +14,6 @@
 #define ERROR_ALREADY_INITIALIZED   10
 #define ERROR_NO_FREE_MEMORY        11
 #define ERROR_INVALID_STATE         12
+#define ERROR_UNALIGNED_ADDRESS     13
 
 #endif
