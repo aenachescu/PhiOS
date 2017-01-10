@@ -25,3 +25,12 @@ IDT32_Load:
     lidt (%eax)
 
     ret
+
+.global TSS32_Load
+.type TSS32_Load, @function
+
+TSS32_Load:
+    movw $0x2B, %ax
+    ltr %ax
+
+    ret
