@@ -4,12 +4,12 @@
 
 #ifdef PhiOS_ARCH_x86_32
 #include "arch/x86/idt32.h"
-#define IDT_registerHandler IDT_registerHandler32
+#define IDT_registerHandler IDT32_registerHandler
 #endif
 
 #ifdef PhiOS_ARCH_x86_64
 #include "arch/x86/idt64.h"
-#define IDT_registerHandler IDT_registerHandler64
+#define IDT_registerHandler IDT64_registerHandler
 #endif
 
 /*
