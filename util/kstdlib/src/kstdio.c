@@ -77,16 +77,18 @@ size_t kprintf(const char *a_format, ...)
 
                 case 'p':
                     address = *((uint32*)args);
+                    args++;
 
                     bufferSize = 32;
                     kutoa(address, buffer, &bufferSize, 16);
 
                     VGA_WriteChar('0');
-                    VGA_WriteChar('X');
+                    VGA_WriteChar('x');
                     VGA_WriteString(buffer);
                     break;
                 case 'x':
                     address = *((size_t*)args);
+                    args++;
 
                     bufferSize = 32;
                     kutoa(address, buffer, &bufferSize, 16);
