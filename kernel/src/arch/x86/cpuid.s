@@ -24,26 +24,35 @@ CPUID_IsSuported:
     ret
 
 CPUID_Call:
-    movl 4(%esp), %eax
-    movl 8(%esp), %ebx
-    movl 12(%esp), %ecx
-    movl 16(%esp), %edx
+    pushl %ebp
+    movl %esp, %ebp
+    sub $8, %esp
+    movl %ebx, -4(%ebp)
+
+    movl 8(%ebp), %eax
+    movl 12(%ebp), %ebx
+    movl 16(%ebp), %ecx
+    movl 20(%ebp), %edx
     cpuid
 
-    pushl %edx
+    movl %edx, -8(%ebp)
 
-    movl 24(%esp), %edx
+    movl 24(%ebp), %edx
     movl %eax, (%edx)
 
-    popl %edx
+    movl -8(%ebp), %edx
 
-    movl 24(%esp), %eax
+    movl 28(%ebp), %eax
     movl %ebx, (%eax)
 
-    movl 28(%esp), %eax
+    movl 32(%ebp), %eax
     movl %ecx, (%eax)
 
-    movl 32(%esp), %eax
+    movl 36(%ebp), %eax
     movl %edx, (%eax)
+
+    movl -4(%ebp), %ebx
+    movl %ebp, %esp
+    popl %ebp
 
     ret
