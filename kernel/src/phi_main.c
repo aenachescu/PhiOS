@@ -53,6 +53,8 @@ void kernel_main(unsigned long magic, size_t addr)
         return;
     }
 
+    CPUID_Init();
+
     // Inits Placement Address Allocator
     PAA_Init();
 
