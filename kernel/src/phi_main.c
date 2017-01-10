@@ -60,7 +60,7 @@ void kernel_main(unsigned long magic, size_t addr)
     GDT32_init();
 
     // Sets kernel stack in TSS struct
-    TSS32_setKernelStack((uint32) &g_kernelStack);
+    TSS32_setKernelStack((uint32) &g_kernelStack[2047]);
 
     // Inits IDT for 32-bit
     IDT32_init();
