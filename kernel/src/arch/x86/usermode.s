@@ -11,6 +11,7 @@ jumpToUserMode:
 
     pushl $0x23
     movl $g_userStack, %eax
+    addl $0x2000, %eax
     pushl %eax
 
     pushfl
