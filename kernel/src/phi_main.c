@@ -5,12 +5,25 @@
 #include "arch/x86/cpuid.h"
 #include "arch/x86/gdt32.h"
 #include "arch/x86/idt32.h"
+#include "arch/x86/tss32.h"
 #include "arch/x86/pit.h"
 #include "arch/x86/pic.h"
 
 #include "multiboot2.h"
 
 #define PRINT(x) kprintf("%s - %u\n", #x, CPUID_HasFeature(x))
+
+extern void jumpToUserMode();
+// THIS IS TEMPORARY
+// TODO: remove this when tasks are available
+size_t g_userStack[2048];   // temporary user mode
+size_t g_kernelStack[2048]; // temporary kernel mode
+
+void user_main()
+{
+    kprintf("Hello, world!\n");
+    while (1) {}
+}
 
 void kernel_main(unsigned long magic, size_t addr)
 {
@@ -40,14 +53,27 @@ void kernel_main(unsigned long magic, size_t addr)
         return;
     }
 
+    // Inits Placement Address Allocator
     PAA_Init();
+
+    // Inits GDT for 32-bit
     GDT32_init();
+
+    // Sets kernel stack in TSS struct
+    TSS32_setKernelStack((uint32) &g_kernelStack[2047]);
+
+    // Inits IDT for 32-bit
     IDT32_init();
+
+    // Inits PIC
     PIC_init();
     PIC_maskUnusedIRQs();
+
+    // Inits timer
     PIT_init((uint16) -1);
 
-    turnOnInts();
+    // Go to user mode
+    jumpToUserMode();
 
     return ;
 }
