@@ -41,8 +41,8 @@ void kernel_main(unsigned long magic, size_t addr)
     }
 
     PAA_Init();
-    GDT_init32();
-    IDT_init32();
+    GDT32_init();
+    IDT32_init();
     PIC_init();
     PIC_maskUnusedIRQs();
     PIT_init((uint16) -1);

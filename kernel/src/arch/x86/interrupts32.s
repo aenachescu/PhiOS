@@ -113,7 +113,7 @@ isr_common_stub_32:
     mov %ax, %fs
     mov %ax, %gs
 
-    call IDT_isrHandler32
+    call IDT32_isrHandler
 
     popl %ebx
 
@@ -171,7 +171,7 @@ irq_common_stub_32:
     mov %ax, %fs
     mov %ax, %gs
 
-    call IDT_irqHandler32
+    call IDT32_irqHandler
 
     popl %ebx
 
