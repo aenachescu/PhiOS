@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "errors.h"
+#include "paging.h"
 
 #define PAGING_IA32_PTE_NUMBER   1024
 #define PAGING_IA32_PDE_NUMBER   1024
@@ -56,7 +57,9 @@ struct IA32_PageDirectory_4KB
     struct IA32_PageTable_4KB *addresses[PAGING_IA32_PDE_NUMBER];
 } __attribute__((packed));
 
-size_t IA32_4KB_initKernelStruct(struct Paging *a_paging);
+size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
+                                 size_t a_kernelStartAddr,
+                                 size_t a_kernelEndAddr);
 
 size_t IA32_4KB_init(struct Paging *a_kernelPaging,
                      struct Paging *a_newPaging);
@@ -79,7 +82,7 @@ size_t IA32_4KB_allocAtAddress(struct Paging *a_paging,
                                bool           a_writeThrough,
                                bool           a_cacheDisabled);
 
-size_t IA32_4KB_free(struct Paging *a_paging
+size_t IA32_4KB_free(struct Paging *a_paging,
                      size_t         a_address,
                      size_t         a_pagesNumber,
                      uint32         a_flags);
