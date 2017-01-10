@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define GDT_ENTRIES 5
+#define GDT_ENTRIES 6
 
 #define SEG_DESCTYPE(x)  ((x) << 0x04) // Descriptor type (0 for system, 1 for code/data)
 #define SEG_PRES(x)      ((x) << 0x07) // Present
@@ -46,6 +46,8 @@
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
                      SEG_PRIV(3)     | SEG_DATA_RDWR
 
+#define TSS_FLAGS    0xE9
+
 struct GDT_Pointer {
     uint16 limit;
     uint32 base;
@@ -65,6 +67,6 @@ size_t GDT_setStruct(GDT *a_gdt, uint32 a_base,
                     uint32 a_limit, uint16 a_type);
 size_t GDT_getStruct(uint32 a_num, GDT **a_gdt);
 size_t GDT_createEntries(GDT *a_gdtArray);
-extern void GDT_Load32(uint32 a_table);
+extern void GDT32_Load(uint32 a_table);
 
 #endif
