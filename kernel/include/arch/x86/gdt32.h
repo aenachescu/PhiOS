@@ -60,7 +60,7 @@ typedef struct GDT {
     uint16 type;
 } GDT;
 
-size_t GDT_init32();
+size_t GDT32_init();
 size_t GDT_setStruct(GDT *a_gdt, uint32 a_base,
                     uint32 a_limit, uint16 a_type);
 size_t GDT_getStruct(uint32 a_num, GDT **a_gdt);
