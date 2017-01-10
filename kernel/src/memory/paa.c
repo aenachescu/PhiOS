@@ -1,30 +1,25 @@
 #include "paa.h"
 
-extern size_t linker_kernelEnd;
 static size_t g_placementAddress = 0;
 
-#define ALIGN_PLACEMENT_ADDRESS                             \
-    if (g_placementAddress & (WORDSIZE_BYTES - 1))          \
-    {                                                       \
-        g_placementAddress &= (~(WORDSIZE_BYTES - 1));      \
-        g_placementAddress += WORDSIZE_BYTES;               \
-    }
-
-size_t PAA_init(void)
+size_t PAA_init(size_t a_startAddress)
 {
     if (g_placementAddress != 0)
     {
         return ERROR_ALREADY_INITIALIZED;
     }
 
-    g_placementAddress = (size_t) &linker_kernelEnd;
+    if (a_startAddress == 0)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
 
-    ALIGN_PLACEMENT_ADDRESS
+    g_placementAddress = a_startAddress;
 
     return ERROR_SUCCESS;
 }
 
-size_t PAA_alloc(size_t a_size, size_t *a_address)
+size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
 {
     *a_address = 0;
 
@@ -43,10 +38,14 @@ size_t PAA_alloc(size_t a_size, size_t *a_address)
         return ERROR_NULL_POINTER;
     }
 
-    *a_address = g_placementAddress;
+    if ((g_placementAddress & (a_alignment - 1)) != 0)
+    {
+        g_placementAddress &= (~(a_alignment - 1));
+        g_placementAddress += a_alignment;
+    }
 
+    *a_address = g_placementAddress;
     g_placementAddress += a_size;
-    ALIGN_PLACEMENT_ADDRESS
 
     return ERROR_SUCCESS;
 }
