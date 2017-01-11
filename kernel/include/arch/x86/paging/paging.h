@@ -19,8 +19,11 @@
 
 struct Paging
 {
-    uint8 pagingType;
-    void *pagingStruct;
+    uint8   pagingType;
+    uint8   locked;
+    void   *pagingStruct;
+    uint64  freeMappedVirtualMemory;
+    uint64  freeVirtualMemory;
 };
 
 #endif
