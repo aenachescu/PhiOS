@@ -7,20 +7,20 @@
 #include "cpu.h"
 #include "kstring.h"
 
-IDT_Entry64 g_IDTEntries64[IDT_ENTRIES];
-IDT_Pointer64 g_IDTPointer64;
+IDT64_Entry g_IDTEntries64[IDT_ENTRIES];
+IDT64_Pointer g_IDTPointer64;
 
-size_t IDT_init64()
+size_t IDT64_init()
 {
     return ERROR_SUCCESS;
 }
 
-size_t IDT_SetEntry64(/* TODO: find sizes for args */)
+size_t IDT64_SetEntry(/* TODO: find sizes for args */)
 {
     return ERROR_SUCCESS;
 }
 
-size_t IDT_RegisterHandler64(uint32 a_n, ISRfunc64 a_handler)
+size_t IDT64_RegisterHandler(uint32 a_n, ISRfunc64 a_handler)
 {
     return ERROR_SUCCESS;
 }

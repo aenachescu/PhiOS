@@ -1,24 +1,33 @@
 #include "types.h"
 #include "arch/x86/gdt32.h"
+#include "arch/x86/tss32.h"
 #include "errors.h"
 
 GDT g_GDTStruct[GDT_ENTRIES];
 GDT_Entry g_GDTEntries[GDT_ENTRIES];
 GDT_Pointer g_GDTPointer;
+extern TSS32_Entry g_TSSKernelEntry;
 
-size_t GDT_init32()
+size_t GDT32_init()
 {
     GDT_setStruct(&g_GDTStruct[0], 0, 0, 0);
     GDT_setStruct(&g_GDTStruct[1], 0, 0xFFFFFFFF, GDT_CODE_PL0);
     GDT_setStruct(&g_GDTStruct[2], 0, 0xFFFFFFFF, GDT_DATA_PL0);
     GDT_setStruct(&g_GDTStruct[3], 0, 0xFFFFFFFF, GDT_CODE_PL3);
     GDT_setStruct(&g_GDTStruct[4], 0, 0xFFFFFFFF, GDT_DATA_PL3);
+
+    TSS32_init(0x10, 0x0);
+    uint32 tssBase = (uint32) &g_TSSKernelEntry;
+    uint32 tsslimit = tssBase + sizeof(TSS32_Entry);
+    GDT_setStruct(&g_GDTStruct[5], tssBase, tsslimit, TSS_FLAGS);
+
     GDT_createEntries(g_GDTStruct);
 
     g_GDTPointer.limit = sizeof(GDT_Entry) * GDT_ENTRIES - 1;
     g_GDTPointer.base = (uint32) &g_GDTEntries;
 
-    GDT_Load32((uint32) &g_GDTPointer);
+    GDT32_Load((uint32) &g_GDTPointer);
+    TSS32_Load();
 
     return ERROR_SUCCESS;
 }
