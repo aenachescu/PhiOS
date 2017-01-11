@@ -60,7 +60,7 @@ void kernel_main(unsigned long magic, size_t addr)
     CPUID_Init();
 
     // Inits Placement Address Allocator
-    PAA_Init();
+    PAA_init((size_t) &linker_kernelEnd);
 
     // Inits GDT for 32-bit
     GDT32_init();
