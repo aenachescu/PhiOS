@@ -1,8 +1,8 @@
 .section .text
-.global GDT_Load32
-.type GDT_Load32, @function
+.global GDT32_Load
+.type GDT32_Load, @function
 
-GDT_Load32:
+GDT32_Load:
     mov 4(%esp), %eax
     lgdt (%eax)
 
@@ -17,11 +17,20 @@ GDT_Load32:
 flush:
     ret
 
-.global IDT_Load32
-.type IDT_Load32, @function
+.global IDT32_Load
+.type IDT32_Load, @function
 
-IDT_Load32:
+IDT32_Load:
     mov 4(%esp), %eax
     lidt (%eax)
+
+    ret
+
+.global TSS32_Load
+.type TSS32_Load, @function
+
+TSS32_Load:
+    movw $0x2B, %ax
+    ltr %ax
 
     ret

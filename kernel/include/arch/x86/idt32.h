@@ -6,25 +6,25 @@
 
 #define IDT_ENTRIES 256
 
-struct IDT_Entry32 {
+struct IDT32_Entry {
     uint16 lowOffset;
     uint16 selector;
     uint8 alwaysZero;
     uint8 type;
     uint16 highOffset;
 } __attribute__((packed));
-typedef struct IDT_Entry32 IDT_Entry32;
+typedef struct IDT32_Entry IDT32_Entry;
 
-struct IDT_Pointer32 {
+struct IDT32_Pointer {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct IDT_Pointer32 IDT_Pointer32;
+typedef struct IDT32_Pointer IDT32_Pointer;
 
 typedef void (*ISRfunc32)(IntCpuState32*);
 
-size_t IDT_init32();
-size_t IDT_registerHandler32(uint32 a_n, ISRfunc32 a_handler);
+size_t IDT32_init();
+size_t IDT32_registerHandler(uint32 a_n, ISRfunc32 a_handler);
 
 extern void isr_32_0 ();
 extern void isr_32_1 ();
