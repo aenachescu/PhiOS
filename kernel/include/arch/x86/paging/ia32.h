@@ -58,8 +58,12 @@ struct IA32_PageDirectory_4KB
 } __attribute__((packed));
 
 size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
-                                 size_t a_kernelStartAddr,
-                                 size_t a_kernelEndAddr);
+                                 size_t a_codeStartAddr,
+                                 size_t a_codeEndAddr,
+                                 size_t a_rodataStartAddr,
+                                 size_t a_rodataEndAddr,
+                                 size_t a_rwdataStartAddr,
+                                 size_t a_rwdataEndAddr);
 
 size_t IA32_4KB_init(struct Paging *a_kernelPaging,
                      struct Paging *a_newPaging);
