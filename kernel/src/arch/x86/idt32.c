@@ -2,16 +2,17 @@
 #include "arch/x86/idt32.h"
 #include "arch/x86/asm_io.h"
 #include "arch/x86/handlers32.h"
+#include "arch/x86/pic.h"
 #include "errors.h"
 #include "cpu.h"
 #include "kstring.h"
 #include "keyboard.h"
 
-static IDT_Entry32 g_IDTEntries32[IDT_ENTRIES];
-static IDT_Pointer32 g_IDTPointer32;
+static IDT32_Entry g_IDTEntries32[IDT_ENTRIES];
+static IDT32_Pointer g_IDTPointer32;
 static ISRfunc32 g_intHandlers[IDT_ENTRIES];
 
-extern void IDT_Load32(uint32 a_table);
+extern void IDT32_Load(uint32 a_table);
 
 static size_t helper_setEntry32(uint32 a_index, uint32 a_base,
                                 uint16 a_selector, uint8 a_flags)
@@ -30,29 +31,39 @@ static size_t helper_setEntry32(uint32 a_index, uint32 a_base,
     return ERROR_SUCCESS;
 }
 
-size_t IDT_init32()
+size_t IDT32_init()
 {
-    g_IDTPointer32.limit = sizeof(IDT_Entry32) * IDT_ENTRIES - 1;
+    g_IDTPointer32.limit = sizeof(IDT32_Entry) * IDT_ENTRIES - 1;
     g_IDTPointer32.base = (uint32) &g_IDTEntries32;
 
-    kmemset(&g_IDTEntries32, 0, sizeof(IDT_Entry32) * IDT_ENTRIES);
+    kmemset(&g_IDTEntries32, 0, sizeof(IDT32_Entry) * IDT_ENTRIES);
 
     for (uint32 i = 0; i < IDT_ENTRIES; i++)
     {
-        IDT_registerHandler32(i, &handlers32_default);
+        IDT32_registerHandler(i, &handlers32_default);
     }
 
-    // Initialize PIC
-    io_outb(0x20, 0x11);
-    io_outb(0xA0, 0x11);
-    io_outb(0x21, 0x20);
-    io_outb(0xA1, 0x28);
-    io_outb(0x21, 0x04);
-    io_outb(0xA1, 0x02);
-    io_outb(0x21, 0x01);
-    io_outb(0xA1, 0x01);
-    io_outb(0x21, 0x0);
-    io_outb(0xA1, 0x0);
+    IDT32_registerHandler(0, &handlers32_zeroDivision);
+    IDT32_registerHandler(1, &handlers32_debug);
+    IDT32_registerHandler(2, &handlers32_NMI);
+    IDT32_registerHandler(3, &handlers32_breakpoint);
+    IDT32_registerHandler(4, &handlers32_overflow);
+    IDT32_registerHandler(5, &handlers32_boundRangeExceed);
+    IDT32_registerHandler(6, &handlers32_invaildOpcode);
+    IDT32_registerHandler(7, &handlers32_deviceNotAvailable);
+    IDT32_registerHandler(8, &handlers32_doubleFault);
+    IDT32_registerHandler(9, &handlers32_coprocessorSegmentOverrun);
+    IDT32_registerHandler(10, &handlers32_invalidTSS);
+    IDT32_registerHandler(11, &handlers32_segmentNotPresent);
+    IDT32_registerHandler(12, &handlers32_stackSegmentFault);
+    IDT32_registerHandler(13, &handlers32_generalProtectionFault);
+    IDT32_registerHandler(14, &handlers32_pageFault);
+    IDT32_registerHandler(16, &handlers32_FPUx87Exception);
+    IDT32_registerHandler(17, &handlers32_alignmentCheck);
+    IDT32_registerHandler(18, &handlers32_machineCheck);
+    IDT32_registerHandler(19, &handlers32_SIMDFloatingPoint);
+    IDT32_registerHandler(20, &handlers32_virtualization);
+    IDT32_registerHandler(30, &handlers32_security);
 
     helper_setEntry32(IRQ0, (uint32) &irq_32_0, 0x08, 0x8E);
     helper_setEntry32(IRQ1, (uint32) &irq_32_1, 0x08, 0x8E);
@@ -105,12 +116,12 @@ size_t IDT_init32()
     helper_setEntry32(31, (uint32) &isr_32_31, 0x08, 0x8E);
     helper_setEntry32(128, (uint32) &isr_32_128, 0x08, 0x8E);
 
-    IDT_Load32((uint32) &g_IDTPointer32);
+    IDT32_Load((uint32) &g_IDTPointer32);
 
     return ERROR_SUCCESS;
 }
 
-size_t IDT_registerHandler32(uint32 a_index, ISRfunc32 a_handler)
+size_t IDT32_registerHandler(uint32 a_index, ISRfunc32 a_handler)
 {
     if (a_handler == NULL)
     {
@@ -127,13 +138,13 @@ size_t IDT_registerHandler32(uint32 a_index, ISRfunc32 a_handler)
     return ERROR_SUCCESS;
 }
 
-void IDT_isrHandler32(IntCpuState32 *a_state)
+void IDT32_isrHandler(IntCpuState32 *a_state)
 {
     ISRfunc32 handler = g_intHandlers[a_state->intNo];
     handler(a_state);
 }
 
-void IDT_irqHandler32(IntCpuState32 *a_state)
+void IDT32_irqHandler(IntCpuState32 *a_state)
 {
     if (a_state->intNo >= 40)
     {
