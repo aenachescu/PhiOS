@@ -11,6 +11,9 @@
 
 #include "multiboot2.h"
 
+extern size_t linker_kernelStart;
+extern size_t linker_kernelEnd;
+
 #define PRINT(x) kprintf("%s - %u\n", #x, CPUID_HasFeature(x))
 
 extern void jumpToUserMode();
@@ -53,6 +56,7 @@ void kernel_main(unsigned long magic, size_t addr)
         return;
     }
 
+    // Inits CPUID detection
     CPUID_Init();
 
     // Inits Placement Address Allocator
