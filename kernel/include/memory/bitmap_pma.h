@@ -1,10 +1,10 @@
-#ifndef PhiOS_PhysicalMemoryManager
-#define PhiOS_PhysicalMemoryManager
+#ifndef PhiOS_BitmapPhysicalMemoryAllocator
+#define PhiOS_BitmapPhysicalMemoryAllocator
 
 #include "types.h"
 #include "errors.h"
 
-struct PhysicalMemoryAllocator
+struct BitmapPMA
 {
     size_t startAddress;
     size_t endAddress;
@@ -31,12 +31,16 @@ struct PhysicalMemoryAllocator
  *      If a_frameSize is not a multiple of 2 or it's less than 2.
  *  ERROR_UNINITIALIZED - if placement address allocator is not initialized.
  */
-size_t PMM_CreateAllocator(struct PhysicalMemoryAllocator *a_pma, size_t a_frameSize,
-                           size_t a_startAddress, size_t a_endAddress);
+size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma,
+                                 size_t a_frameSize,
+                                 size_t a_startAddress,
+                                 size_t a_endAddress);
 
 /*
  * @brief Allocates physical memory.
  *
+ * @param a_bpma Pointer to the bitmap physical memory allocator structure. In
+ *               this structure will be allocated the memory.
  * @param a_framesNumber The frames number to be allocated continuous.
  * @param a_physicalAddress In this parameter will be returned the physical
  *                          address.
@@ -51,12 +55,15 @@ size_t PMM_CreateAllocator(struct PhysicalMemoryAllocator *a_pma, size_t a_frame
  *  ERROR_NULL_POINTER - if a_physicalAddress or a_pma is null
  *  ERROR_INVALID_PARAMETER - if a_framesNumber is 0.
  */
-size_t PMM_Alloc(struct PhysicalMemoryAllocator *a_pma,
-                 size_t a_framesNumber, size_t *a_physicalAddress);
+size_t BitmapPMA_alloc(struct BitmapPMA *a_bpma,
+                       size_t a_framesNumber,
+                       size_t *a_physicalAddress);
 
 /*
  * @brief Frees physical memory.
  *
+ * @param a_bpma Pointer to the bitmap physical memory allocator structure. In
+ *               this structure will be freed the memory.
  * @param a_framesNumber The frames number to be freed.
  * @param a_physicalAddress The starting address of memory area.
  *
@@ -74,7 +81,8 @@ size_t PMM_Alloc(struct PhysicalMemoryAllocator *a_pma,
  *      a_physicalAddress and the ending address.
  *  ERROR_NULL_POINTER - if a_pma is null.
  */
-size_t PMM_Free(struct PhysicalMemoryAllocator *a_pma,
-                size_t a_framesNumber, size_t a_physicalAddress);
+size_t BitmapPMA_free(struct BitmapPMA *a_bpma,
+                      size_t a_framesNumber,
+                      size_t a_physicalAddress);
 
 #endif
