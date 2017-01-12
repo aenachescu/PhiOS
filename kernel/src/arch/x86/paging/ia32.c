@@ -1,5 +1,5 @@
 #include "arch/x86/paging/ia32.h"
-#include "memory/pma.h"
+#include "memory/pmm.h"
 
 size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
                                  size_t a_codeStartAddr,
