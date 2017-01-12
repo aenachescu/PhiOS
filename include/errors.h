@@ -15,5 +15,8 @@
 #define ERROR_NO_FREE_MEMORY        11
 #define ERROR_INVALID_STATE         12
 #define ERROR_UNALIGNED_ADDRESS     13
+#define ERROR_UNKNOWN_FLAG          14
+#define ERROR_LIMIT_REACHED         15
+#define ERROR_INVALID_FUNCTION      16
 
 #endif
