@@ -15,16 +15,16 @@ struct IDT32_Entry {
 } __attribute__((packed));
 typedef struct IDT32_Entry IDT32_Entry;
 
-struct IDT32_Pointer {
+struct IDT32 {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct IDT32_Pointer IDT32_Pointer;
+typedef struct IDT32 IDT32;
 
-typedef void (*ISRfunc32)(IntCpuState32*);
+typedef void (*ISR32_PFN)(IntCpuState32*);
 
 size_t IDT32_init();
-size_t IDT32_registerHandler(uint32 a_n, ISRfunc32 a_handler);
+size_t IDT32_registerHandler(uint32 a_n, ISR32_PFN a_handler);
 
 extern void isr_32_0 ();
 extern void isr_32_1 ();
