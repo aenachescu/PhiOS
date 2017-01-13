@@ -13,19 +13,19 @@ struct IDT64_Entry {
     uint32 highOffset;
     uint32 alwaysZero;
 } __attribute__((packed));
-typedef struct IDT64_Pointer IDT64_Entry;
+typedef struct IDT64_Entry IDT64_Entry;
 
-struct IDT64_Pointer {
+struct IDT64 {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct IDT64_Pointer IDT64_Pointer;
+typedef struct IDT64 IDT64;
 
-typedef void (*ISRfunc64)(IntCpuState64*);
+typedef void (*ISR64_PFN)(IntCpuState64*);
 
 size_t IDT64_init();
 size_t IDT64_SetEntry(/* TODO: find sizes for args */);
-size_t IDT64_RegisterHandler(uint32 a_n, ISRfunc64 a_handler);
+size_t IDT64_RegisterHandler(uint32 a_n, ISR64_PFN a_handler);
 extern void IDT64_Load(uint64 a_table);
 
 void IDT64_isrHandler(IntCpuState64 *a_state);
