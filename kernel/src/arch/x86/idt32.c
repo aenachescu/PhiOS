@@ -9,8 +9,8 @@
 #include "keyboard.h"
 
 static IDT32_Entry g_IDTEntries32[IDT_ENTRIES];
-static IDT32_Pointer g_IDTPointer32;
-static ISRfunc32 g_intHandlers[IDT_ENTRIES];
+static IDT32 g_IDTPointer32;
+static ISR32_PFN g_intHandlers[IDT_ENTRIES];
 
 extern void IDT32_Load(uint32 a_table);
 
@@ -121,7 +121,7 @@ size_t IDT32_init()
     return ERROR_SUCCESS;
 }
 
-size_t IDT32_registerHandler(uint32 a_index, ISRfunc32 a_handler)
+size_t IDT32_registerHandler(uint32 a_index, ISR32_PFN a_handler)
 {
     if (a_handler == NULL)
     {
@@ -140,7 +140,7 @@ size_t IDT32_registerHandler(uint32 a_index, ISRfunc32 a_handler)
 
 void IDT32_isrHandler(IntCpuState32 *a_state)
 {
-    ISRfunc32 handler = g_intHandlers[a_state->intNo];
+    ISR32_PFN handler = g_intHandlers[a_state->intNo];
     handler(a_state);
 }
 
@@ -155,6 +155,6 @@ void IDT32_irqHandler(IntCpuState32 *a_state)
     // Reset signal to master
     io_outb(0x20, 0x20);
 
-    ISRfunc32 handler = g_intHandlers[a_state->intNo];
+    ISR32_PFN handler = g_intHandlers[a_state->intNo];
     handler(a_state);
 }

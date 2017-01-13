@@ -48,25 +48,25 @@
 
 #define TSS_FLAGS    0xE9
 
-struct GDT_Pointer {
+struct GDT32_Pointer {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct GDT_Pointer GDT_Pointer;
+typedef struct GDT32_Pointer GDT32_Pointer;
 
-typedef uint64 GDT_Entry;
+typedef uint64 GDT32_Entry;
 
-typedef struct GDT {
+typedef struct GDT32 {
     uint32 base;
     uint32 limit;
     uint16 type;
-} GDT;
+} GDT32;
 
 size_t GDT32_init();
-size_t GDT_setStruct(GDT *a_gdt, uint32 a_base,
+size_t GDT32_setStruct(GDT32 *a_gdt, uint32 a_base,
                     uint32 a_limit, uint16 a_type);
-size_t GDT_getStruct(uint32 a_num, GDT **a_gdt);
-size_t GDT_createEntries(GDT *a_gdtArray);
+size_t GDT32_getStruct(uint32 a_num, GDT32 **a_gdt);
+size_t GDT32_createEntries(GDT32 *a_gdtArray);
 extern void GDT32_Load(uint32 a_table);
 
 #endif
