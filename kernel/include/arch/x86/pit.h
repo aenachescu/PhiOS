@@ -1,5 +1,5 @@
-#ifndef PhiOS_pit32
-#define PhiOS_pit32
+#ifndef PhiOS_ProgrammableIntervalTimer
+#define PhiOS_ProgrammableIntervalTimer
 
 #include "types.h"
 #include "errors.h"
