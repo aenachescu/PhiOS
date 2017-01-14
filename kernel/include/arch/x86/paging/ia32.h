@@ -86,6 +86,13 @@ size_t IA32_4KB_free(struct Paging *a_paging,
                      size_t         a_address,
                      size_t         a_pagesNumber,
                      uint32         a_flags);
+
+struct IA32_Paging_4KB
+{
+    struct IA32_PageDirectory_4KB *currentPageDirectory;
+};
+
+
 /*
  * struct for page directory with page size 4MB
  */
