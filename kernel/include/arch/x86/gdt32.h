@@ -59,12 +59,12 @@ struct GDT32_Entry
     uint64 data;
 };
 
-typedef struct GDT32
+struct GDT32
 {
     uint32 base;
     uint32 limit;
     uint16 type;
-};
+} __attribute__((packed));
 
 size_t GDT32_init();
 size_t GDT32_setStruct(struct GDT32 *a_gdt, uint32 a_base,
