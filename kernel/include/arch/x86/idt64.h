@@ -1,5 +1,5 @@
-#ifndef PhiOS_idt64
-#define PhiOS_idt64
+#ifndef PhiOS_InterruptDescriptorTable64
+#define PhiOS_InterruptDescriptorTable64
 
 #include "types.h"
 #include "cpu.h"

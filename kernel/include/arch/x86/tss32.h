@@ -1,5 +1,5 @@
-#ifndef PhiOS_tss32
-#define PhiOS_tss32
+#ifndef PhiOS_TaskStateSegment32
+#define PhiOS_TaskStateSegment32
 
 #include "types.h"
 

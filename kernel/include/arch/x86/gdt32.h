@@ -1,5 +1,5 @@
-#ifndef _PhiOS_gdt32
-#define _PhiOS_gdt32
+#ifndef PhiOS_GlobalDescriptorTable32
+#define PhiOS_GlobalDescriptorTable32
 
 #include "types.h"
 
