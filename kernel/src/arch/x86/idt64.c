@@ -7,8 +7,8 @@
 #include "cpu.h"
 #include "kstring.h"
 
-IDT64_Entry g_IDTEntries64[IDT_ENTRIES];
-IDT64 g_IDTPointer64;
+static struct IDT64_Entry   g_IDTEntries64[IDT_ENTRIES];
+static struct IDT64         g_IDTPointer64;
 
 size_t IDT64_init()
 {
