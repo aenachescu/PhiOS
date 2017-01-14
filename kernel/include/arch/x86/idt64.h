@@ -4,7 +4,8 @@
 #include "types.h"
 #include "cpu.h"
 
-struct IDT64_Entry {
+struct IDT64_Entry
+{
     uint16 lowOffset;
     uint16 selector;
     uint8 IST;
@@ -13,13 +14,12 @@ struct IDT64_Entry {
     uint32 highOffset;
     uint32 alwaysZero;
 } __attribute__((packed));
-typedef struct IDT64_Entry IDT64_Entry;
 
-struct IDT64 {
+struct IDT64
+{
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct IDT64 IDT64;
 
 typedef void (*ISR64_PFN)(IntCpuState64*);
 
