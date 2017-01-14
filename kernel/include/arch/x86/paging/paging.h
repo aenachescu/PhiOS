@@ -21,6 +21,7 @@ struct Paging
 {
     uint8 pagingType;
     void *pagingStruct;
+    size_t lastAllocatedPage;
 };
 
 #endif
