@@ -3,11 +3,11 @@
 #include "errors.h"
 #include "kstring.h"
 
-TSS32_Entry g_TSSKernelEntry;
+struct TSS32_Entry g_TSSKernelEntry;
 
 size_t TSS32_init(uint16 a_ss0, uint32 a_esp0)
 {
-    kmemset(&g_TSSKernelEntry, 0, sizeof(TSS32_Entry));
+    kmemset(&g_TSSKernelEntry, 0, sizeof(struct TSS32_Entry));
 
     g_TSSKernelEntry.ss0 = a_ss0;
     g_TSSKernelEntry.esp0 = a_esp0;

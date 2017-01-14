@@ -8,9 +8,9 @@
 #include "kstring.h"
 #include "keyboard.h"
 
-static IDT32_Entry g_IDTEntries32[IDT_ENTRIES];
-static IDT32 g_IDTPointer32;
-static ISR32_PFN g_intHandlers[IDT_ENTRIES];
+static struct IDT32_Entry   g_IDTEntries32[IDT_ENTRIES];
+static struct IDT32         g_IDTPointer32;
+static ISR32_PFN            g_intHandlers[IDT_ENTRIES];
 
 extern void IDT32_Load(uint32 a_table);
 
@@ -33,10 +33,10 @@ static size_t helper_setEntry32(uint32 a_index, uint32 a_base,
 
 size_t IDT32_init()
 {
-    g_IDTPointer32.limit = sizeof(IDT32_Entry) * IDT_ENTRIES - 1;
+    g_IDTPointer32.limit = sizeof(struct IDT32_Entry) * IDT_ENTRIES - 1;
     g_IDTPointer32.base = (uint32) &g_IDTEntries32;
 
-    kmemset(&g_IDTEntries32, 0, sizeof(IDT32_Entry) * IDT_ENTRIES);
+    kmemset(&g_IDTEntries32, 0, sizeof(struct IDT32_Entry) * IDT_ENTRIES);
 
     for (uint32 i = 0; i < IDT_ENTRIES; i++)
     {
