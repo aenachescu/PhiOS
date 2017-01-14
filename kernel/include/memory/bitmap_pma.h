@@ -55,7 +55,7 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma,
  *  ERROR_NULL_POINTER - if a_physicalAddress or a_pma is null
  *  ERROR_INVALID_PARAMETER - if a_framesNumber is 0.
  */
-size_t BitmapPMA_alloc(struct BitmapPMA *a_bpma,
+size_t BitmapPMA_alloc(void *a_bpma,
                        size_t a_framesNumber,
                        size_t *a_physicalAddress);
 
@@ -81,7 +81,7 @@ size_t BitmapPMA_alloc(struct BitmapPMA *a_bpma,
  *      a_physicalAddress and the ending address.
  *  ERROR_NULL_POINTER - if a_pma is null.
  */
-size_t BitmapPMA_free(struct BitmapPMA *a_bpma,
+size_t BitmapPMA_free(void *a_bpma,
                       size_t a_framesNumber,
                       size_t a_physicalAddress);
 
