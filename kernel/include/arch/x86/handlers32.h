@@ -1,5 +1,5 @@
-#ifndef PhiOS_handlers32
-#define PhiOS_handlers32
+#ifndef PhiOS_exception_handlers32
+#define PhiOS_exception_handlers32
 
 #include "arch/x86/idt32.h"
 #include "cpu.h"
