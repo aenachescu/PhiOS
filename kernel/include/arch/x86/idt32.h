@@ -13,13 +13,11 @@ struct IDT32_Entry {
     uint8 type;
     uint16 highOffset;
 } __attribute__((packed));
-typedef struct IDT32_Entry IDT32_Entry;
 
 struct IDT32 {
     uint16 limit;
     uint32 base;
 } __attribute__((packed));
-typedef struct IDT32 IDT32;
 
 typedef void (*ISR32_PFN)(IntCpuState32*);
 
