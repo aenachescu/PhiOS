@@ -1,6 +1,5 @@
 #include "types.h"
 #include "errors.h"
-#include "values.h"
 #include "kstring.h"
 #include "arch/x86/paging/ia32.h"
 #include "arch/x86/paging/paging.h"
@@ -8,6 +7,120 @@
 #include "memory/paa.h"
 
 #include "kstdio.h"
+
+size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
+                                 size_t a_codeStartAddr,
+                                 size_t a_codeEndAddr,
+                                 size_t a_rodataStartAddr,
+                                 size_t a_rodataEndAddr,
+                                 size_t a_rwdataStartAddr,
+                                 size_t a_rwdataEndAddr)
+{
+    if (a_paging == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (a_codeEndAddr   <= a_codeStartAddr    ||
+        a_rodataEndAddr <  a_rodataStartAddr  ||
+        a_rwdataEndAddr <  a_rwdataStartAddr)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    if ((a_codeStartAddr   & 4095) != 0 ||
+        (a_rodataStartAddr & 4095) != 0 ||
+        (a_rwdataStartAddr & 4095) != 0)
+    {
+        return ERROR_UNALIGNED_ADDRESS;
+    }
+
+    size_t error = ERROR_SUCCESS;
+
+    do
+    {
+    } while (false);
+
+    return error;
+}
+
+size_t IA32_4KB_init(struct Paging *a_kernelPaging,
+                     struct Paging *a_newPaging)
+{
+    if (a_kernelPaging == NULL || a_newPaging == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    size_t error = ERROR_SUCCESS;
+
+    do
+    {
+    } while (false);
+
+    return error;
+}
+
+size_t IA32_4KB_alloc(struct Paging *a_paging,
+                      struct AllocFuncParam *a_request,
+                      size_t *a_address)
+{
+    if (a_paging == NULL || a_request == NULL || a_address == NULL ||
+        a_paging->pagingStruct == NULL || a_request->param == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (a_request->pagingType != PAGING_TYPE_IA32_4KB)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    size_t error = ERROR_SUCCESS;
+
+    *a_address = NULL;
+
+    struct IA32_PageDirectory_4KB     *pd;
+    struct IA32_4KB_Paging_AllocParam *request;
+
+    pd      = (struct IA32_PageDirectory_4KB*)     a_paging->pagingStruct;
+    request = (struct IA32_4KB_Paging_AllocParam*) a_request->param;
+
+    do
+    {
+    } while (false);
+
+    return error;
+}
+
+size_t IA32_4KB_free(struct Paging *a_paging,
+                     struct FreeFuncParam *a_request)
+{
+    if (a_paging == NULL || a_request == NULL ||
+        a_paging->pagingStruct == NULL || a_request->param == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (a_request->pagingType != PAGING_TYPE_IA32_4KB)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    size_t error = ERROR_SUCCESS;
+
+    struct IA32_PageDirectory_4KB     *pd;
+    struct IA32_4KB_Paging_FreeParam  *request;
+
+    pd      = (struct IA32_PageDirectory_4KB*)     a_paging->pagingStruct;
+    request = (struct IA32_4KB_Paging_FreeParam*)  a_request->param;
+
+    do
+    {
+    } while (false);
+
+    return error;
+}
 
 /*
 struct Paging g_kernelPaging;
