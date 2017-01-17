@@ -75,7 +75,7 @@ size_t IA32_4KB_alloc(struct Paging *a_paging,
 size_t IA32_4KB_free(struct Paging *a_paging,
                      struct FreeFuncParam *a_request);
 
-struct IA32_Paging_AllocParam
+struct IA32_4KB_Paging_AllocParam
 {
     uint32  flag;
     bool    write;
@@ -85,7 +85,7 @@ struct IA32_Paging_AllocParam
     size_t  physicalAddress;
 };
 
-struct IA32_Paging_FreeParam
+struct IA32_4KB_Paging_FreeParam
 {
     uint32 flag;
     size_t startAddress;
