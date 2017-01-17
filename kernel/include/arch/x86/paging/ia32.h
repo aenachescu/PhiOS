@@ -69,33 +69,27 @@ size_t IA32_4KB_init(struct Paging *a_kernelPaging,
                      struct Paging *a_newPaging);
 
 size_t IA32_4KB_alloc(struct Paging *a_paging,
-                      size_t         a_pagesNumber,
-                      uint32         a_flags,
-                      bool           a_write,
-                      bool           a_user,
-                      bool           a_writeThrough,
-                      bool           a_cacheDisabled,
-                      size_t        *a_address);
-
-size_t IA32_4KB_allocAtAddress(struct Paging *a_paging,
-                               size_t         a_address,
-                               size_t         a_pagesNumber,
-                               uint32         a_flags,
-                               bool           a_write,
-                               bool           a_user,
-                               bool           a_writeThrough,
-                               bool           a_cacheDisabled);
+                      struct AllocFuncParam *a_request);
 
 size_t IA32_4KB_free(struct Paging *a_paging,
-                     size_t         a_address,
-                     size_t         a_pagesNumber,
-                     uint32         a_flags);
+                     struct FreeFuncParam *a_request);
 
-struct IA32_Paging_4KB
+struct IA32_Paging_AllocParam
 {
-    struct IA32_PageDirectory_4KB *currentPageDirectory;
+    uint32  flag;
+    bool    write;
+    bool    cacheDisabled;
+    bool    writeThrough;
+    size_t  virtualAddress;
+    size_t  physicalAddress;
 };
 
+struct IA32_Paging_FreeParam
+{
+    uint32 flag;
+    size_t startAddress;
+    size_t pagesNumber;
+};
 
 /*
  * struct for page directory with page size 4MB
