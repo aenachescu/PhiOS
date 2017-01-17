@@ -24,6 +24,7 @@ struct Paging
     void   *pagingStruct;
     uint64  freeMappedVirtualMemory;
     uint64  freeVirtualMemory;
+    uint64  lastAllocatedPage;
 };
 
 #endif
