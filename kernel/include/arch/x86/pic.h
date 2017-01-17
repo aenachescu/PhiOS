@@ -1,5 +1,5 @@
-#ifndef PhiOS_pic
-#define PhiOS_pic
+#ifndef PhiOS_ProgrammableInterruptController
+#define PhiOS_ProgrammableInterruptController
 
 #define PIC1_COMMAND                0x20
 #define PIC1_DATA                   0x21

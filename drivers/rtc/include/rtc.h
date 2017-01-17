@@ -1,5 +1,5 @@
-#ifndef PhiOS_rtc
-#define PhiOS_rtc
+#ifndef PhiOS_RealTimeClock
+#define PhiOS_RealTimeClock
 
 #include "types.h"
 #include "errors.h"
