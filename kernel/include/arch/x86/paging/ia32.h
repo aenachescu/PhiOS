@@ -69,7 +69,8 @@ size_t IA32_4KB_init(struct Paging *a_kernelPaging,
                      struct Paging *a_newPaging);
 
 size_t IA32_4KB_alloc(struct Paging *a_paging,
-                      struct AllocFuncParam *a_request);
+                      struct AllocFuncParam *a_request,
+                      size_t *a_address);
 
 size_t IA32_4KB_free(struct Paging *a_paging,
                      struct FreeFuncParam *a_request);
