@@ -1,6 +1,8 @@
 #include "vga/text_mode.h"
 #include "types.h"
 #include "memory/paa.h"
+#include "memory/pmm.h"
+#include "memory/bitmap_pma.h"
 #include "kstdio.h"
 #include "arch/x86/cpuid.h"
 #include "arch/x86/gdt32.h"
@@ -17,6 +19,7 @@ extern size_t linker_kernelStart;
 extern size_t linker_kernelEnd;
 
 #define PRINT(x) kprintf("%s - %u\n", #x, CPUID_HasFeature(x))
+#define FRAME_SIZE 4096
 
 extern void jumpToUserMode();
 // THIS IS TEMPORARY
@@ -25,6 +28,7 @@ size_t g_userStack[2048];   // temporary user mode
 size_t g_kernelStack[2048]; // temporary kernel mode
 
 char *g_CPUvendorName;
+struct BitmapPMA g_PMAVM; // physical memory allocator for virtual memory
 
 void user_main()
 {
@@ -105,6 +109,24 @@ void kernel_main(unsigned long magic, size_t addr)
     // Inits real time clock
     RTC_init();
     kprintf("[SYSTEM] Initialized real time clock.\n");
+
+    // Inits Physical Memory Manager
+    PMM_init(1);
+    // Temporary BitmapPMA that uses memory from 0 to 4 MiB
+    // It should use memory from 0 to end of RAM
+    BitmapPMA_createAllocator(&g_PMAVM, FRAME_SIZE, 0x0, 0x400000);
+    PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
+                    &BitmapPMA_alloc, &BitmapPMA_free);
+    size_t addr1, addr2, addr3;
+    PMM_alloc(&addr1, 2, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_alloc(&addr2, 4, PMM_FOR_VIRTUAL_MEMORY);
+    kprintf("Alloc: %x %x\n", addr1, addr2);
+    PMM_free(addr1, 2, PMM_FOR_VIRTUAL_MEMORY);
+    kprintf("Free: %x\n", addr1);
+    PMM_alloc(&addr3, 2, PMM_FOR_VIRTUAL_MEMORY);
+    kprintf("Alloc: %x\n", addr3);
+    PMM_alloc(&addr1, 10, PMM_FOR_VIRTUAL_MEMORY);
+    kprintf("Alloc: %x\n", addr1);
 
     // Go to user mode
     jumpToUserMode();
