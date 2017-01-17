@@ -14,17 +14,40 @@
 #define PAGING_TYPE_IA32E_2MB   6
 #define PAGING_TYPE_IA32E_1GB   7
 
-#define PAGING_FLAG_USER        0x10000000
-#define PAGING_FLAG_KERNEL      0x20000000
+#define PAGING_FLAG_USER                0x10000000
+#define PAGING_FLAG_KERNEL              0x20000000
+
+#define PAGING_FLAG_ALLOC_AT_ADDRESS    0x00000001
+#define PAGING_FLAG_SHARED_MEMORY       0x00000002
+
+struct AllocFuncParam
+{
+    uint8       pagingType;
+    void       *param;
+};
+
+struct FreeFuncParam
+{
+    uint8       pagingType;
+    void       *param;
+};
+
+typedef size_t (*VMA_ALLOC_PFN)(struct Paging *a_paging,
+                                struct AllocFuncParam *a_request);
+
+typedef size_t (*VMA_FREE_PFN)(struct Paging *a_paging,
+                               struct FreeFuncParam *a_request);
 
 struct Paging
 {
-    uint8   pagingType;
-    uint8   locked;
-    void   *pagingStruct;
-    uint64  freeMappedVirtualMemory;
-    uint64  freeVirtualMemory;
-    uint64  lastAllocatedPage;
+    uint8           pagingType;
+    uint8           locked;
+    void           *pagingStruct;
+    VMA_ALLOC_PFN   allocFn;
+    VMA_FREE_PFN    freeFn;
+    uint64          freeMappedVirtualMemory;
+    uint64          freeVirtualMemory;
+    uint64          lastAllocatedPage;
 };
 
 #endif

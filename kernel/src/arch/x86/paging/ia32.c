@@ -9,6 +9,7 @@
 
 #include "kstdio.h"
 
+/*
 struct Paging g_kernelPaging;
 struct IA32_Paging_4KB g_kernelPagingStruct;
 struct IA32_PageDirectory_4KB g_kernelPageDirectory;
@@ -183,3 +184,4 @@ size_t IA32_4KB_free(struct Paging *a_paging,
 
     return ERROR_SUCCESS;
 }
+*/
