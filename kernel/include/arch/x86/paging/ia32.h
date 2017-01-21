@@ -78,10 +78,12 @@ size_t IA32_4KB_free(struct Paging *a_paging,
 struct IA32_4KB_Paging_AllocParam
 {
     uint32  flag;
+    bool    user;
     bool    write;
     bool    cacheDisabled;
     bool    writeThrough;
     size_t  virtualAddress;
+    size_t  pagesNumber;
     size_t  physicalAddress;
 };
 
