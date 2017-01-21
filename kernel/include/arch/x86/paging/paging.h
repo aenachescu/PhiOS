@@ -20,6 +20,8 @@
 #define PAGING_FLAG_ALLOC_AT_ADDRESS    0x00000001
 #define PAGING_FLAG_SHARED_MEMORY       0x00000002
 
+#define PAGING_FLAG_DESTROY             0x00000010
+
 struct AllocFuncParam
 {
     uint8       pagingType;
