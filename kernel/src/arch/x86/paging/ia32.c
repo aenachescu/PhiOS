@@ -1,12 +1,5 @@
-#include "types.h"
-#include "errors.h"
-#include "kstring.h"
 #include "arch/x86/paging/ia32.h"
-#include "arch/x86/paging/paging.h"
 #include "memory/pmm.h"
-#include "memory/paa.h"
-
-#include "kstdio.h"
 
 static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
 {
@@ -73,31 +66,12 @@ static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
     return error;
 }
 
-size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
-                                 size_t a_codeStartAddr,
-                                 size_t a_codeEndAddr,
-                                 size_t a_rodataStartAddr,
-                                 size_t a_rodataEndAddr,
-                                 size_t a_rwdataStartAddr,
-                                 size_t a_rwdataEndAddr)
+size_t IA32_4KB_init(struct Paging *a_paging,
+                     const struct KernelArea *a_kernelArea)
 {
-    if (a_paging == NULL)
+    if (a_kernelArea == NULL || a_paging == NULL)
     {
         return ERROR_NULL_POINTER;
-    }
-
-    if (a_codeEndAddr   <= a_codeStartAddr    ||
-        a_rodataEndAddr <  a_rodataStartAddr  ||
-        a_rwdataEndAddr <  a_rwdataStartAddr)
-    {
-        return ERROR_INVALID_PARAMETER;
-    }
-
-    if ((a_codeStartAddr   & 4095) != 0 ||
-        (a_rodataStartAddr & 4095) != 0 ||
-        (a_rwdataStartAddr & 4095) != 0)
-    {
-        return ERROR_UNALIGNED_ADDRESS;
     }
 
     size_t error = ERROR_SUCCESS;
@@ -115,34 +89,6 @@ size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
     if (error != ERROR_SUCCESS)
     {
         helper_IA32_4KB_deletePaging(a_paging);
-    }
-
-    return error;
-}
-
-size_t IA32_4KB_init(struct Paging *a_kernelPaging,
-                     struct Paging *a_newPaging)
-{
-    if (a_kernelPaging == NULL || a_newPaging == NULL)
-    {
-        return ERROR_NULL_POINTER;
-    }
-
-    size_t error = ERROR_SUCCESS;
-
-    error = helper_IA32_4KB_createPaging(a_newPaging);
-    if (error != ERROR_SUCCESS)
-    {
-        return error;
-    }
-
-    do
-    {
-    } while (false);
-
-    if (error != ERROR_SUCCESS)
-    {
-        helper_IA32_4KB_deletePaging(a_newPaging);
     }
 
     return error;
