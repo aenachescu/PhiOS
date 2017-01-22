@@ -57,4 +57,16 @@ struct Paging
     size_t          lastAllocatedPage;
 };
 
+struct KernelArea
+{
+    size_t codeStartAddr;
+    size_t codeEndAddr;
+
+    size_t rodataStartAddr;
+    size_t rodataEndAddr;
+
+    size_t rwdataStartAddr;
+    size_t rwdataEndAddr;
+};
+
 #endif
