@@ -57,16 +57,8 @@ struct IA32_PageDirectory_4KB
     struct IA32_PageTable_4KB *addresses[PAGING_IA32_PDE_NUMBER];
 } __attribute__((packed));
 
-size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
-                                 size_t a_codeStartAddr,
-                                 size_t a_codeEndAddr,
-                                 size_t a_rodataStartAddr,
-                                 size_t a_rodataEndAddr,
-                                 size_t a_rwdataStartAddr,
-                                 size_t a_rwdataEndAddr);
-
-size_t IA32_4KB_init(struct Paging *a_kernelPaging,
-                     struct Paging *a_newPaging);
+size_t IA32_4KB_init(struct Paging *a_paging,
+                     const struct KernelArea *a_kernelArea);
 
 size_t IA32_4KB_alloc(struct Paging *a_paging,
                       struct AllocFuncParam *a_request,
