@@ -8,6 +8,71 @@
 
 #include "kstdio.h"
 
+static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
+{
+    size_t error = ERROR_SUCCESS;
+    size_t pdAddr = 0;
+    struct IA32_PageDirectory_4KB *pd = NULL;
+
+    do
+    {
+        error = PMM_alloc(&pdAddr, 8192, PMM_FOR_VIRTUAL_MEMORY);
+        if (error != ERROR_SUCCESS)
+        {
+            break;
+        }
+
+        pd = (struct IA32_PageDirectory_4KB*) pdAddr;
+        for (uint32 i = 0; i < PAGING_IA32_PDE_NUMBER; i++)
+        {
+            struct IA32_PageDirectory_4KB_Entry *pdEntry = pd->entries + i;
+            size_t *entryAddr = (size_t*) pdEntry;
+            *entryAddr = 0;
+            pd->addresses[i] = NULL;
+        }
+
+        a_paging->pagingType                = PAGING_TYPE_IA32_4KB;
+        a_paging->locked                    = 0;
+        a_paging->pagingStruct              = (void*) pd;
+        a_paging->allocFn                   = IA32_4KB_alloc;
+        a_paging->freeFn                    = IA32_4KB_free;
+        a_paging->freeMappedVirtualMemory   = 0;
+        a_paging->freeVirtualMemory         = 0;
+        a_paging->lastAllocatedPage         = 1;
+
+    } while (false);
+
+    return error;
+}
+
+static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
+{
+    size_t error = ERROR_SUCCESS;
+    size_t pdAddr = 0;
+
+    do
+    {
+        pdAddr = (size_t) a_paging->pagingStruct;
+        error = PMM_free(pdAddr, 8192, PMM_FOR_VIRTUAL_MEMORY);
+        if (error != ERROR_SUCCESS)
+        {
+            break;
+        }
+
+        a_paging->pagingType                = PAGING_TYPE_NONE;
+        a_paging->locked                    = 0;
+        a_paging->pagingStruct              = NULL;
+        a_paging->allocFn                   = NULL;
+        a_paging->freeFn                    = NULL;
+        a_paging->freeMappedVirtualMemory   = 0;
+        a_paging->freeVirtualMemory         = 0;
+        a_paging->lastAllocatedPage         = 0;
+
+    } while (false);
+
+    return error;
+}
+
 size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
                                  size_t a_codeStartAddr,
                                  size_t a_codeEndAddr,
@@ -37,9 +102,20 @@ size_t IA32_4KB_initKernelStruct(struct Paging *a_paging,
 
     size_t error = ERROR_SUCCESS;
 
+    error = helper_IA32_4KB_createPaging(a_paging);
+    if (error != ERROR_SUCCESS)
+    {
+        return error;
+    }
+
     do
     {
     } while (false);
+
+    if (error != ERROR_SUCCESS)
+    {
+        helper_IA32_4KB_deletePaging(a_paging);
+    }
 
     return error;
 }
@@ -54,9 +130,20 @@ size_t IA32_4KB_init(struct Paging *a_kernelPaging,
 
     size_t error = ERROR_SUCCESS;
 
+    error = helper_IA32_4KB_createPaging(a_newPaging);
+    if (error != ERROR_SUCCESS)
+    {
+        return error;
+    }
+
     do
     {
     } while (false);
+
+    if (error != ERROR_SUCCESS)
+    {
+        helper_IA32_4KB_deletePaging(a_newPaging);
+    }
 
     return error;
 }
