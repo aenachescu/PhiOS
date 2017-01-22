@@ -4,6 +4,8 @@
 #include "types.h"
 #include "errors.h"
 
+#define PAGING_TYPE_NONE        0
+
 #define PAGING_TYPE_IA32_4KB    1
 #define PAGING_TYPE_IA32_4MB    2
 
@@ -50,9 +52,9 @@ struct Paging
     void           *pagingStruct;
     VMA_ALLOC_PFN   allocFn;
     VMA_FREE_PFN    freeFn;
-    uint64          freeMappedVirtualMemory;
-    uint64          freeVirtualMemory;
-    uint64          lastAllocatedPage;
+    size_t          freeMappedVirtualMemory;
+    size_t          freeVirtualMemory;
+    size_t          lastAllocatedPage;
 };
 
 #endif
