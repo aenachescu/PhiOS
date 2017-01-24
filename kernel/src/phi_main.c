@@ -12,8 +12,11 @@
 #include "arch/x86/pic.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "arch/x86/paging/paging.h"
 
 #include "multiboot2.h"
+
+struct KernelArea g_kernelArea;
 
 extern size_t linker_kernelStart;
 extern size_t linker_kernelEnd;
