@@ -1,0 +1,15 @@
+notifications:
+    email:
+        recipients:
+            - alinenachescu033@gmail.com
+
+notifications:
+    irc: "chat.freenode.net#cruce-devel"
+
+install:
+    - wget -O build.tar.gz https://doc-0g-20-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/1v704fv1bbcsgl2drs9ok07vulm4auu0/1485280800000/15155571134338238711/*/0Bymj_P5Wbu4geGg0bWxWOFEyN2c?e=download
+    - tar -zxvf build.tar.gz
+
+script:
+    - ./linux_compile.sh clean-all
+    - ./linux_compile.sh build x86_32
