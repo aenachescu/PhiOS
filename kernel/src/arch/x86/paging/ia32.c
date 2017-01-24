@@ -1,6 +1,8 @@
 #include "arch/x86/paging/ia32.h"
 #include "memory/pmm.h"
 
+extern struct KernelArea g_kernelArea;
+
 static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
 {
     size_t error = ERROR_SUCCESS;
@@ -66,10 +68,9 @@ static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
     return error;
 }
 
-size_t IA32_4KB_init(struct Paging *a_paging,
-                     const struct KernelArea *a_kernelArea)
+size_t IA32_4KB_init(struct Paging *a_paging, struct Paging *a_currentPaging)
 {
-    if (a_kernelArea == NULL || a_paging == NULL)
+    if (a_paging == NULL)
     {
         return ERROR_NULL_POINTER;
     }
@@ -82,8 +83,72 @@ size_t IA32_4KB_init(struct Paging *a_paging,
         return error;
     }
 
+    struct IA32_4KB_Paging_AllocParam allocParam;
+    struct AllocFuncParam request;
+    size_t returnedAddress  = 0;
+    size_t requestedAddress = 3221225472; // 3GB
+    size_t difference       = 0;
+
     do
     {
+        // init request
+        request.pagingType = PAGING_TYPE_IA32_4KB;
+        request.param      = &allocParam;
+
+        // init allocParam for the kernel code area
+        allocParam.flag             = PAGING_FLAG_ALLOC_SHARED_MEMORY   |
+                                      PAGING_FLAG_ALLOC_AT_ADDRESS      |
+                                      PAGING_FLAG_ALLOC_MAPS_KERNEL;
+        allocParam.currentPaging    = a_currentPaging;
+        allocParam.user             = false;
+        allocParam.write            = false;
+        allocParam.cacheDisabled    = false;
+        allocParam.writeThrough     = true;
+        allocParam.virtualAddress   = requestedAddress;
+        allocParam.length           = g_kernelArea.codeEndAddr -
+                                      g_kernelArea.codeStartAddr;
+        allocParam.physicalAddress  = g_kernelArea.codeStartAddr;
+
+        error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
+        if (error != ERROR_SUCCESS)
+        {
+            break;
+        }
+
+        requestedAddress = allocParam.length;
+        if ((difference = allocParam.length % 4096) != 0)
+        {
+            requestedAddress += (4096 - difference);
+        }
+
+        allocParam.virtualAddress   = requestedAddress;
+        allocParam.length           = g_kernelArea.rodataEndAddr -
+                                      g_kernelArea.rodataStartAddr;
+        allocParam.physicalAddress  = g_kernelArea.rodataStartAddr;
+
+        error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
+        if (error != ERROR_SUCCESS)
+        {
+            break;
+        }
+
+        requestedAddress = allocParam.length;
+        if ((difference = allocParam.length % 4096) != 0)
+        {
+            requestedAddress += (4096 - difference);
+        }
+
+        allocParam.write            = true;
+        allocParam.virtualAddress   = requestedAddress;
+        allocParam.length           = g_kernelArea.rwdataEndAddr -
+                                      g_kernelArea.rwdataStartAddr;
+        allocParam.physicalAddress  = g_kernelArea.rwdataStartAddr;
+
+        error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
+        if (error != ERROR_SUCCESS)
+        {
+            break;
+        }
     } while (false);
 
     if (error != ERROR_SUCCESS)
