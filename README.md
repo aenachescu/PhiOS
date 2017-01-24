@@ -1,1 +1,1 @@
-# PhiOS
+# PhiOS ![Build Passing Icon](https://travis-ci.org/EnachescuAlin/PhiOS.svg)
