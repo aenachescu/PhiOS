@@ -57,7 +57,8 @@ struct IA32_PageDirectory_4KB
     struct IA32_PageTable_4KB *addresses[PAGING_IA32_PDE_NUMBER];
 } __attribute__((packed));
 
-size_t IA32_4KB_init(struct Paging *a_paging);
+size_t IA32_4KB_init(struct Paging *a_paging,
+                     struct Paging *a_currentPaging);
 
 size_t IA32_4KB_alloc(struct Paging *a_paging,
                       struct AllocFuncParam *a_request,
@@ -68,14 +69,15 @@ size_t IA32_4KB_free(struct Paging *a_paging,
 
 struct IA32_4KB_Paging_AllocParam
 {
-    uint32  flag;
-    bool    user;
-    bool    write;
-    bool    cacheDisabled;
-    bool    writeThrough;
-    size_t  virtualAddress;
-    size_t  length; // in bytes
-    size_t  physicalAddress;
+    uint32          flag;
+    bool            user;
+    bool            write;
+    bool            cacheDisabled;
+    bool            writeThrough;
+    size_t          virtualAddress;
+    size_t          length; // in bytes
+    size_t          physicalAddress;
+    struct Paging  *currentPaging;
 };
 
 struct IA32_4KB_Paging_FreeParam
