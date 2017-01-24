@@ -74,7 +74,7 @@ struct IA32_4KB_Paging_AllocParam
     bool    cacheDisabled;
     bool    writeThrough;
     size_t  virtualAddress;
-    size_t  pagesNumber;
+    size_t  length; // in bytes
     size_t  physicalAddress;
 };
 
@@ -82,7 +82,7 @@ struct IA32_4KB_Paging_FreeParam
 {
     uint32 flag;
     size_t startAddress;
-    size_t pagesNumber;
+    size_t length; // in bytes
 };
 
 /*
