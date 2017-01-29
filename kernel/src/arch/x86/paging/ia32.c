@@ -68,6 +68,57 @@ static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
     return error;
 }
 
+static void helpet_IA32_4KB_allocArea(struct Paging *a_paging,
+                                      struct IA32_4KB_Paging_AllocParam *a_request)
+{
+    struct IA32_PageDirectory_4KB *pd = a_paging->pagingStruct;
+    size_t virtualAddress = a_request->virtualAddress & (~4095);
+
+    size_t firstPageId = virtualAddress / 4096;
+    size_t pageTableId = firstPageId / PAGING_IA32_PDE_NUMBER;
+    size_t pageId = firstPageId % PAGING_IA32_PTE_NUMBER;
+
+    size_t lastVirtualAddress = a_request->virtualAddress + a_request->length;
+    if (lastVirtualAddress % 4096 != 0)
+    {
+        lastVirtualAddress &= (~4095);
+        lastVirtualAddress += 4096;
+    }
+
+    size_t pagesNumber = (lastVirtualAddress - virtualAddress) / 4096;
+    struct IA32_PageTable_4KB *pageTable = pd->addresses[pageTableId];
+    size_t physicalAddress = a_request->physicalAddress;
+
+#define PAGE pageTable->entries[pageId]
+
+    while (pagesNumber != 0)
+    {
+        PAGE.present        = 1;
+        PAGE.write          = a_request->write;
+        PAGE.user           = a_request->user;
+        PAGE.writeThrough   = a_request->writeThrough;
+        PAGE.cacheDisabled  = a_request->cacheDisabled;
+        PAGE.accessed       = 0;
+        PAGE.dirty          = 0;
+        PAGE.pat            = 0;
+        PAGE.global         = 0;
+        PAGE.ignored        = 0;
+        PAGE.address        = (physicalAddress >> 12);
+
+        pageId++;
+        if (pageId == PAGING_IA32_PTE_NUMBER)
+        {
+            pageTableId++;
+            pageId = 0;
+            pageTable = pd->addresses[pageTableId];
+        }
+
+        pagesNumber--;
+    }
+
+#undef PAGE
+}
+
 size_t IA32_4KB_init(struct Paging *a_paging, struct Paging *a_currentPaging)
 {
     if (a_paging == NULL)
