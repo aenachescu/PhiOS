@@ -4,7 +4,7 @@
 #include "errors.h"
 #include "kstring.h"
 #include "arch/x86/asm_io.h"
-#include "arch/x86/idt32.h"
+#include "arch/x86/idt.h"
 #include "kstdio.h"
 
 char g_USasciiNonShift[] = {
@@ -112,7 +112,7 @@ size_t keyboard_init()
     g_capsOn = false;
     g_shift = false;
     g_special = false;
-    IDT32_registerHandler(IRQ1, &keyboard_intHandler32);
+    IDT_registerHandler(IRQ1, &keyboard_intHandler);
 
     return ERROR_SUCCESS;
 }
@@ -148,12 +148,7 @@ char keyboard_readKey()
     return (char) g_keyboardBuffer[g_keyboardBufferPos - 1];
 }
 
-void keyboard_intHandler32(__attribute__((unused)) CpuState *a_state)
+void keyboard_intHandler(__attribute__((unused)) CpuState *a_state)
 {
     helper_keyboardReadScanCode();
 }
-
-/*void keyboard_intHandler64(__attribute__((unused)) IntCpuState64 *a_state)
-{
-    helper_keyboardReadScanCode();
-}*/
