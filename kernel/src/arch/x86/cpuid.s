@@ -1,4 +1,6 @@
 .section .text
+.code32
+
 .global CPUID_IsSuported
 .type CPUID_IsSuported, @function
 .global CPUID_Call

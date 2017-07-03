@@ -1,4 +1,6 @@
 .section .text
+.code32
+
 .global GDT32_Load
 .type GDT32_Load, @function
 
