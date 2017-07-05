@@ -1,56 +1,55 @@
-ENTRY(bootstrap)
+KERNEL_VMA = 0x100000;
+KERNEL_LMA = 0x100000;
+ALIGN_VAL = 0x1000;
+
+OUTPUT_FORMAT("elf32-x86-64")
+ENTRY(_start64)
 SECTIONS
 {
     . = KERNEL_LMA;
 
-        .bootstrap :
-        {
-            *(.multiboot_header)
-            <path of bootstrap object> (.text)
-        }
+    linker_kernelStart = .;
 
-        . += KERNEL_VMA;
+    _boot = .;
+    .boot :
+    {
+        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot64.s.o (.text)
+    }
+    _eboot = .;
 
-        .text : AT(ADDR(.text) - KERNEL_VMA)
-        {
-            _code = .;
-            *(EXCLUDE_FILE(*<path of bootstrap object>) .text)
-            *(.rodata*)
-            . = ALIGN(4096);
-        }
+    _text = .;
+    .text :
+    {
+        *(EXCLUDE_FILE(CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot64.s.o) .text)
+    }
+    _etext = .;
 
-   .data : AT(ADDR(.data) - KERNEL_VMA)
-   {
-        _data = .;
+    _data = .;
+    .data :
+    {
         *(.data)
-        . = ALIGN(4096);
-   }
+    }
+    _edata = .;
 
-   .eh_frame : AT(ADDR(.eh_frame) - KERNEL_VMA)
-   {
-       _ehframe = .;
-       *(.eh_frame)
-        . = ALIGN(4096);
-   }
+    _eh_frame = .;
+    .eh_frame :
+    {
+        *(.eh_frame)
+    }
+    _eeh_frame = .;
 
-   .bss : AT(ADDR(.bss) - KERNEL_VMA)
-   {
-       _bss = .;
-       *(.bss)
-
-       /*
-        * You usually need to include generated COMMON symbols
-        * under kernel BSS section or use gcc's -fno-common
-        */
-
+    _bss = .;
+    .bss :
+    {
+        *(.bss)
         *(COMMON)
-       . = ALIGN(4096);
-   }
+    }
+    _ebss = .;
 
-   _end = .;
+    linker_kernelEnd = .;
 
-   /DISCARD/ :
-   {
+    .comment :
+    {
         *(.comment)
-   }
+    }
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project (PhiOS C ASM)
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Enable languages
 enable_language(C)
@@ -61,18 +61,10 @@ else ()
     set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_64")
 endif()
 
-# Set bootstrap rules
-SET_SOURCE_FILES_PROPERTIES(
-        ${BOOTSTRAP_OBJS}
-        PROPERTIES
-        EXTERNAL_OBJECT true
-        GENERATED true
-)
-
 # Set flags
 set(CMAKE_ASM_FLAGS "")
 set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -std=gnu11 -ffreestanding -O2 -Wall -Wextra")
-set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib")
+set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib -z max-page-size=0x1000")
 
 # Set linker rule
 set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> ${CMAKE_LINKER_FLAGS} <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
@@ -111,6 +103,7 @@ add_custom_command(
 
 # Set custom targets
 add_custom_target(iso DEPENDS phios.iso)
+add_custom_target(bootstrap DEPENDS ${PRJ_PATH}/bin/x86_64/boot.o)
 
 # Add OS image
 add_executable(phios.elf ${C_SOURCES} ${ASM_SOURCES})
