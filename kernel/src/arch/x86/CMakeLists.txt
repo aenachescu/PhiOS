@@ -19,19 +19,17 @@ if (DEFINED ARCH)
         list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/interrupts32.s")
         list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/cpuid.s")
         list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/usermode.s")
-        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/multiboot.s")
-        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot.s")
+        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot32.s")
     elseif (ARCH STREQUAL "x86_64")
         # TODO: add files for 64-bit arch
         list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/idt64.c")
 
         list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/descriptors32.s")
-        #list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/interrupts32.s")
+        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/interrupts32.s")
         #list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/cpuid.s")
         list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/usermode.s")
 
-        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/multiboot.s")
-        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot.s")
+        list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot64.s")
     else ()
         message(FATAL_ERROR "Architecture not supported")
     endif()
@@ -41,8 +39,7 @@ else ()
     #list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/cpuid.s")
     list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/usermode.s")
 
-    list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/multiboot.s")
-    list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot.s")
+    list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/boot64.s")
 endif()
 
 # Update parent scope
