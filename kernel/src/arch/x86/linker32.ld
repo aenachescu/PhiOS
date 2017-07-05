@@ -1,47 +1,55 @@
-/* The bootloader will look at this image and start execution at the symbol
-   designated as the entry point. */
-ENTRY(_start)
+KERNEL_VMA = 0x100000;
+KERNEL_LMA = 0x100000;
+ALIGN_VAL = 0x1000;
 
-/* Tell where the various sections of the object files will be put in the final
-   kernel image. */
+OUTPUT_FORMAT("elf32-i386")
+ENTRY(_start32)
 SECTIONS
 {
-	/* Begin putting sections at 1 MiB, a conventional place for kernels to be
-	   loaded at by the bootloader. */
-	. = 1M;
-    linker_kernelStart = 1M;
+    . = KERNEL_LMA;
 
-	/* First put the multiboot header, as it is required to be put very early
-	   early in the image or the bootloader won't recognize the file format.
-	   Next we'll put the .text section. */
+    linker_kernelStart = .;
 
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-	    *(.multiboot_header)
-		*(.text)
-	}
+    _boot = .;
+    .boot :
+    {
+        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o (.text)
+    }
+    _eboot = .;
 
-	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
-		*(.rodata)
-	}
+    _text = .;
+    .text :
+    {
+        *(.text)
+    }
+    _etext = .;
 
-	/* Read-write data (initialized) */
-	.data BLOCK(4K) : ALIGN(4K)
-	{
-		*(.data)
-	}
+    _data = .;
+    .data :
+    {
+        *(.data)
+    }
+    _edata = .;
 
-	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		*(COMMON)
-		*(.bss)
-	}
+    _eh_frame = .;
+    .eh_frame :
+    {
+        *(.eh_frame)
+    }
+    _eeh_frame = .;
 
-	/* The compiler may produce other sections, by default it will put them in
-	   a segment with the same name. Simply add stuff here as needed. */
+    _bss = .;
+    .bss :
+    {
+        *(.bss)
+        *(COMMON)
+    }
+    _ebss = .;
 
-        linker_kernelEnd = .;
+    linker_kernelEnd = .;
+
+    .comment :
+    {
+        *(.comment)
+    }
 }
