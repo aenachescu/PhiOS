@@ -2,10 +2,11 @@
 .code32
 
 multiboot_header_begin:
-    /*
-        TODO: here should be the multiboot header
-        Using 32bit Multiboot 2 header the OS doesn't start.
-    */
+    .align 4
+    .long 0xe85250d6
+    .long 0
+    .long multiboot_header_end - multiboot_header_begin
+    .long -(0xe85250d6 + (multiboot_header_end - multiboot_header_begin))
 multiboot_header_end:
 
 .global _start64
