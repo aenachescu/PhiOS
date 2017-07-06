@@ -1,4 +1,5 @@
 .section .text
+.code32
 
 .macro ISR_NOERRCODE_32 n
     .global isr_32_\n
