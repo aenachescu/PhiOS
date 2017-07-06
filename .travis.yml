@@ -20,3 +20,4 @@ install:
 script:
     - ./linux_compile.sh clean-all
     - ./linux_compile.sh build x86_32
+    - ./linux_compile.sh build x86_64
