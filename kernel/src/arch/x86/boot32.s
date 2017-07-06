@@ -1,11 +1,24 @@
 .code32
 
+.section .text
+
 multiboot_header_begin:
-    .align 4
+    # 64-bit header align
+    .align 8
+
+    # Magic header value
     .long 0xe85250d6
+
+    # Architecture type: protected mode 32-bit
     .long 0
+
+    # Header size
     .long multiboot_header_end - multiboot_header_begin
+
+    # Checksum
     .long -(0xe85250d6 + (multiboot_header_end - multiboot_header_begin))
+
+    # End tag
     .short 0
     .short 0
     .long 8
