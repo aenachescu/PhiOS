@@ -14,7 +14,7 @@ before_install:
     - sudo apt-get install xorriso
 
 install:
-    - wget -O build.tar.gz https://doc-0g-20-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/1v704fv1bbcsgl2drs9ok07vulm4auu0/1485280800000/15155571134338238711/*/0Bymj_P5Wbu4geGg0bWxWOFEyN2c?e=download
+    - wget -O build.tar.gz "https://onedrive.live.com/download?cid=9B17C13D0B35F82E&resid=9B17C13D0B35F82E%21401&authkey=AMivmxXl5pr8kzc"
     - tar -zxvf build.tar.gz
 
 script:
