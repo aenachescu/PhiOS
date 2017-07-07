@@ -18,5 +18,5 @@ install:
     - tar -zxvf build.tar.gz
 
 script:
-    - ./linux_compile.sh clean-all
-    - ./linux_compile.sh build-all
+    - ./linux_x86_64_compile.sh clean-all
+    - ./linux_x86_64_compile.sh build-all
