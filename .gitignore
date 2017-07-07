@@ -37,3 +37,6 @@ build
 
 *.swp
 *.swo
+
+# Visual Studio Code
+.vscode
