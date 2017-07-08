@@ -87,7 +87,6 @@ struct PAE_PageDirectory_4KB_Entry
 struct PAE_PageDirectory_4KB
 {
     struct PAE_PageDirectory_4KB_Entry entries[PAGING_PAE_PDE_NUMBER];
-    struct PAE_PageTable_4KB *addresses[PAGING_PAE_PDE_NUMBER];
 } __attribute__((packed));
 
 /*
@@ -111,14 +110,12 @@ struct PAE_PageDirectoryPointerTable_Entry
 struct PAE_PageDirectoryPointerTable_4KB
 {
     struct PAE_PageDirectoryPointerTable_Entry entries[PAGING_PAE_PDPTE_NUMBER];
-    struct PAE_PageDirectory_4KB *addresses[PAGING_PAE_PDPTE_NUMBER];
 } __attribute__((packed));
 
 // maps 4GB with pages of 2MB
 struct PAE_PageDirectoryPointerTable_2MB
 {
     struct PAE_PageDirectoryPointerTable_Entry entries[PAGING_PAE_PDPTE_NUMBER];
-    struct PAE_PageDirectory_2MB *addresses[PAGING_PAE_PDPTE_NUMBER];
 } __attribute__((packed));
 
 #endif

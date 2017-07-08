@@ -54,7 +54,6 @@ struct IA32_PageDirectory_4KB_Entry
 struct IA32_PageDirectory_4KB
 {
     struct IA32_PageDirectory_4KB_Entry entries[PAGING_IA32_PDE_NUMBER];
-    struct IA32_PageTable_4KB *addresses[PAGING_IA32_PDE_NUMBER];
 } __attribute__((packed));
 
 size_t IA32_4KB_init(struct Paging *a_paging,

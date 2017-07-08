@@ -78,7 +78,6 @@ struct IA32E_PageDirectory_4KB_Entry
 struct IA32E_PageDirectory_4KB
 {
     struct IA32E_PageDirectory_4KB_Entry entries[PAGING_IA32E_PDE_NUMBER];
-    struct IA32E_PageTable_4KB *addresses[PAGING_IA32E_PDE_NUMBER];
 } __attribute__((packed));
 
 // maps 1GB
@@ -102,14 +101,12 @@ struct IA32E_PageDirectoryPointerTable_4KB_Entry
 struct IA32E_PageDirectoryPointerTable_4KB
 {
     struct IA32E_PageDirectoryPointerTable_4KB_Entry entries[PAGING_IA32E_PDPTE_NUMBER];
-    struct IA32E_PageDirectory_4KB *addresses[PAGING_IA32E_PDPTE_NUMBER];
 } __attribute__((packed));
 
 // maps 256PB
 struct IA32E_PageMapLevel4_4KB
 {
     struct IA32E_PageMapLevel4_Entry entries[PAGING_IA32E_PML4E_NUMBER];
-    struct IA32E_PageDirectoryPointerTable_4KB *addresses[PAGING_IA32E_PML4E_NUMBER];
 } __attribute__((packed));
 
 /*
@@ -164,14 +161,12 @@ struct IA32E_PageDirectoryPointerTable_2MB_Entry
 struct IA32E_PageDirectoryPointerTable_2MB
 {
     struct IA32E_PageDirectoryPointerTable_2MB_Entry entries[PAGING_IA32E_PDPTE_NUMBER];
-    struct IA32E_PageDirectory_2MB *addresses[PAGING_IA32E_PDPTE_NUMBER];
 } __attribute__((packed));
 
 // maps 256PB
 struct IA32E_PageMapLevel4_2MB
 {
     struct IA32E_PageMapLevel4_Entry entries[PAGING_IA32E_PML4E_NUMBER];
-    struct IA32E_PageDirectoryPointerTable_2MB *addresses[PAGING_IA32E_PML4E_NUMBER];
 } __attribute__((packed));
 
 /*
@@ -209,7 +204,6 @@ struct IA32E_PageDirectoryPointerTable_1GB
 struct IA32E_PageMapLevel4_1GB
 {
     struct IA32E_PageMapLevel4_Entry entries[PAGING_IA32E_PML4E_NUMBER];
-    struct IA32E_PageDirectoryPointerTable_1GB *addresses[PAGING_IA32E_PML4E_NUMBER];
 } __attribute__((packed));
 
 #endif
