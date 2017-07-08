@@ -1,23 +1,14 @@
 #include "arch/x86/pit.h"
 #include "arch/x86/asm_io.h"
 #include "cpu.h"
-
-#ifdef PhiOS_ARCH_x86_32
-#include "arch/x86/idt32.h"
-#define IDT_registerHandler IDT32_registerHandler
-#endif
-
-#ifdef PhiOS_ARCH_x86_64
-#include "arch/x86/idt64.h"
-#define IDT_registerHandler IDT64_registerHandler
-#endif
+#include "arch/x86/idt.h"
 
 /*
  * The interval time (in ms) in which it's called helper_pitHandler().
  */
 static size_t g_time;
 
-static void helper_pitHandler(CpuState *a_state)
+static void helper_pitHandler(__attribute__((unused)) CpuState *a_state)
 {
     return;
 }
