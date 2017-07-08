@@ -23,7 +23,6 @@ static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
             struct IA32_PageDirectory_4KB_Entry *pdEntry = pd->entries + i;
             size_t *entryAddr = (size_t*) pdEntry;
             *entryAddr = 0;
-            pd->addresses[i] = NULL;
         }
 
         a_paging->pagingType                = PAGING_TYPE_IA32_4KB;
@@ -68,7 +67,7 @@ static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
     return error;
 }
 
-static void helpet_IA32_4KB_allocArea(struct Paging *a_paging,
+static void helper_IA32_4KB_allocArea(struct Paging *a_paging,
                                       struct IA32_4KB_Paging_AllocParam *a_request)
 {
     struct IA32_PageDirectory_4KB *pd = a_paging->pagingStruct;
@@ -86,7 +85,7 @@ static void helpet_IA32_4KB_allocArea(struct Paging *a_paging,
     }
 
     size_t pagesNumber = (lastVirtualAddress - virtualAddress) / 4096;
-    struct IA32_PageTable_4KB *pageTable = pd->addresses[pageTableId];
+    struct IA32_PageTable_4KB *pageTable = NULL;
     size_t physicalAddress = a_request->physicalAddress;
 
 #define PAGE pageTable->entries[pageId]
@@ -110,7 +109,7 @@ static void helpet_IA32_4KB_allocArea(struct Paging *a_paging,
         {
             pageTableId++;
             pageId = 0;
-            pageTable = pd->addresses[pageTableId];
+            pageTable = NULL;
         }
 
         pagesNumber--;
