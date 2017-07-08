@@ -16,6 +16,12 @@
 
 # $2 can take the following values: x86_32, x86_64
 
+
+
+
+
+# helper functions
+
 function create_bin {
     if ! [ -d "bin" ];
     then
@@ -47,6 +53,28 @@ function remove_dir {
     fi
 }
 
+function build_x86_32 {
+    create_bin
+    create_x86_32
+    cmake ../.. -DARCH:STRING=x86_32
+    make
+    make iso
+}
+
+function build_x86_64 {
+    create_bin
+    create_x86_64
+    cmake ../.. -DARCH:STRING=x86_64
+    make
+    make iso
+}
+
+
+
+
+
+# set environment
+
 if [ "$1" == "" ];
 then
     export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
@@ -65,35 +93,48 @@ then
     fi
 fi
 
+if [ "$1" == "build-all" ];
+then
+    export PATH=$PWD/build/linux-x86_64/gcc-x86_32/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
+    export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
+fi
+
+
+
+
+
+# build
+
 if [ "$1" == "" ];
 then
-    create_bin
-    create_x86_64
-    cmake ../.. -DARCH:STRING=x86_64
-    make
-    make iso
+    build_x86_64
 fi
 
 if [ "$1" == "build" ];
 then
     if [ "$2" == "x86_64" ];
     then
-        create_bin
-        create_x86_64
-        cmake ../.. -DARCH:STRING=x86_64
-        make
-        make iso
+        build_x86_64
     fi
 
     if [ "$2" == "x86_32" ];
     then
-        create_bin
-        create_x86_32
-        cmake ../.. -DARCH:STRING=x86_32
-        make
-        make iso
+        build_x86_32
     fi
 fi
+
+if [ "$1" == "build-all" ];
+then
+    build_x86_32
+    cd ../..
+    build_x86_64
+fi
+
+
+
+
+
+# clean-up
 
 if [ "$1" == "clean-all" ];
 then

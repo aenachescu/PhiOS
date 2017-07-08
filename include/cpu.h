@@ -20,10 +20,6 @@
 // Stop CPU exectuion, but interrupts remain turned on
 #define freezeCpu() while(true) { pauseCpu(); }
 
-#endif // PhiOS_ARCH_x86_32 || PhiOS_ARCH_x86_64
-
-#ifdef PhiOS_ARCH_x86_32
-
 typedef struct IntCpuState32 {
     uint32 cr3;
     uint32 cr2;
@@ -48,11 +44,11 @@ typedef struct IntCpuState32 {
     uint16 ss;
 } IntCpuState32;
 
+#ifdef PhiOS_ARCH_x86_32
+
 typedef IntCpuState32 CpuState;
 
 #endif // PhiOS_ARCH_x86_32
-
-#ifdef PhiOS_ARCH_x86_64
 
 typedef struct IntCpuState64 {
     uint64 cr3;
@@ -86,10 +82,18 @@ typedef struct IntCpuState64 {
     uint16 ss;
 } IntCpuState64;
 
+#ifdef PhiOS_ARCH_x86_64
+
 typedef IntCpuState64 CpuState;
+
+#endif // PhiOS_ARCH_x86_64
+
+void cpu_printState32(IntCpuState32 *a_state);
+
+void cpu_printState64(IntCpuState64 *a_state);
 
 void cpu_printState(CpuState *a_state);
 
-#endif // PhiOS_ARCH_x86_64
+#endif // PhiOS_ARCH_x86_32 || PhiOS_ARCH_x86_64
 
 #endif // PhiOS_cpu
