@@ -82,6 +82,7 @@ void kernel_main(unsigned long magic, size_t addr)
     // Inits Placement Address Allocator
     PAA_init((size_t) &linker_kernelEnd);
 
+#ifdef PhiOS_ARCH_x86_32
     // Inits CPUID detection
     CPUID_Init();
     PAA_alloc(256, (size_t*) g_CPUvendorName, 1);
@@ -133,6 +134,7 @@ void kernel_main(unsigned long magic, size_t addr)
 
     // Go to user mode
     jumpToUserMode();
+#endif // PhiOS_ARCH_x86_32
 
     return ;
 }

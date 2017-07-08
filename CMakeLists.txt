@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project (PhiOS C ASM)
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Enable languages
 enable_language(C)
@@ -30,15 +30,18 @@ if (DEFINED ARCH)
         set(CMAKE_C_COMPILER "i686-elf-gcc")
         set(CMAKE_AR "i686-elf-ar")
         set(CMAKE_LINKER "i686-elf-ld")
-        set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
+        set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker32.ld")
         set(ARCH_PATH "kernel/src/arch/x86")
         set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_32")
     elseif (ARCH STREQUAL "x86_64")
+        set(C_32BIT_COMPILER "i686-elf-gcc")
+        set(ASM_32BIT_COMPILER "i686-elf-as")
+
         set(CMAKE_ASM_COMPILER "x86_64-elf-as")
         set(CMAKE_C_COMPILER "x86_64-elf-gcc")
         set(CMAKE_AR "x86_64-elf-ar")
         set(CMAKE_LINKER "x86_64-elf-ld")
-        set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
+        set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker64.ld")
         set(ARCH_PATH "kernel/src/arch/x86")
         set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_64")
     else ()
@@ -46,11 +49,14 @@ if (DEFINED ARCH)
     endif()
 else ()
     # Use defaults if user doesn't specify any architecture
+    set(C_32BIT_COMPILER "i686-elf-gcc")
+    set(ASM_32BIT_COMPILER "i686-elf-as")
+
     set(CMAKE_ASM_COMPILER "x86_64-elf-as")
     set(CMAKE_C_COMPILER "x86_64-elf-gcc")
     set(CMAKE_AR "x86_64-elf-ar")
     set(CMAKE_LINKER "x86_64-elf-ld")
-    set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker.ld")
+    set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker64.ld")
     set(ARCH_PATH "kernel/src/arch/x86")
     set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_64")
 endif()
@@ -58,12 +64,13 @@ endif()
 # Set flags
 set(CMAKE_ASM_FLAGS "")
 set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -std=gnu11 -ffreestanding -O2 -Wall -Wextra")
-set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib")
+set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib -z max-page-size=0x1000")
 
 # Set linker rule
 set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> ${CMAKE_LINKER_FLAGS} <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 
 # Set sources
+list(APPEND BOOTSTRAP_SOURCES "")
 list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
 list(APPEND ASM_SOURCES "")
 list(APPEND STATIC_LIBS "")
@@ -81,10 +88,6 @@ add_subdirectory("${PRJ_PATH}/util")
 # Add include paths
 include_directories(${INCLUDE_PATH})
 
-# Add OS image
-add_executable(phios.elf ${C_SOURCES} ${ASM_SOURCES})
-target_link_libraries(phios.elf ${STATIC_LIBS})
-
 # Set custom commands
 add_custom_command(
     OUTPUT
@@ -100,3 +103,8 @@ add_custom_command(
 
 # Set custom targets
 add_custom_target(iso DEPENDS phios.iso)
+add_custom_target(bootstrap DEPENDS ${PRJ_PATH}/bin/x86_64/boot.o)
+
+# Add OS image
+add_executable(phios.elf ${C_SOURCES} ${ASM_SOURCES})
+target_link_libraries(phios.elf ${STATIC_LIBS})

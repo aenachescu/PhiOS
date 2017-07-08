@@ -1,4 +1,5 @@
 .section .text
+.code32
 
 .global jumpToUserMode
 .type jumpToUserMode, @function

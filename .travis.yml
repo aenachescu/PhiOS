@@ -1,0 +1,21 @@
+notifications:
+    email:
+        recipients:
+            - alinenachescu033@gmail.com
+
+notifications:
+    irc: "chat.freenode.net#cruce-devel"
+
+language: c
+compiler: gcc
+sudo: required
+
+before_install:
+    - sudo apt-get install xorriso
+
+install:
+    - ./linux_x86_64_getDependencies.sh
+
+script:
+    - ./linux_x86_64_compile.sh clean-all
+    - ./linux_x86_64_compile.sh build-all
