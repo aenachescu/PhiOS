@@ -53,7 +53,7 @@ struct Paging
 {
     uint8           pagingType;
     uint8           locked;
-    void           *pagingStruct;
+    void           *pagingStruct; // physical address
     VMA_ALLOC_PFN   allocFn;
     VMA_FREE_PFN    freeFn;
     size_t          freeMappedVirtualMemory;
