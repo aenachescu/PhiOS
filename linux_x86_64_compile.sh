@@ -56,17 +56,30 @@ function remove_dir {
 function build_x86_32 {
     create_bin
     create_x86_32
+
     cmake ../.. -DARCH:STRING=x86_32
+    rc=$?; if [[ $rc != 0 ]]; then echo "cmake failed - $rc"; exit $rc; fi
+
     make
+    rc=$?; if [[ $rc != 0 ]]; then echo "make failed - $rc"; exit $rc; fi
+    
     make iso
+    rc=$?; if [[ $rc != 0 ]]; then echo "make iso failed - $rc"; exit $rc; fi
+    
 }
 
 function build_x86_64 {
     create_bin
     create_x86_64
+
     cmake ../.. -DARCH:STRING=x86_64
+    rc=$?; if [[ $rc != 0 ]]; then echo "cmake failed - $rc"; exit $rc; fi
+
     make
+    rc=$?; if [[ $rc != 0 ]]; then echo "make failed - $rc"; exit $rc; fi
+
     make iso
+    rc=$?; if [[ $rc != 0 ]]; then echo "make iso failed - $rc"; exit $rc; fi    
 }
 
 
