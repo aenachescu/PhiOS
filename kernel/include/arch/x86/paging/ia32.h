@@ -17,7 +17,8 @@ struct IA32_PageTable_4KB_Entry
 {
     union
     {
-        struct {
+        struct
+        {
             uint32 present        :  1;
             uint32 write          :  1;
             uint32 user           :  1;
@@ -90,17 +91,16 @@ struct IA32_4KB_Paging_AllocParam
     bool            write;
     bool            cacheDisabled;
     bool            writeThrough;
-    size_t          virtualAddress;
-    size_t          length; // in bytes
-    size_t          physicalAddress;
-    struct Paging  *currentPaging;
+    uint32          virtualAddress;
+    uint32          length; // in bytes
+    uint32          physicalAddress;
 };
 
 struct IA32_4KB_Paging_FreeParam
 {
     uint32 flag;
-    size_t startAddress;
-    size_t length; // in bytes
+    uint32 startAddress;
+    uint32 length; // in bytes
 };
 
 /*
