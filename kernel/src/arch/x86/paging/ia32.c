@@ -123,7 +123,7 @@ static void helper_IA32_4KB_allocArea(struct Paging *a_paging,
 }
 
 static size_t helper_IA32_4KB_getPositionForVirtualAddress(
-    uint32 virtualAddr,
+    uint32 virtualAddress,
     uint32 *pageId,
     uint32 *tableId)
 {
