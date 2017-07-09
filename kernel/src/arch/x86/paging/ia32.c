@@ -6,6 +6,29 @@ extern struct KernelArea g_kernelArea;
 #define IA32_4KB_PD_VIRTUAL_ADDRESS 0x00100000 // 1MiB
 #define IA32_4KB_PT_VIRTUAL_ADDRESS 0x00101000 // 1MiB + 4KiB
 
+#define IA32_4KB_PAGE_PRESENT           ((uint32) 0x00000001)
+#define IA32_4KB_PAGE_WRITE             ((uint32) 0x00000002)
+#define IA32_4KB_PAGE_USER              ((uint32) 0x00000004)
+#define IA32_4KB_PAGE_WRITE_THROUGH     ((uint32) 0x00000008)
+#define IA32_4KB_PAGE_CACHE_DISABLED    ((uint32) 0x00000010)
+#define IA32_4KB_PAGE_ACCESSED          ((uint32) 0x00000020)
+#define IA32_4KB_PAGE_DIRTY             ((uint32) 0x00000040)
+#define IA32_4KB_PAGE_PAT               ((uint32) 0x00000080)
+#define IA32_4KB_PAGE_GLOBAL            ((uint32) 0x00000100)
+#define IA32_4KB_PAGE_IGNORED           ((uint32) 0x00000E00)
+#define IA32_4KB_PAGE_ADDRESS           ((uint32) 0xFFFFF000)
+
+#define IA32_4KB_PAGE_TABLE_PRESENT         ((uint32) 0x00000001)
+#define IA32_4KB_PAGE_TABLE_WRITE           ((uint32) 0x00000002)
+#define IA32_4KB_PAGE_TABLE_USER            ((uint32) 0x00000004)
+#define IA32_4KB_PAGE_TABLE_WRITE_THROUGH   ((uint32) 0x00000008)
+#define IA32_4KB_PAGE_TABLE_CACHE_DISABLED  ((uint32) 0x00000010)
+#define IA32_4KB_PAGE_TABLE_ACCESSED        ((uint32) 0x00000020)
+#define IA32_4KB_PAGE_TABLE_IGNORED1        ((uint32) 0x00000040)
+#define IA32_4KB_PAGE_TABLE_PAGE_SIZE       ((uint32) 0x00000080)
+#define IA32_4KB_PAGE_TABLE_IGNORED2        ((uint32) 0x00000F00)
+#define IA32_4KB_PAGE_TABLE_ADDRESS         ((uint32) 0xFFFFF000)
+
 static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
 {
     size_t error = ERROR_SUCCESS;
@@ -139,6 +162,15 @@ static size_t helper_IA32_4KB_getPositionForVirtualAddress(
     return ERROR_SUCCESS;
 }
 
+static void helper_IA32_4KB_initPageTable(struct IA32E_PageTable_4KB *pt)
+{
+    // TODO: optimizes this for using kmemset()
+    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER)
+    {
+        pt->entries[i].data = 0;
+    }
+}
+
 size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
 {
     if (a_paging == NULL)
@@ -170,6 +202,19 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         struct IA32_PageTable_4KB *pt = (struct IA32_PageTable_4KB*) ptAddr;
         uint32 pdPageId = 0, pdTableId = 0;
         uint32 ptPageId = 0, ptTableId = 0;
+        uint32 pageFlags = 0, pageTableFlags = 0;
+
+        // create flags for pages
+        pageFlags |= IA32_4KB_PAGE_PRESENT;
+        pageFlags |= IA32_4KB_PAGE_WRITE;
+        pageFlags |= IA32_4KB_PAGE_WRITE_THROUGH;
+
+        // create flags for page tables
+        pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
+        pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE;
+        pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
+
+        helper_IA32_4KB_initPageTable(pt);
 
         // get position for the page where it's stored the PD
         helper_IA32_4KB_getPositionForVirtualAddress(
@@ -179,18 +224,10 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         );
 
         // map the table where it's stored the PD
-        pd->entries[pdTableId].data = 0;
-        pd->entries[pdTableId].present = 1;
-        pd->entries[pdTableId].write = 1;
-        pd->entries[pdTableId].writeThrough = 1;
-        pd->entries[pdTableId].address = (ptAddr >> 12);
+        pd->entries[pdTableId].data = pageTableFlags | (ptAddr >> 12);
 
         // map the page where it's stored the PD
-        pt->entries[pdPageId].data = 0;
-        pt->entries[pdPageId].present = 1;
-        pt->entries[pdPageId].write = 1;
-        pt->entries[pdPageId].writeThrough = 1;
-        pt->entries[pdPageId].address = (((uint32) pd) >> 12);
+        pt->entries[pdPageId].data = pageFlags | (((uint32) pd ) >> 12);
 
         // get position for the page where it's stored the PT
         helper_IA32_4KB_getPositionForVirtualAddress(
@@ -208,11 +245,7 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         }
 
         // map the page where it's stored the PT
-        pt->entries[ptPageId].data = 0;
-        pt->entries[ptPageId].present = 1;
-        pt->entries[ptPageId].write = 1;
-        pt->entries[ptPageId].writeThrough = 1;
-        pt->entries[ptPageId].address = (ptAddr >> 12);
+        pt->entries[ptPageId].data = pageFlags | (ptAddr >> 12);
 
         // map the tables where it's stored the kernel
 
