@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project (PhiOS C ASM)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+
+if (DEFINED VERBOSE)
+    if (VERBOSE STREQUAL "on")
+        set(CMAKE_VERBOSE_MAKEFILE ON)
+    else ()
+        set(CMAKE_VERBOSE_MAKEFILE OFF)
+    endif ()
+else ()
+    set(CMAKE_VERBOSE_MAKEFILE OFF)
+endif ()
 
 # Enable languages
 enable_language(C)
