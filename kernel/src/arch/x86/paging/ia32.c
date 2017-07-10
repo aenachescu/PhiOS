@@ -3,8 +3,11 @@
 
 extern struct KernelArea g_kernelArea;
 
-#define IA32_4KB_PD_VIRTUAL_ADDRESS 0x00100000 // 1MiB
-#define IA32_4KB_PT_VIRTUAL_ADDRESS 0x00101000 // 1MiB + 4KiB
+#define IA32_4KB_PD_VIRTUAL_ADDRESS \
+    ((struct IA32_PageDirectory_4KB*) 0x003FF000) // 3MiB + 1020KiB
+
+#define IA32_4KB_PT_VIRTUAL_ADDRESS \
+    ((struct IA32_PageTable_4KB*) 0x00400000) // 4MiB
 
 #define IA32_4KB_PAGE_PRESENT           ((uint32) 0x00000001)
 #define IA32_4KB_PAGE_WRITE             ((uint32) 0x00000002)
@@ -162,10 +165,10 @@ static size_t helper_IA32_4KB_getPositionForVirtualAddress(
     return ERROR_SUCCESS;
 }
 
-static void helper_IA32_4KB_initPageTable(struct IA32E_PageTable_4KB *pt)
+static void helper_IA32_4KB_initPageTable(struct IA32_PageTable_4KB *pt)
 {
     // TODO: optimizes this for using kmemset()
-    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER)
+    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++)
     {
         pt->entries[i].data = 0;
     }
@@ -189,8 +192,17 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
             break;
         }
 
-        size_t ptAddr = 0;
-        error = PMM_alloc(&ptAddr, sizeof(struct IA32_PageTable_4KB),
+        uint32 pt0Addr = 0; // physical address for PT0
+        uint32 pt1Addr = 0; // physical address for PT1
+        uint32 pdAddr  = 0; // physical address for PD
+        struct IA32_PageDirectory_4KB *pd = NULL;
+        struct IA32_PageTable_4KB *pt0 = NULL;
+        struct IA32_PageTable_4KB *pt1 = NULL;
+        uint32 pageFlags = 0, pageTableFlags = 0;
+
+        // alloc physical memory for 2 PTs
+        error = PMM_alloc(&pt0Addr,
+                          2 * sizeof(struct IA32_PageTable_4KB),
                           PMM_FOR_VIRTUAL_MEMORY);
         if (error != ERROR_SUCCESS)
         {
@@ -198,11 +210,13 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
             break;
         }
 
-        struct IA32_PageDirectory_4KB *pd = a_paging->pagingStruct;
-        struct IA32_PageTable_4KB *pt = (struct IA32_PageTable_4KB*) ptAddr;
-        uint32 pdPageId = 0, pdTableId = 0;
-        uint32 ptPageId = 0, ptTableId = 0;
-        uint32 pageFlags = 0, pageTableFlags = 0;
+        pt1Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
+
+        pdAddr = (uint32) a_paging->pagingStruct;
+
+        pd = (struct IA32_PageDirectory_4KB*) a_paging->pagingStruct;
+        pt0 = (struct IA32_PageTable_4KB*) pt0Addr;
+        pt1 = (struct IA32_PageTable_4KB*) pt1Addr;
 
         // create flags for pages
         pageFlags |= IA32_4KB_PAGE_PRESENT;
@@ -214,42 +228,24 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE;
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
 
-        helper_IA32_4KB_initPageTable(pt);
+        helper_IA32_4KB_initPageTable(pt0);
+        helper_IA32_4KB_initPageTable(pt1);
 
-        // get position for the page where it's stored the PD
-        helper_IA32_4KB_getPositionForVirtualAddress(
-            IA32_4KB_PD_VIRTUAL_ADDRESS,
-            &pdPageId,
-            &pdTableId
-        );
+        // map the first page table
+        pd->entries[0].data = (pageTableFlags | (pt0Addr >> 12));
 
-        // map the table where it's stored the PD
-        pd->entries[pdTableId].data = pageTableFlags | (ptAddr >> 12);
+        // map the second page table
+        pd->entries[1].data = (pageTableFlags | (pt1Addr >> 12));
+
+        // map the page where it's stored the first page table
+        pt1->entries[0].data = (pageFlags | (pt0Addr >> 12));
+
+        // map the page where it's stored the second page table
+        pt1->entries[1].data = (pageFlags | (pt1Addr >> 12));
 
         // map the page where it's stored the PD
-        pt->entries[pdPageId].data = pageFlags | (((uint32) pd ) >> 12);
+        pt0->entries[1023].data = (pageFlags | (pdAddr >> 12));
 
-        // get position for the page where it's stored the PT
-        helper_IA32_4KB_getPositionForVirtualAddress(
-            ((uint32)IA32_4KB_PT_VIRTUAL_ADDRESS) + 4096 * pdTableId,
-            &ptPageId,
-            &ptTableId
-        );
-
-        if (ptTableId != pdTableId)
-        {
-            // cleanup and returns error
-            // but, it should always be equal
-            // it's good to test just for the future changes
-            // if it worked once then it will always work
-        }
-
-        // map the page where it's stored the PT
-        pt->entries[ptPageId].data = pageFlags | (ptAddr >> 12);
-
-        // map the tables where it's stored the kernel
-
-        // map the pages where it's stored the kernel
     } while (false);
 
     return error;
