@@ -85,7 +85,6 @@ void kernel_main(unsigned long magic, size_t addr)
 #ifdef PhiOS_ARCH_x86_32
     // Inits CPUID detection
     CPUID_Init();
-    PAA_alloc(256, (size_t*) g_CPUvendorName, 1);
     CPUID_GetVendorName((const char**) &g_CPUvendorName);
     kprintf("[CPU] %s \n", g_CPUvendorName);
 
