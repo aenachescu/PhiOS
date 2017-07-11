@@ -41,7 +41,7 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma,
  *
  * @param a_bpma Pointer to the bitmap physical memory allocator structure. In
  *               this structure will be allocated the memory.
- * @param a_framesNumber The frames number to be allocated continuous.
+ * @param a_size The size of memory to be allocated continuous.
  * @param a_physicalAddress In this parameter will be returned the physical
  *                          address.
  *
@@ -56,7 +56,7 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma,
  *  ERROR_INVALID_PARAMETER - if a_framesNumber is 0.
  */
 size_t BitmapPMA_alloc(void *a_bpma,
-                       size_t a_framesNumber,
+                       size_t a_size,
                        size_t *a_physicalAddress);
 
 /*
@@ -64,7 +64,7 @@ size_t BitmapPMA_alloc(void *a_bpma,
  *
  * @param a_bpma Pointer to the bitmap physical memory allocator structure. In
  *               this structure will be freed the memory.
- * @param a_framesNumber The frames number to be freed.
+ * @param a_size The size of memory to be freed.
  * @param a_physicalAddress The starting address of memory area.
  *
  * @return
@@ -82,7 +82,7 @@ size_t BitmapPMA_alloc(void *a_bpma,
  *  ERROR_NULL_POINTER - if a_pma is null.
  */
 size_t BitmapPMA_free(void *a_bpma,
-                      size_t a_framesNumber,
+                      size_t a_size,
                       size_t a_physicalAddress);
 
 #endif
