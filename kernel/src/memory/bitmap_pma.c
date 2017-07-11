@@ -323,3 +323,41 @@ FreesBits:
 
     return ERROR_SUCCESS;
 }
+
+size_t BitmapPMA_reserve(void *a_bpma,
+                         size_t a_size, size_t a_physicalAddress)
+{
+
+    struct BitmapPMA *bpma = (struct BitmapPMA*) a_bpma;
+
+    if (bpma == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (bpma->bitmap == NULL)
+    {
+        return ERROR_UNINITIALIZED;
+    }
+
+    size_t endAddress = a_physicalAddress + a_size;
+
+    if (a_size == NULL || 
+        endAddress > bpma->endAddress || 
+        a_physicalAddress < bpma->startAddress)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    size_t frameNumber = a_physicalAddress / bpma->frameSize + 
+                        (a_physicalAddress % bpma->frameSize ? 1 : 0);
+    size_t framesToReserve = endAddress / bpma->frameSize +
+                             (endAddress % bpma->frameSize ? 1 : 0) -
+                             frameNumber;
+    size_t bitmapIndex = frameNumber / WORDSIZE;
+    size_t indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
+
+    helper_marksBits(bpma, bitmapIndex, indexBits, framesToReserve);
+    
+    return ERROR_SUCCESS;
+}
