@@ -11,36 +11,44 @@ SECTIONS
     linker_kernelStart = .;
 
     /* Read-Only sections */
-    linker_textStart = .;
     .text BLOCK(4K) : ALIGN(4K)
     {
+        linker_textStart = .;
+
         CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot64.s.o (.text)
         *(EXCLUDE_FILE(CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot64.s.o) .text)
-    }
-    linker_textEnd = .;
 
-    linker_rodataStart = .;
+        linker_textEnd = .;
+    }
+
     .rodata BLOCK(4K) : ALIGN(4K)
     {
+        linker_rodataStart = .;
+
     	*(.rodata)
+
+        linker_rodataEnd = .;
     }
-    linker_rodataEnd = .;
 
     /* Read-Write sections */
-    linker_dataStart = .;
     .data BLOCK(4K) : ALIGN(4K)
     {
-        *(.data)
-    }
-    linker_dataEnd = .;
+        linker_dataStart = .;
 
-    _bss = .;
+        *(.data)
+
+        linker_dataEnd = .;
+    }
+
     .bss BLOCK(4K) : ALIGN(4K)
     {
+        linker_bssStart = .;
+
         *(.bss)
         *(COMMON)
+
+        linker_bssEnd = .;
     }
-    _ebss = .;
 
     linker_kernelEnd = .;
 
