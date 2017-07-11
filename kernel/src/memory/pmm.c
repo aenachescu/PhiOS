@@ -81,7 +81,7 @@ size_t PMM_addAllocator(void *a_pma, uint8 a_flag,
     return error;
 }
 
-size_t PMM_alloc(size_t *a_address, size_t a_frames, uint8 a_flag)
+size_t PMM_alloc(size_t *a_address, size_t a_size, uint8 a_flag)
 {
     size_t error = ERROR_UNKNOWN_FLAG;
 
@@ -106,7 +106,7 @@ size_t PMM_alloc(size_t *a_address, size_t a_frames, uint8 a_flag)
              */
 
             error = g_allocators[i].allocFn((void*) g_allocators[i].PMAStruct,
-                                            a_frames,
+                                            a_size,
                                             a_address);
             if (error == ERROR_SUCCESS)
             {
@@ -118,7 +118,7 @@ size_t PMM_alloc(size_t *a_address, size_t a_frames, uint8 a_flag)
     return error;
 }
 
-size_t PMM_free(size_t a_address, size_t a_frames, uint8 a_flag)
+size_t PMM_free(size_t a_address, size_t a_size, uint8 a_flag)
 {
     size_t error = ERROR_UNKNOWN_FLAG;
 
@@ -143,7 +143,7 @@ size_t PMM_free(size_t a_address, size_t a_frames, uint8 a_flag)
              */
 
             error = g_allocators[i].freeFn((void*) g_allocators[i].PMAStruct,
-                                           a_frames,
+                                           a_size,
                                            a_address);
             if (error == ERROR_SUCCESS)
             {
