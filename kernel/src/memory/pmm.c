@@ -25,7 +25,7 @@ size_t PMM_init(uint8 a_allocatorsNumber)
         }
 
         error = PAA_alloc(sizeof(struct PMA) * a_allocatorsNumber,
-                          &address, WORDSIZE);
+                          &address, WORDSIZE_BYTES);
         if (error != ERROR_SUCCESS)
         {
             break;
