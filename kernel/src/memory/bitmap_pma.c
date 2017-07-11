@@ -105,7 +105,7 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma, size_t a_frameSize,
 
     size_t error = PAA_alloc(sizeof(size_t) * bitmapSize,
                              (size_t*) &a_bpma->bitmap,
-                             WORDSIZE);
+                             WORDSIZE_BYTES);
 
     if (error != ERROR_SUCCESS)
     {
