@@ -119,7 +119,8 @@ void kernel_main(unsigned long magic, size_t addr)
     // It should use memory from 0 to end of RAM
     BitmapPMA_createAllocator(&g_PMAVM, FRAME_SIZE, 0x0, 0x400000);
     PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
-                    &BitmapPMA_alloc, &BitmapPMA_free);
+                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve);
+    PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY);
     size_t addr1, addr2, addr3;
     PMM_alloc(&addr1, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     PMM_alloc(&addr2, 4 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
@@ -130,6 +131,9 @@ void kernel_main(unsigned long magic, size_t addr)
     kprintf("Alloc: %x\n", addr3);
     PMM_alloc(&addr1, 10 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     kprintf("Alloc: %x\n", addr1);
+    PMM_free(addr3, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_free(addr1, 10 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_free(addr2, 4 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
 
     // Go to user mode
     jumpToUserMode();
