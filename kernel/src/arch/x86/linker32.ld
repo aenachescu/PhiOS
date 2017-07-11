@@ -1,49 +1,38 @@
 KERNEL_VMA = 0x100000;
-KERNEL_LMA = 0x100000;
-ALIGN_VAL = 0x1000;
+KERNEL_PMA = 0x100000;
 
 OUTPUT_FORMAT("elf32-i386")
 ENTRY(_start32)
 SECTIONS
 {
-    . = KERNEL_LMA;
+    /* Place kernel at 1 MiB */
+    . = KERNEL_PMA;
 
     linker_kernelStart = .;
 
-    _boot = .;
-    .boot BLOCK(4K) : ALIGN(4K)
-    {
-        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o (.text)
-    }
-    _eboot = .;
-
-    _text = .;
+    /* Read-Only sections */
+    linker_textStart = .;
     .text BLOCK(4K) : ALIGN(4K)
     {
+        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o (.text)
         *(EXCLUDE_FILE(CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o) .text)
     }
-    _etext = .;
+    linker_textEnd = .;
 
-    _rodata = .;
+    linker_rodataStart = .;
     .rodata BLOCK(4K) : ALIGN(4K)
     {
     	*(.rodata)
     }
-    _erodata = .;
+    linker_rodataEnd = .;
 
-    _data = .;
+    /* Read-Write sections */
+    linker_dataStart = .;
     .data BLOCK(4K) : ALIGN(4K)
     {
         *(.data)
     }
-    _edata = .;
-
-    _eh_frame = .;
-    .eh_frame BLOCK(4K) : ALIGN(4K)
-    {
-        *(.eh_frame)
-    }
-    _eeh_frame = .;
+    linker_dataEnd = .;
 
     _bss = .;
     .bss BLOCK(4K) : ALIGN(4K)
@@ -55,8 +44,11 @@ SECTIONS
 
     linker_kernelEnd = .;
 
-    .comment :
+    /* Discard useless sections */ 
+    /DISCARD/ :
     {
+        *(.note)
         *(.comment)
+        *(.eh_frame) /* Add this if C++ support is needed */
     }
 }
