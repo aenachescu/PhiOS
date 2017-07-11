@@ -40,7 +40,7 @@ size_t PMM_init(uint8 a_allocatorsNumber)
 }
 
 size_t PMM_addAllocator(void *a_pma, uint8 a_flag,
-                        PMA_ALLOC_PFN a_allocFn, PMA_FREE_PFN a_freeFn)
+                        PMA_ALLOC_PFN a_allocFn, PMA_FREE_PFN a_freeFn, PMA_RESERVE_PFN a_reserveFn)
 {
     size_t error = ERROR_SUCCESS;
 
@@ -64,7 +64,7 @@ size_t PMM_addAllocator(void *a_pma, uint8 a_flag,
             break;
         }
 
-        if (a_allocFn == NULL || a_freeFn == NULL)
+        if (a_allocFn == NULL || a_freeFn == NULL || a_reserveFn == NULL)
         {
             error = ERROR_INVALID_FUNCTION;
             break;
@@ -75,6 +75,7 @@ size_t PMM_addAllocator(void *a_pma, uint8 a_flag,
         g_allocators[g_index].PMAStruct   = a_pma;
         g_allocators[g_index].allocFn     = a_allocFn;
         g_allocators[g_index].freeFn      = a_freeFn;
+        g_allocators[g_index].reserveFn   = a_reserveFn;
         g_index++;
     } while (false);
 
@@ -145,6 +146,43 @@ size_t PMM_free(size_t a_address, size_t a_size, uint8 a_flag)
             error = g_allocators[i].freeFn((void*) g_allocators[i].PMAStruct,
                                            a_size,
                                            a_address);
+            if (error == ERROR_SUCCESS)
+            {
+                break;
+            }
+        }
+    } while (false);
+
+    return error;
+}
+
+size_t PMM_reserve(size_t a_address, size_t a_size, uint8 a_flag)
+{
+    size_t error = ERROR_UNKNOWN_FLAG;
+
+    do
+    {
+        if (g_allocators == NULL)
+        {
+            error = ERROR_UNINITIALIZED;
+            break;
+        }
+
+        for (uint8 i = 0; i < g_index; i++)
+        {
+            if (g_allocators[i].type != a_flag)
+            {
+                continue;
+            }
+
+            /*
+             * TODO when will be implemented the multitasking.
+             * Here should checked if the structure is locked or not.
+             */
+
+            error = g_allocators[i].reserveFn((void*) g_allocators[i].PMAStruct,
+                                            a_size,
+                                            a_address);
             if (error == ERROR_SUCCESS)
             {
                 break;
