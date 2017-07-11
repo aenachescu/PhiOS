@@ -158,7 +158,7 @@ void kernel_main(unsigned long magic, size_t addr)
     kprintf("BssStart: %x BssEnd: %x\n",
         &linker_bssStart, &linker_bssEnd);
 
-    kprintf("Placement address: %x\n", PAA_getCurrentAddress());
+    kprintf("Placement address: %u\n", PAA_getCurrentAddress());
 
     // Go to user mode
     jumpToUserMode();
