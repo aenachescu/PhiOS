@@ -85,4 +85,8 @@ size_t BitmapPMA_free(void *a_bpma,
                       size_t a_size,
                       size_t a_physicalAddress);
 
+
+size_t BitmapPMA_reserve(void *a_bpma,
+                         size_t a_size, size_t a_physicalAddress);
+
 #endif
