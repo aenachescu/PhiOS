@@ -121,14 +121,14 @@ void kernel_main(unsigned long magic, size_t addr)
     PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
                     &BitmapPMA_alloc, &BitmapPMA_free);
     size_t addr1, addr2, addr3;
-    PMM_alloc(&addr1, 2, PMM_FOR_VIRTUAL_MEMORY);
-    PMM_alloc(&addr2, 4, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_alloc(&addr1, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_alloc(&addr2, 4 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     kprintf("Alloc: %x %x\n", addr1, addr2);
-    PMM_free(addr1, 2, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_free(addr1, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     kprintf("Free: %x\n", addr1);
-    PMM_alloc(&addr3, 2, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_alloc(&addr3, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     kprintf("Alloc: %x\n", addr3);
-    PMM_alloc(&addr1, 10, PMM_FOR_VIRTUAL_MEMORY);
+    PMM_alloc(&addr1, 10 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     kprintf("Alloc: %x\n", addr1);
 
     // Go to user mode
