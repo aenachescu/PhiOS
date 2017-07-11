@@ -18,8 +18,16 @@
 
 struct KernelArea g_kernelArea;
 
-extern size_t linker_kernelStart;
-extern size_t linker_kernelEnd;
+extern uint32 linker_kernelStart;
+extern uint32 linker_kernelEnd;
+extern uint32 linker_textStart;
+extern uint32 linker_textEnd;
+extern uint32 linker_rodataStart;
+extern uint32 linker_rodataEnd;
+extern uint32 linker_dataStart;
+extern uint32 linker_dataEnd;
+extern uint32 linker_bssStart;
+extern uint32 linker_bssEnd;
 
 #define PRINT(x) kprintf("%s - %u\n", #x, CPUID_HasFeature(x))
 #define FRAME_SIZE 4096
@@ -134,6 +142,23 @@ void kernel_main(unsigned long magic, size_t addr)
     PMM_free(addr3, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     PMM_free(addr1, 10 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
     PMM_free(addr2, 4 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
+
+    kprintf("KernelStart: %x KernelEnd: %x\n",
+        &linker_kernelStart, &linker_kernelEnd);
+
+    kprintf("TextStart: %x TextEnd: %x\n",
+        &linker_textStart, &linker_textEnd);
+
+    kprintf("RodataStart: %x RodataEnd: %x\n",
+        &linker_rodataStart, &linker_rodataEnd);
+
+    kprintf("DataStart: %x DataEnd: %x\n",
+        &linker_dataStart, &linker_dataEnd);
+
+    kprintf("BssStart: %x BssEnd: %x\n",
+        &linker_bssStart, &linker_bssEnd);
+
+    kprintf("Placement address: %x\n", PAA_getCurrentAddress());
 
     // Go to user mode
     jumpToUserMode();
