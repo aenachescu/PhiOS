@@ -33,4 +33,12 @@ size_t PAA_init(size_t a_startAddress);
  */
 size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment);
 
+/*
+ * @brief Get current address for placement
+ *
+ * @return
+ *  Returns the current placement address or 0 if the PAA is not initialized
+ */
+size_t PAA_getCurrentAddress();
+
 #endif
