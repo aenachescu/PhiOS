@@ -246,6 +246,9 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         // map the page where it's stored the PD
         pt0->entries[1023].data = (pageFlags | (pdAddr >> 12));
 
+        // map the page tables where it's stored the kernel
+
+        // map the pages where it's stored the kernel
     } while (false);
 
     return error;
@@ -287,9 +290,9 @@ size_t IA32_4KB_init(struct Paging *a_paging, struct Paging *a_currentPaging)
         allocParam.cacheDisabled    = false;
         allocParam.writeThrough     = true;
         allocParam.virtualAddress   = requestedAddress;
-        allocParam.length           = g_kernelArea.codeEndAddr -
-                                      g_kernelArea.codeStartAddr;
-        allocParam.physicalAddress  = g_kernelArea.codeStartAddr;
+        allocParam.length           = g_kernelArea.textEndAddr -
+                                      g_kernelArea.textStartAddr;
+        allocParam.physicalAddress  = g_kernelArea.textStartAddr;
 
         error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
         if (error != ERROR_SUCCESS)
@@ -322,9 +325,9 @@ size_t IA32_4KB_init(struct Paging *a_paging, struct Paging *a_currentPaging)
 
         allocParam.write            = true;
         allocParam.virtualAddress   = requestedAddress;
-        allocParam.length           = g_kernelArea.rwdataEndAddr -
-                                      g_kernelArea.rwdataStartAddr;
-        allocParam.physicalAddress  = g_kernelArea.rwdataStartAddr;
+        allocParam.length           = g_kernelArea.dataEndAddr -
+                                      g_kernelArea.dataStartAddr;
+        allocParam.physicalAddress  = g_kernelArea.dataStartAddr;
 
         error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
         if (error != ERROR_SUCCESS)
