@@ -63,14 +63,19 @@ struct Paging
 
 struct KernelArea
 {
-    size_t codeStartAddr;
-    size_t codeEndAddr;
+    size_t textStartAddr;
+    size_t textEndAddr;
 
     size_t rodataStartAddr;
     size_t rodataEndAddr;
 
-    size_t rwdataStartAddr;
-    size_t rwdataEndAddr;
+    size_t dataStartAddr;
+    size_t dataEndAddr;
+
+    size_t bssStartAddr;
+    size_t bssEndAddr;
+
+    size_t endPlacementAddr;
 };
 
 #endif
