@@ -10,6 +10,7 @@
 #include "arch/x86/tss32.h"
 #include "arch/x86/pit.h"
 #include "arch/x86/pic.h"
+#include "arch/x86/paging/ia32.h"
 #include "keyboard.h"
 #include "rtc.h"
 #include "arch/x86/paging/paging.h"
@@ -40,6 +41,9 @@ size_t g_kernelStack[2048]; // temporary kernel mode
 
 char *g_CPUvendorName;
 struct BitmapPMA g_PMAVM; // physical memory allocator for virtual memory
+struct Paging g_kernelPaging;
+
+extern struct PMA *g_allocators;
 
 void user_main()
 {
@@ -129,19 +133,6 @@ void kernel_main(unsigned long magic, size_t addr)
     PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve);
     PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY);
-    size_t addr1, addr2, addr3;
-    PMM_alloc(&addr1, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    PMM_alloc(&addr2, 4 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    kprintf("Alloc: %x %x\n", addr1, addr2);
-    PMM_free(addr1, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    kprintf("Free: %x\n", addr1);
-    PMM_alloc(&addr3, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    kprintf("Alloc: %x\n", addr3);
-    PMM_alloc(&addr1, 10 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    kprintf("Alloc: %x\n", addr1);
-    PMM_free(addr3, 2 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    PMM_free(addr1, 10 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
-    PMM_free(addr2, 4 * FRAME_SIZE, PMM_FOR_VIRTUAL_MEMORY);
 
     kprintf("KernelStart: %x KernelEnd: %x\n",
         &linker_kernelStart, &linker_kernelEnd);
@@ -160,8 +151,31 @@ void kernel_main(unsigned long magic, size_t addr)
 
     kprintf("Placement address: %u\n", PAA_getCurrentAddress());
 
+    g_kernelArea.textStartAddr = linker_textStart;
+    g_kernelArea.textEndAddr = linker_textEnd;
+    g_kernelArea.rodataStartAddr = linker_rodataStart;
+    g_kernelArea.rodataEndAddr = linker_rodataEnd;
+    g_kernelArea.dataStartAddr = linker_dataStart;
+    g_kernelArea.dataEndAddr = linker_dataEnd;
+    g_kernelArea.bssStartAddr = linker_bssStart;
+    g_kernelArea.bssEndAddr = linker_bssEnd;
+    g_kernelArea.endPlacementAddr = PAA_getCurrentAddress();
+
+    PMM_reserve(g_kernelArea.textStartAddr,
+                g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
+                PMM_FOR_VIRTUAL_MEMORY);
+
+    IA32_4KB_initKernelPaging(&g_kernelPaging);
+
+    g_PMAVM.bitmap = (size_t*) ((size_t)g_PMAVM.bitmap + 0xC0000000 - 0x00100000);
+    g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
+
+    //enable paging
+
+    kprintf("paging enabled\n");
+
     // Go to user mode
-    jumpToUserMode();
+    //jumpToUserMode();
 #endif // PhiOS_ARCH_x86_32
 
     return ;
