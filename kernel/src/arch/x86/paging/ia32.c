@@ -265,17 +265,30 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         PMM_alloc(&ptAddr, ptNum * sizeof(struct IA32_PageTable_4KB),
                   PMM_FOR_VIRTUAL_MEMORY);
 
+        uint32 physicalAddr = g_kernelArea.textStartAddr;
         for (uint32 i = 0; i < ptNum; i++)
         {
             uint32 addr = ptAddr + i * sizeof(struct IA32_PageTable_4KB);
-            struct IA32_PageTable_4KB *tmp = (struct IA32_PageTable_4KB*) addr;
-            helper_IA32_4KB_initPageTable(tmp);
+            struct IA32_PageTable_4KB *pt = (struct IA32_PageTable_4KB*) addr;
+            helper_IA32_4KB_initPageTable(pt);
 
             pd->entries[768 + i].data = (pageTableFlags | (addr >> 12));
             pt1->entries[768 + i].data = (pageFlags | (addr >> 12));
+
+            uint32 max = PAGING_IA32_PTE_NUMBER;
+            if (pagesNum < max)
+                max = pagesNum;
+
+            // map the pages where it's stored the kernel
+            for (uint32 page = 0; page < max; page++)
+            {
+                pt->entries[page].data = (pageFlags | (physicalAddr >> 12));
+                physicalAddr += 4096;
+            }
+
+            pagesNum -= max;
         }
 
-        // map the pages where it's stored the kernel
     } while (false);
 
     return error;
