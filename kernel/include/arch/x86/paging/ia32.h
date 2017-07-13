@@ -74,6 +74,8 @@ struct IA32_PageDirectory_4KB
  * public functions for ia32 paging with page size of 4KB
  */
 
+size_t IA32_4KB_initKernelPaging(struct Paging *a_paging);
+
 size_t IA32_4KB_init(struct Paging *a_paging,
                      struct Paging *a_currentPaging);
 
