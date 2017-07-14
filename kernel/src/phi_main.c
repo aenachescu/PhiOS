@@ -165,6 +165,7 @@ void kernel_main(unsigned long magic, size_t addr)
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
                PMM_FOR_VIRTUAL_MEMORY);
     IA32_4KB_initKernelPaging(&g_kernelPaging);
+    IA32_4KB_enablePaging(&g_kernelPaging);
 
     g_PMAVM.bitmap = (size_t*) ((size_t)g_PMAVM.bitmap + 0xC0000000 - 0x00100000);
     g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
