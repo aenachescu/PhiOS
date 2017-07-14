@@ -151,20 +151,19 @@ void kernel_main(unsigned long magic, size_t addr)
 
     kprintf("Placement address: %u\n", PAA_getCurrentAddress());
 
-    g_kernelArea.textStartAddr = linker_textStart;
-    g_kernelArea.textEndAddr = linker_textEnd;
-    g_kernelArea.rodataStartAddr = linker_rodataStart;
-    g_kernelArea.rodataEndAddr = linker_rodataEnd;
-    g_kernelArea.dataStartAddr = linker_dataStart;
-    g_kernelArea.dataEndAddr = linker_dataEnd;
-    g_kernelArea.bssStartAddr = linker_bssStart;
-    g_kernelArea.bssEndAddr = linker_bssEnd;
+    g_kernelArea.textStartAddr = &linker_textStart;
+    g_kernelArea.textEndAddr = &linker_textEnd;
+    g_kernelArea.rodataStartAddr = &linker_rodataStart;
+    g_kernelArea.rodataEndAddr = &linker_rodataEnd;
+    g_kernelArea.dataStartAddr = &linker_dataStart;
+    g_kernelArea.dataEndAddr = &linker_dataEnd;
+    g_kernelArea.bssStartAddr = &linker_bssStart;
+    g_kernelArea.bssEndAddr = &linker_bssEnd;
     g_kernelArea.endPlacementAddr = PAA_getCurrentAddress();
 
     PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
-                PMM_FOR_VIRTUAL_MEMORY);
-
+               PMM_FOR_VIRTUAL_MEMORY);
     IA32_4KB_initKernelPaging(&g_kernelPaging);
 
     g_PMAVM.bitmap = (size_t*) ((size_t)g_PMAVM.bitmap + 0xC0000000 - 0x00100000);
