@@ -86,6 +86,11 @@ size_t IA32_4KB_alloc(struct Paging *a_paging,
 size_t IA32_4KB_free(struct Paging *a_paging,
                      struct FreeFuncParam *a_request);
 
+size_t IA32_4KB_switchDirectory(struct Paging *a_paging,
+                                struct IA32_PageDirectory_4KB *a_pageDirectory);
+
+size_t IA32_4KB_enablePaging(struct Paging *a_paging);
+
 struct IA32_4KB_Paging_AllocParam
 {
     uint32          flag;

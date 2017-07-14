@@ -1,5 +1,6 @@
 #include "arch/x86/paging/ia32.h"
 #include "memory/pmm.h"
+#include "cpu.h"
 
 extern struct KernelArea g_kernelArea;
 
@@ -441,4 +442,34 @@ size_t IA32_4KB_free(struct Paging *a_paging,
     } while (false);
 
     return error;
+}
+
+size_t IA32_4KB_switchDirectory(struct Paging *a_paging,
+                                struct IA32_PageDirectory_4KB *a_pageDirectory)
+{
+    if (a_paging == NULL || a_pageDirectory == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    a_paging = (void*) a_pageDirectory;
+    size_t addr = (size_t) a_pageDirectory;
+    writeCR3(addr);
+
+    return ERROR_SUCCESS;
+}
+
+size_t IA32_4KB_enablePaging(struct Paging *a_paging)
+{
+    if (a_paging == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    IA32_4KB_switchDirectory(a_paging, (struct IA32_PageDirectory_4KB*) a_paging->pagingStruct);
+    size_t cr0 = readCR0();
+    cr0 |= 0x80000001;
+    writeCR0(cr0);
+
+    return ERROR_SUCCESS;
 }
