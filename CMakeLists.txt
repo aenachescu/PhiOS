@@ -105,7 +105,7 @@ add_custom_command(
         mkdir -p isodir/boot/grub &&
         cp phios.elf isodir/boot/phios.elf &&
         cp ${PRJ_PATH}/grub.cfg isodir/boot/grub/grub.cfg &&
-        grub-mkrescue -o phios.iso isodir
+        grub-mkrescue -d /usr/lib/grub/i386-pc -o phios.iso isodir
     DEPENDS
         phios.elf
     )
