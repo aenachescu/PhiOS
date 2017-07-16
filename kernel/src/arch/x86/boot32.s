@@ -41,7 +41,7 @@ _start32:
     pushl %eax
 
     # Call main OS function
-    call kernel_main
+    call init_init32
 
 1:
     hlt
