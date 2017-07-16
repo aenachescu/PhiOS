@@ -50,7 +50,7 @@ function build_x86_32 {
         exit $rc
     fi
 
-    if [ "$1" == "fasle" ]; then
+    if [ "$1" == "false" ]; then
         make iso
 
         rc=$?
@@ -115,13 +115,13 @@ if [ "$1" == "build" ];then
     fi
 
     if [ "$2" == "x86_64" ]; then
-        build_x86_64 notGenerateIso
+        build_x86_64 $notGenerateIso
         echo "build x86_64 successfully"
         exit 0
     fi
 
     if [ "$2" == "x86_32" ]; then
-        build_x86_32 notGenerateIso
+        build_x86_32 $notGenerateIso
         echo "build x86_32 successfully"
         exit 0
     fi
