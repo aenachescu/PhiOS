@@ -17,152 +17,142 @@
 # $2 can take the following values: x86_32, x86_64
 
 
-
-
-
-# helper functions
-
-function create_bin {
-    if ! [ -d "bin" ];
-    then
-        mkdir "bin"
-    fi
-    cd bin
-}
-
-function create_x86_32 {
-    if ! [ -d "x86_32" ];
-    then
-        mkdir x86_32
-    fi
-    cd x86_32
-}
-
-function create_x86_64 {
-    if ! [ -d "x86_64" ];
-    then
-        mkdir x86_64
-    fi
-    cd x86_64
-}
-
 function remove_dir {
-    if [ -d "$1" ];
-    then
+    if [ -d "$1" ]; then
         rm -rf $1
     fi
 }
 
+function create_dir {
+    if ! [ -d "$1" ]; then
+        mkdir $1
+    fi
+    cd $1
+}
+
 function build_x86_32 {
-    create_bin
-    create_x86_32
+    export PATH=$PWD/build/linux-x86_64/gcc-x86_32/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
+    
+    create_dir bin
+    create_dir x86_32
 
     cmake ../.. -DARCH:STRING=x86_32
-    rc=$?; if [[ $rc != 0 ]]; then echo "cmake failed - $rc"; exit $rc; fi
+    rc=$?
+    if [[ $rc != 0 ]]; then
+        echo "cmake failed - $rc"
+        exit $rc
+    fi
 
     make
-    rc=$?; if [[ $rc != 0 ]]; then echo "make failed - $rc"; exit $rc; fi
-    
-    make iso
-    rc=$?; if [[ $rc != 0 ]]; then echo "make iso failed - $rc"; exit $rc; fi
-    
+    rc=$?
+    if [[ $rc != 0 ]]; then
+        echo "make failed - $rc"
+        exit $rc
+    fi
+
+    if [ "$1" == "fasle" ]; then
+        make iso
+
+        rc=$?
+        if [[ $rc != 0 ]]; then
+            echo "make iso failed - $rc"
+            exit $rc
+        fi
+    fi    
 }
 
 function build_x86_64 {
-    create_bin
-    create_x86_64
+    export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
+    
+    create_dir bin
+    create_dir x86_64
 
     cmake ../.. -DARCH:STRING=x86_64
-    rc=$?; if [[ $rc != 0 ]]; then echo "cmake failed - $rc"; exit $rc; fi
+    rc=$?
+    if [[ $rc != 0 ]]; then
+        echo "cmake failed - $rc"
+        exit $rc
+    fi
 
     make
-    rc=$?; if [[ $rc != 0 ]]; then echo "make failed - $rc"; exit $rc; fi
+    rc=$?
+    if [[ $rc != 0 ]]; then
+        echo "make failed - $rc"
+        exit $rc
+    fi
 
-    make iso
-    rc=$?; if [[ $rc != 0 ]]; then echo "make iso failed - $rc"; exit $rc; fi    
+    if [ "$1" == "false" ]; then
+        make iso
+
+        rc=$?
+        if [[ $rc != 0 ]]; then
+            echo "make iso failed - $rc"
+            exit $rc
+        fi
+    fi
 }
 
-
-
-
-
-# set environment
-
-if [ "$1" == "" ];
-then
-    export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
+if [ $# -lt 2 ]; then
+    echo "Illegal number of parameters"
+    exit 1
 fi
 
-if [ "$1" == "build" ];
-then
-    if [ "$2" == "x86_32" ];
-    then
-        export PATH=$PWD/build/linux-x86_64/gcc-x86_32/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
+if [ "$1" == "build" ];then
+
+    if [ $# -gt 3 ]; then
+        echo "invalid syntax for build command"
+        exit 1
     fi
 
-    if [ "$2" == "x86_64" ];
-    then
-        export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
-    fi
-fi
-
-if [ "$1" == "build-all" ];
-then
-    export PATH=$PWD/build/linux-x86_64/gcc-x86_32/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
-    export PATH=$PWD/build/linux-x86_64/gcc-x86_64/bin:$PWD/build/linux-x86_64/cmake/bin:$PATH
-fi
-
-
-
-
-
-# build
-
-if [ "$1" == "" ];
-then
-    build_x86_64
-fi
-
-if [ "$1" == "build" ];
-then
-    if [ "$2" == "x86_64" ];
-    then
-        build_x86_64
+    notGenerateIso="false"
+    if [ $# -eq 3 ]; then
+        if [ "$3" == "notGenerateIso" ]; then
+            notGenerateIso="true"
+        else
+            echo "invalid second parameter for build command"
+            exit 1
+        fi
     fi
 
-    if [ "$2" == "x86_32" ];
-    then
-        build_x86_32
+    if [ "$2" == "x86_64" ]; then
+        build_x86_64 notGenerateIso
+        echo "build x86_64 successfully"
+        exit 0
     fi
+
+    if [ "$2" == "x86_32" ]; then
+        build_x86_32 notGenerateIso
+        echo "build x86_32 successfully"
+        exit 0
+    fi
+
+    echo "invalid parameter for build command"
+    exit 1
 fi
 
-if [ "$1" == "build-all" ];
-then
-    build_x86_32
-    cd ../..
-    build_x86_64
-fi
+if [ "$1" == "clean" ]; then
 
+    if [ $# -ne 2 ]; then
+        echo "invalid syntax for clean command"
+        exit 1
+    fi
 
-
-
-
-# clean-up
-
-if [ "$1" == "clean-all" ];
-then
-    remove_dir bin
-fi
-
-if [ "$1" == "clean" ];
-then
-    if [ "$2" == "x86_32" ];
-    then
+    if [ "$2" == "x86_32" ]; then
         remove_dir bin/x86_32
+        echo "clean x86_32 successfully"
+        exit 0
     fi
 
-    if [ "$2" == "x86_64" ];
-    then
+    if [ "$2" == "x86_64" ]; then
         remove_dir bin/x86_64
+        echo "clean x86_64 successfully"
+        exit 0
     fi
+
+    echo "invalid parameter for clean command"
+    exit 1
 fi
+
+echo "invalid syntax"
+
+exit 1
