@@ -290,6 +290,12 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
             pagesNum -= max;
         }
 
+        // map the page where it's stored the boot.s file
+        // so, map the virtual address from 1mb to 1mb and 4kb
+        pt0->entries[256].data = (pageFlags | (0x00100000 >> 12));
+
+        // map video address (0x000B8000)
+        pt0->entries[184].data = (pageFlags | (0x000B8000 >> 12));
     } while (false);
 
     return error;
@@ -452,7 +458,6 @@ size_t IA32_4KB_switchDirectory(struct Paging *a_paging,
         return ERROR_NULL_POINTER;
     }
 
-    a_paging = (void*) a_pageDirectory;
     size_t addr = (size_t) a_pageDirectory;
     writeCR3(addr);
 

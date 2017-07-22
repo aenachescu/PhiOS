@@ -141,5 +141,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     g_PMAVM.bitmap = (size_t*) ((size_t)g_PMAVM.bitmap + 0xC0000000 - 0x00100000);
     g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
 
+    IA32_4KB_switchDirectory(&g_kernelPaging,
+        (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct);
+
     return ERROR_SUCCESS;
 }

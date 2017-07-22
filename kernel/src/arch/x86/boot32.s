@@ -43,6 +43,20 @@ _start32:
     # Call main OS function
     call init_init32
 
+    # Enable paging
+    mov %cr0, %ecx
+    or $0x80000001, %ecx
+    mov %ecx, %cr0
+
+    # Enter higher-half
+    lea _higherHalf, %ecx
+    jmp *%ecx             # NOTE: Must be absolute jump!
+
+.global _higherHalf
+.type _higherHalf, @function
+_higherHalf:
+    call kernel_main
+
 1:
     hlt
     jmp 1b
