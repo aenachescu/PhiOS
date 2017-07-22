@@ -24,5 +24,6 @@ void user_main()
 
 void kernel_main()
 {
+    kprintf("paging enabled");
     return;
 }
