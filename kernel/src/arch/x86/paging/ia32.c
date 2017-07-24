@@ -235,19 +235,19 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         helper_IA32_4KB_initPageTable(pt1);
 
         // map the first page table
-        pd->entries[0].data = (pageTableFlags | (pt0Addr >> 12));
+        pd->entries[0].data = (pageTableFlags | pt0Addr);
 
         // map the second page table
-        pd->entries[1].data = (pageTableFlags | (pt1Addr >> 12));
+        pd->entries[1].data = (pageTableFlags | pt1Addr);
 
         // map the page where it's stored the first page table
-        pt1->entries[0].data = (pageFlags | (pt0Addr >> 12));
+        pt1->entries[0].data = (pageFlags | pt0Addr);
 
         // map the page where it's stored the second page table
-        pt1->entries[1].data = (pageFlags | (pt1Addr >> 12));
+        pt1->entries[1].data = (pageFlags | pt1Addr);
 
         // map the page where it's stored the PD
-        pt0->entries[1023].data = (pageFlags | (pdAddr >> 12));
+        pt0->entries[1023].data = (pageFlags | pdAddr);
 
         uint32 kernelEnd = g_kernelArea.endPlacementAddr;
         if (kernelEnd & 0x00000FFF)
@@ -258,9 +258,12 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
 
         // map the page tables where it's stored the kernel
         uint32 pagesNum = kernelEnd - g_kernelArea.textStartAddr;
+        pagesNum /= 4096;
         uint32 ptNum = pagesNum / PAGING_IA32_PTE_NUMBER;
         if (pagesNum % PAGING_IA32_PTE_NUMBER != 0)
             ptNum++;
+
+        kprintf("PTnum = %u, page num = %u", ptNum, pagesNum);
 
         uint32 ptAddr = 0;
         PMM_alloc(&ptAddr, ptNum * sizeof(struct IA32_PageTable_4KB),
@@ -273,8 +276,8 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
             struct IA32_PageTable_4KB *pt = (struct IA32_PageTable_4KB*) addr;
             helper_IA32_4KB_initPageTable(pt);
 
-            pd->entries[768 + i].data = (pageTableFlags | (addr >> 12));
-            pt1->entries[768 + i].data = (pageFlags | (addr >> 12));
+            pd->entries[768 + i].data = (pageTableFlags | addr);
+            pt1->entries[768 + i].data = (pageFlags | addr);
 
             uint32 max = PAGING_IA32_PTE_NUMBER;
             if (pagesNum < max)
@@ -283,7 +286,7 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
             // map the pages where it's stored the kernel
             for (uint32 page = 0; page < max; page++)
             {
-                pt->entries[page].data = (pageFlags | (physicalAddr >> 12));
+                pt->entries[page].data = (pageFlags | physicalAddr);
                 physicalAddr += 4096;
             }
 
@@ -292,10 +295,10 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
 
         // map the page where it's stored the boot.s file
         // so, map the virtual address from 1mb to 1mb and 4kb
-        pt0->entries[256].data = (pageFlags | (0x00100000 >> 12));
+        pt0->entries[256].data = (pageFlags | 0x00100000);
 
         // map video address (0x000B8000)
-        pt0->entries[184].data = (pageFlags | (0x000B8000 >> 12));
+        pt0->entries[184].data = (pageFlags | 0x000B8000);
     } while (false);
 
     return error;
