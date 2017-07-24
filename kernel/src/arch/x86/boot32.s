@@ -43,6 +43,8 @@ _start32:
     # Call main OS function
     call init_init32
 
+    cli
+
     # Enable paging
     mov %cr0, %ecx
     or $0x80000001, %ecx
@@ -55,6 +57,9 @@ _start32:
 .global _higherHalf
 .type _higherHalf, @function
 _higherHalf:
+2:
+    hlt
+    jmp 2b
     call kernel_main
 
 1:
