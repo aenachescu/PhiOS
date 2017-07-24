@@ -121,7 +121,7 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     kprintf("BssStart: %x BssEnd: %x\n",
         &linker_bssStart, &linker_bssEnd);
 
-    kprintf("Placement address: %u\n", PAA_getCurrentAddress());
+    kprintf("Placement address: %x\n", PAA_getCurrentAddress());
 
     g_kernelArea.textStartAddr      = (size_t) &linker_textStart;
     g_kernelArea.textEndAddr        = (size_t) &linker_textEnd;
