@@ -52,14 +52,16 @@ _start32:
 
     # Enter higher-half
     lea _higherHalf, %ecx
+    add $0xBFF00000, %ecx
     jmp *%ecx             # NOTE: Must be absolute jump!
 
 .global _higherHalf
 .type _higherHalf, @function
 _higherHalf:
-2:
-    hlt
-    jmp 2b
+    mov $stack_top, %esp
+    add $0xBFF00000, %esp
+    mov %esp, %ebp
+
     call kernel_main
 
 1:
