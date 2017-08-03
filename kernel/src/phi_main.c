@@ -3,6 +3,8 @@
 
 // TODO: remove this when tasks are available
 size_t g_userStack[2048]; // temporary user mode
+int x = 0;
+int y;
 
 void user_main()
 {
@@ -24,6 +26,7 @@ void user_main()
 
 void kernel_main()
 {
-    kprintf("paging enabled");
+    x = 0;
+    y = 5;
     return;
 }
