@@ -263,8 +263,6 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         if (pagesNum % PAGING_IA32_PTE_NUMBER != 0)
             ptNum++;
 
-        kprintf("PTnum = %u, page num = %u", ptNum, pagesNum);
-
         uint32 ptAddr = 0;
         PMM_alloc(&ptAddr, ptNum * sizeof(struct IA32_PageTable_4KB),
                   PMM_FOR_VIRTUAL_MEMORY);
