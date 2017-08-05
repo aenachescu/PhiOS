@@ -38,7 +38,7 @@ char *g_layout;
 char *g_shiftLayout;
 char *g_capsOnLayout;
 uint8 g_keyboardBuffer[KEYBOARD_BUFFER_SIZE];
-volatile uint32 g_keyboardBufferPos;
+uint32 g_keyboardBufferPos;
 bool g_capsOn;
 bool g_special;
 bool g_shift;
@@ -134,18 +134,28 @@ size_t keyboard_setLayout(char *a_layout, char *a_shiftLayout,
 
 char keyboard_readKey()
 {
-    volatile uint8 cpos = g_keyboardBufferPos;
-
     while (true)
     {
-        if (cpos != g_keyboardBufferPos &&
-            g_keyboardBuffer[g_keyboardBufferPos - 1])
-        {
+        turnOffInts();
+
+        if (g_keyboardBufferPos != 0) {
             break;
         }
+
+        turnOnInts();
+        pauseCpu();
     }
 
-    return (char) g_keyboardBuffer[g_keyboardBufferPos - 1];
+    char ret = g_keyboardBuffer[0];
+
+    for (uint32 i = 1; i < g_keyboardBufferPos; i++)
+        g_keyboardBuffer[i - 1] = g_keyboardBuffer[i];
+
+    g_keyboardBufferPos--;
+
+    turnOnInts();
+
+    return ret;
 }
 
 void keyboard_intHandler(__attribute__((unused)) CpuState *a_state)
