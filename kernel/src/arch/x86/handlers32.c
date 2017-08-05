@@ -159,7 +159,7 @@ void handlers32_pageFault(IntCpuState32 *a_state)
     VGA_WriteString("[");
     VGA_WriteColoredString("EXCEPTION", VGA_ColorBlack, VGA_ColorRed);
     VGA_WriteString("] ");
-    VGA_WriteString("\n");
+    VGA_WriteString("Page fault...\n");
     cpu_printState32(a_state);
     stopCpu();
 }

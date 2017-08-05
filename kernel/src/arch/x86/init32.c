@@ -72,27 +72,6 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     CPUID_GetVendorName(&cpuVendorName);
     kprintf("[CPU] %s\n", cpuVendorName);
 
-    // Inits GDT for 32-bit
-    GDT32_init();
-
-    // Sets kernel stack in TSS struct
-    TSS32_setKernelStack((uint32) &g_kernelStack[2047]);
-
-    // Inits IDT for 32-bit
-    IDT32_init();
-
-    // Inits PIC
-    PIC_init();
-    PIC_maskUnusedIRQs();
-
-    // Inits timer
-    PIT_init((uint16) -1);
-    kprintf("[SYSTEM] Initialized timer at %d frequency.\n", OSCILLATOR_FREQUENCY);
-
-    // Inits keyboard
-    keyboard_init();
-    kprintf("[SYSTEM] Initialized keyboard.\n");
-
     // Inits real time clock
     RTC_init();
     kprintf("[SYSTEM] Initialized real time clock.\n");
