@@ -64,6 +64,8 @@ _higherHalf:
 
     call kernel_main
 
+    sti
+
 1:
     hlt
     jmp 1b
