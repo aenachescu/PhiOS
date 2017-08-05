@@ -15,8 +15,9 @@ SECTIONS
     {
         linker_textStart = .;
 
+        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/descriptors32.s.o (.text)
         CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o (.text)
-        *(EXCLUDE_FILE(CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o) .text)
+        *(EXCLUDE_FILE(CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o CMakeFiles/phios.elf.dir/kernel/src/arch/x86/descriptors32.s.o) .text)
 
         linker_textEnd = .;
     }
