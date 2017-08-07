@@ -38,6 +38,12 @@ SECTIONS
 
         *(.data)
 
+        . = ALIGN(4);
+        linker_gotStart = .;
+        KEEP(*(.got))
+        KEEP(*(.got.plt))
+        linker_gotEnd = .;
+
         linker_dataEnd = .;
     }
 
