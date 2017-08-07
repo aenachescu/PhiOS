@@ -34,28 +34,24 @@ void user_main()
     }
 }
 
-int x, y;
+extern uint32 linker_gotStart;
+extern uint32 linker_gotEnd;
 
-void print(void* addr)
+void adjust_got()
 {
-    kprintf("%p\n", addr);
-}
+    uint32 begin = (uint32) &linker_gotStart;
+    uint32 end = (uint32) &linker_gotEnd;
+    uint32 num = (end - begin) / 4;
+    uint32 *ptr = (uint32*) begin;
 
-void f1()
-{
-    print(&y);
-}
-
-void f2()
-{
-    x = 0;
-    print(&x);
+    for (uint32 i = 0; i < num; i++) {
+        ptr[i] += 0xBFF00000;
+    }
 }
 
 void kernel_main()
 {
-    //f1();
-    //f2();
+    adjust_got();
 
     kprintf("paging enabled\n");
 
