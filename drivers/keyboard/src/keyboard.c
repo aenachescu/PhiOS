@@ -38,7 +38,7 @@ char *g_layout;
 char *g_shiftLayout;
 char *g_capsOnLayout;
 uint8 g_keyboardBuffer[KEYBOARD_BUFFER_SIZE];
-uint32 g_keyboardBufferPos;
+volatile uint32 g_keyboardBufferPos;
 bool g_capsOn;
 bool g_special;
 bool g_shift;
