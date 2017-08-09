@@ -61,6 +61,47 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         return ERROR_UNALIGNED_ADDRESS;
     }
 
+    // Iterate over tags and collect info
+    uint64 memoryEnd = 0x0;
+
+    struct multiboot_tag *tag;
+    for (tag = (struct multiboot_tag*) (mboot2Addr + 8);
+         tag->type != MULTIBOOT_TAG_TYPE_END;
+         tag = (struct multiboot_tag*) ((multiboot_uint8_t *) tag
+                                        + ((tag->size + 7) & ~7)))
+    {
+        switch (tag->type)
+        {
+            case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO: ;
+                struct multiboot_tag_basic_meminfo *mem = (struct multiboot_tag_basic_meminfo*) tag;
+                //kprintf("Basic memory area %x - %x\n",
+                //        mem->mem_lower,
+                //        mem->mem_upper);
+                break;
+            case MULTIBOOT_TAG_TYPE_MMAP: ;
+                multiboot_memory_map_t *mmap;
+                struct multiboot_tag_mmap *mmapTag = (struct multiboot_tag_mmap*) tag;
+
+                for (mmap = mmapTag->entries;
+                     (multiboot_uint8_t*) mmap < (multiboot_uint8_t*) tag + tag->size;
+                     mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
+                            + mmapTag->entry_size))
+                {
+                    //kprintf("Memory area starting at %x with "
+                    //        "length of %x and type %x",
+                    //        (unsigned) (mmap->addr),
+                    //        (unsigned) (mmap->len),
+                    //        (unsigned) mmap->type);
+                    
+                    memoryEnd += (uint64) mmap->len;
+                }
+                break;
+            default:
+                //kprintf("Unkown tag %x, size %x\n", tag->type, tag->size);
+                break;
+        }
+    }
+
     VGA_WriteString("GRUB multiboot2\n");
 
     // Inits Placement Address Allocator
@@ -78,12 +119,12 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 
     // Inits Physical Memory Manager
     PMM_init(1);
-    // Temporary BitmapPMA that uses memory from 0 to 4 MiB
-    // It should use memory from 0 to end of RAM
-    BitmapPMA_createAllocator(&g_PMAVM, FRAME_SIZE, 0x0, 0x400000);
+    BitmapPMA_createAllocator(&g_PMAVM, FRAME_SIZE, 0x0, memoryEnd);
     PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve);
     PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY);
+
+    kprintf("Memory size: %d MiBs\n", memoryEnd / 1024 / 1024);
 
     kprintf("KernelStart: %x KernelEnd: %x\n",
         &linker_kernelStart, &linker_kernelEnd);
@@ -99,6 +140,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 
     kprintf("BssStart: %x BssEnd: %x\n",
         &linker_bssStart, &linker_bssEnd);
+
+    kprintf("Memory end: %x\n", memoryEnd);
 
     kprintf("Placement address: %x\n", PAA_getCurrentAddress());
 
