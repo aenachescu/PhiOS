@@ -62,7 +62,12 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     }
 
     // Iterate over tags and collect info
-    uint64 memoryEnd = 0x0;
+    uint32 memoryEnd = 0x0;
+    struct reservedArea {
+        uint32 addr;
+        uint32 len;
+    } areasToReserve[256];
+    uint32 areasNumber = 0;
 
     struct multiboot_tag *tag;
     for (tag = (struct multiboot_tag*) (mboot2Addr + 8);
@@ -87,13 +92,21 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                      mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
                             + mmapTag->entry_size))
                 {
-                    //kprintf("Memory area starting at %x with "
-                    //        "length of %x and type %x",
-                    //        (unsigned) (mmap->addr),
-                    //        (unsigned) (mmap->len),
-                    //        (unsigned) mmap->type);
+                    kprintf("Memory area starting at %x with "
+                            "length of %x and type %x",
+                            (unsigned) (mmap->addr),
+                            (unsigned) (mmap->len),
+                            (unsigned) mmap->type);
                     
-                    memoryEnd += (uint64) mmap->len;
+                    memoryEnd += (uint32) mmap->len;
+
+                    if (mmap->type == MULTIBOOT_MEMORY_RESERVED)
+                    {
+                        areasToReserve[areasNumber].addr = mmap->addr;
+                        areasToReserve[areasNumber].len = mmap->len;
+                        kprintf("%x %x\n", areasToReserve[areasNumber].addr , areasToReserve[areasNumber].len);
+                        areasNumber++;
+                    }
                 }
                 break;
             default:
@@ -123,6 +136,12 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve);
     PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY);
+
+    for (uint32 i = 0; i < areasNumber; i++)
+    {
+        kprintf("%d\n", i);
+        PMM_reserve(areasToReserve[i].addr, areasToReserve[i].len, PMM_FOR_VIRTUAL_MEMORY);
+    }
 
     kprintf("Memory size: %d MiBs\n", memoryEnd / 1024 / 1024);
 
