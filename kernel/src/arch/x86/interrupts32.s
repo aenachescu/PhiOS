@@ -133,9 +133,9 @@ isr_common_stub_32:
     popl %esi
     popl %ebp
     popl %esp
-    popl %ebx
     popl %edx
     popl %ecx
+    popl %ebx
     popl %eax
 
     add $8, %esp
@@ -191,9 +191,9 @@ irq_common_stub_32:
     popl %esi
     popl %ebp
     popl %esp
-    popl %ebx
     popl %edx
     popl %ecx
+    popl %ebx
     popl %eax
 
     add $8, %esp

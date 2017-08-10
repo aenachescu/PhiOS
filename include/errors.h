@@ -18,5 +18,6 @@
 #define ERROR_UNKNOWN_FLAG          14
 #define ERROR_LIMIT_REACHED         15
 #define ERROR_INVALID_FUNCTION      16
+#define ERROR_NOT_IMPLEMENTED       17
 
 #endif
