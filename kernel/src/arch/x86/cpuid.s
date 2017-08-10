@@ -16,12 +16,12 @@ CPUID_IsSuported:
     popfl
     pushfl
 
-    popl %ebx
-    xorl (%esp), %ebx
+    popl %ecx
+    xorl (%esp), %ecx
 
     popfl
 
-    andl %ebx, %eax
+    andl %ecx, %eax
 
     ret
 

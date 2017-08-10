@@ -15,7 +15,10 @@ GDT32_Load:
     mov %ax, %gs
     mov %ax, %ss
 
-    jmp $0x08, $flush
+    # jmp $0x08, $flush
+    # descriptor32.s it's mapped first, so the flush is somewhat constant...
+    # that trick is needed because the kernel is pic...
+    jmp $0x08, $0xC000001c
 flush:
     ret
 
