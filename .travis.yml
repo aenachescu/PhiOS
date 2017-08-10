@@ -8,14 +8,12 @@ notifications:
 
 language: c
 compiler: gcc
-sudo: required
-
-before_install:
-    - sudo apt-get install xorriso
 
 install:
     - ./linux_x86_64_getDependencies.sh
 
 script:
-    - ./linux_x86_64_compile.sh clean-all
-    - ./linux_x86_64_compile.sh build-all
+    - ./linux_x86_64_compile.sh clean x86_32
+    - ./linux_x86_64_compile.sh clean x86_64
+    - ./linux_x86_64_compile.sh build x86_32 notGenerateIso
+    - ./linux_x86_64_compile.sh build x86_64 notGenerateIso

@@ -49,3 +49,8 @@ size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
 
     return ERROR_SUCCESS;
 }
+
+size_t PAA_getCurrentAddress()
+{
+    return g_placementAddress;
+}

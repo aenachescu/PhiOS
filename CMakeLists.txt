@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 project (PhiOS C ASM)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+
+if (DEFINED VERBOSE)
+    if (VERBOSE STREQUAL "on")
+        set(CMAKE_VERBOSE_MAKEFILE ON)
+    else ()
+        set(CMAKE_VERBOSE_MAKEFILE OFF)
+    endif ()
+else ()
+    set(CMAKE_VERBOSE_MAKEFILE OFF)
+endif ()
 
 # Enable languages
 enable_language(C)
@@ -63,7 +72,7 @@ endif()
 
 # Set flags
 set(CMAKE_ASM_FLAGS "")
-set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -std=gnu11 -ffreestanding -O2 -Wall -Wextra")
+set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -std=gnu11 -ffreestanding -Wall -Wextra -fpie -O2")
 set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib -z max-page-size=0x1000")
 
 # Set linker rule
@@ -78,6 +87,7 @@ list(APPEND STATIC_LIBS "")
 # Set include paths
 list(APPEND INCLUDE_PATH "${PRJ_PATH}/include")
 list(APPEND INCLUDE_PATH "${PRJ_PATH}/kernel/include")
+list(APPEND INCLUDE_PATH "${PRJ_PATH}")
 
 # Add subdirectories
 add_subdirectory("${PRJ_PATH}/kernel")
@@ -96,7 +106,7 @@ add_custom_command(
         mkdir -p isodir/boot/grub &&
         cp phios.elf isodir/boot/phios.elf &&
         cp ${PRJ_PATH}/grub.cfg isodir/boot/grub/grub.cfg &&
-        grub-mkrescue -o phios.iso isodir
+        grub-mkrescue -d /usr/lib/grub/i386-pc -o phios.iso isodir
     DEPENDS
         phios.elf
     )
