@@ -139,7 +139,10 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 
     for (uint32 i = 0; i < areasNumber; i++)
     {
-        kprintf("%d\n", i);
+        // If memory area exceed 4 GB space, ignore
+        uint64 sum = (uint64) areasToReserve[i].addr + (uint64) areasToReserve[i].len;
+        if (sum > 0xFFFFFFFF) continue;
+
         PMM_reserve(areasToReserve[i].addr, areasToReserve[i].len, PMM_FOR_VIRTUAL_MEMORY);
     }
 
