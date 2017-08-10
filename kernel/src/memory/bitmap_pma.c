@@ -340,11 +340,14 @@ size_t BitmapPMA_reserve(void *a_bpma,
         return ERROR_UNINITIALIZED;
     }
 
+    a_physicalAddress = a_physicalAddress & (~(bpma->frameSize - 1));
     size_t endAddress = a_physicalAddress + a_size;
 
     if (a_size == NULL || 
         endAddress > bpma->endAddress || 
-        a_physicalAddress < bpma->startAddress)
+        a_physicalAddress < bpma->startAddress ||
+        a_size == 0 ||
+        a_physicalAddress >= endAddress)
     {
         return ERROR_INVALID_PARAMETER;
     }
@@ -354,6 +357,7 @@ size_t BitmapPMA_reserve(void *a_bpma,
     size_t framesToReserve = endAddress / bpma->frameSize +
                              (endAddress % bpma->frameSize ? 1 : 0) -
                              frameNumber;
+
     size_t bitmapIndex = frameNumber / WORDSIZE;
     size_t indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
 
