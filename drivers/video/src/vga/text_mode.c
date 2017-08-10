@@ -130,7 +130,20 @@ void VGA_WriteColoredBuffer(const char *a_buffer, size_t a_len,
 
 void VGA_Scroll()
 {
-    // TODO: implement this
+    for (size_t i = 0; i < VGA_HEIGHT - 1; i++) 
+    {
+        for (size_t j = 0; j < VGA_WIDTH; j++)
+        {
+            g_VGA_buffer[i * VGA_WIDTH + j] = g_VGA_buffer[(i + 1) * VGA_WIDTH + j];
+        }
+    }
+    uint16 blank = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
+
+    for (size_t i = 0; i < VGA_WIDTH; i++)
+    {
+        g_VGA_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + i] = blank;
+    }
+    g_VGA_row = VGA_HEIGHT - 1;
 }
 
 void VGA_Clear()
@@ -144,4 +157,7 @@ void VGA_Clear()
                                                   g_VGA_foregroundColor);
         }
     }
+
+    g_VGA_row = 0;
+    g_VGA_column = 0;
 }
