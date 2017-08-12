@@ -26,16 +26,9 @@
  *
  *  ERROR_UNSUPPORTED - If a_base is different of 2, 10, 16.
  */
-#if defined WORDSIZE && WORDSIZE == 32
 size_t kitoa(sint32 a_value, char *a_buffer, size_t *a_length, size_t a_base);
 size_t kutoa(uint32 a_value, char *a_buffer, size_t *a_length, size_t a_base);
 size_t ku64toa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base);
 size_t ki64toa(sint64 a_value, char *a_buffer, size_t *a_length, size_t a_base);
-#endif
-
-#if defined WORDSIZE && WORDSIZE == 64
-size_t kitoa(sint64 a_value, char *a_buffer, size_t *a_length, size_t a_base);
-size_t kutoa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base);
-#endif
 
 #endif
