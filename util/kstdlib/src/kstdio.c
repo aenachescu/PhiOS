@@ -44,7 +44,7 @@ size_t kprintf(const char *a_format, ...)
                     if (extend)
                     {
                         esvalue = *((sint64*) args);
-                        args++;
+                        args += 2;
 
                         bufferSize = 64;
                         ki64toa(esvalue, ebuffer, &bufferSize, 10);
@@ -68,7 +68,7 @@ size_t kprintf(const char *a_format, ...)
                     if (extend)
                     {
                         euvalue = *((uint64*)args);
-                        args++;
+                        args += 2;
 
                         bufferSize = 64;
                         ku64toa(euvalue, ebuffer, &bufferSize, 10);
@@ -123,11 +123,12 @@ size_t kprintf(const char *a_format, ...)
                     VGA_WriteString(buffer);
                     extend = false;
                     break;
+
                 case 'x':
                     if (extend)
                     {
                         eaddress = *((uint64*)args);
-                        args++;
+                        args += 2;
 
                         bufferSize = 64;
                         kutoa(eaddress, ebuffer, &bufferSize, 16);
