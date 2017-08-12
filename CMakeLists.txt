@@ -42,7 +42,6 @@ if (DEFINED ARCH)
         set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker32.ld")
         set(ARCH_PATH "kernel/src/arch/x86")
         set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_32")
-        #list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
     elseif (ARCH STREQUAL "x86_64")
         set(C_32BIT_COMPILER "i686-elf-gcc")
         set(ASM_32BIT_COMPILER "i686-elf-as")
@@ -58,17 +57,7 @@ if (DEFINED ARCH)
         message(FATAL_ERROR "Architecture not supported")
     endif()
 else ()
-    # Use defaults if user doesn't specify any architecture
-    set(C_32BIT_COMPILER "i686-elf-gcc")
-    set(ASM_32BIT_COMPILER "i686-elf-as")
-
-    set(CMAKE_ASM_COMPILER "x86_64-elf-as")
-    set(CMAKE_C_COMPILER "x86_64-elf-gcc")
-    set(CMAKE_AR "x86_64-elf-ar")
-    set(CMAKE_LINKER "x86_64-elf-ld")
-    set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker64.ld")
-    set(ARCH_PATH "kernel/src/arch/x86")
-    set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_64")
+    message(FATAL_ERROR "Architecture is not defined")
 endif()
 
 # Set flags
@@ -81,7 +70,7 @@ set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> ${CMAKE_LINKER_FLAGS} <OBJECTS> -o <
 
 # Set sources
 list(APPEND BOOTSTRAP_SOURCES "")
-list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
+list(APPEND C_SOURCES "")
 list(APPEND ASM_SOURCES "")
 list(APPEND STATIC_LIBS "")
 
@@ -96,7 +85,12 @@ add_subdirectory("${PRJ_PATH}/${ARCH_PATH}")
 add_subdirectory("${PRJ_PATH}/drivers")
 add_subdirectory("${PRJ_PATH}/util")
 
-list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
+if (DEFINED ARCH)
+    if (ARCH STREQUAL "x86_32")
+        list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
+        list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
+    endif()
+endif()
 
 
 # Add include paths
