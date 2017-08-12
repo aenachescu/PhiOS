@@ -42,7 +42,7 @@ if (DEFINED ARCH)
         set(LINKER_FILE "${PRJ_PATH}/kernel/src/arch/x86/linker32.ld")
         set(ARCH_PATH "kernel/src/arch/x86")
         set(CMAKE_C_FLAGS " -DPhiOS_ARCH_x86_32")
-        list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
+        #list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
     elseif (ARCH STREQUAL "x86_64")
         set(C_32BIT_COMPILER "i686-elf-gcc")
         set(ASM_32BIT_COMPILER "i686-elf-as")
@@ -95,6 +95,9 @@ add_subdirectory("${PRJ_PATH}/kernel")
 add_subdirectory("${PRJ_PATH}/${ARCH_PATH}")
 add_subdirectory("${PRJ_PATH}/drivers")
 add_subdirectory("${PRJ_PATH}/util")
+
+list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
+
 
 # Add include paths
 include_directories(${INCLUDE_PATH})
