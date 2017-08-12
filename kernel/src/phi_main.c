@@ -1,10 +1,14 @@
-#include "drivers/keyboard/include/keyboard.h"
-#include "util/kstdlib/include/kstdio.h"
 #include "kernel/include/arch/x86/gdt32.h"
 #include "kernel/include/arch/x86/idt32.h"
 #include "kernel/include/arch/x86/tss32.h"
 #include "kernel/include/arch/x86/pit.h"
 #include "kernel/include/arch/x86/pic.h"
+#include "kernel/include/arch/x86/cpuid.h"
+
+#include "drivers/keyboard/include/keyboard.h"
+#include "drivers/rtc/include/rtc.h"
+
+#include "util/kstdlib/include/kstdio.h"
 
 extern size_t g_kernelStack[2048];
 
@@ -54,6 +58,16 @@ void kernel_main()
     adjust_got();
 
     kprintf("paging enabled\n");
+
+    // Inits CPUID detection
+    CPUID_Init();
+    const char *cpuVendorName = NULL;
+    CPUID_GetVendorName(&cpuVendorName);
+    kprintf("[CPU] %s\n", cpuVendorName);
+
+    // Inits real time clock
+    RTC_init();
+    kprintf("[SYSTEM] Initialized real time clock.\n");
 
     // Inits GDT for 32-bit
     GDT32_init();
