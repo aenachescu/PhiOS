@@ -1,10 +1,4 @@
 #include "kernel/include/arch/x86/init32.h"
-#include "kernel/include/arch/x86/cpuid.h"
-#include "kernel/include/arch/x86/gdt32.h"
-#include "kernel/include/arch/x86/idt32.h"
-#include "kernel/include/arch/x86/tss32.h"
-#include "kernel/include/arch/x86/pit.h"
-#include "kernel/include/arch/x86/pic.h"
 #include "kernel/include/arch/x86/paging/ia32.h"
 #include "kernel/include/arch/x86/paging/paging.h"
 
@@ -13,8 +7,6 @@
 #include "kernel/include/memory/bitmap_pma.h"
 
 #include "drivers/video/include/vga/text_mode.h"
-#include "drivers/keyboard/include/keyboard.h"
-#include "drivers/rtc/include/rtc.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -43,6 +35,23 @@ struct Paging g_kernelPaging;
 
 extern struct PMA *g_allocators;
 
+static __attribute__ ((unused)) void printKernelArea()
+{
+    kprintf("TextStart: %x TextEnd: %x\n",
+        g_kernelArea.textStartAddr, g_kernelArea.textEndAddr);
+
+    kprintf("RodataStart: %x RodataEnd: %x\n",
+        g_kernelArea.rodataStartAddr, g_kernelArea.rodataEndAddr);
+
+    kprintf("DataStart: %x DataEnd: %x\n",
+        g_kernelArea.dataStartAddr, g_kernelArea.dataEndAddr);
+
+    kprintf("BssStart: %x BssEnd: %x\n",
+        g_kernelArea.bssStartAddr, g_kernelArea.bssEndAddr);
+
+    kprintf("Placement address: %x\n", g_kernelArea.endPlacementAddr);
+}
+
 size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 {
     // Inits VGA
@@ -61,6 +70,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         return ERROR_UNALIGNED_ADDRESS;
     }
 
+    VGA_WriteString("GRUB multiboot2\n");
+
     // Iterate over tags and collect info
     uint32 memoryEnd = 0x0;
     struct reservedArea {
@@ -78,7 +89,7 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         switch (tag->type)
         {
             case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO: ;
-                struct multiboot_tag_basic_meminfo *mem = (struct multiboot_tag_basic_meminfo*) tag;
+                //struct multiboot_tag_basic_meminfo *mem = (struct multiboot_tag_basic_meminfo*) tag;
                 //kprintf("Basic memory area %x - %x\n",
                 //        mem->mem_lower,
                 //        mem->mem_upper);
@@ -115,20 +126,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         }
     }
 
-    VGA_WriteString("GRUB multiboot2\n");
-
     // Inits Placement Address Allocator
     PAA_init((size_t) &linker_kernelEnd);
-
-    // Inits CPUID detection
-    CPUID_Init();
-    const char *cpuVendorName = NULL;
-    CPUID_GetVendorName(&cpuVendorName);
-    kprintf("[CPU] %s\n", cpuVendorName);
-
-    // Inits real time clock
-    RTC_init();
-    kprintf("[SYSTEM] Initialized real time clock.\n");
 
     // Inits Physical Memory Manager
     PMM_init(1);
@@ -148,24 +147,7 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 
     kprintf("Memory size: %d MiBs\n", memoryEnd / 1024 / 1024);
 
-    kprintf("KernelStart: %x KernelEnd: %x\n",
-        &linker_kernelStart, &linker_kernelEnd);
-
-    kprintf("TextStart: %x TextEnd: %x\n",
-        &linker_textStart, &linker_textEnd);
-
-    kprintf("RodataStart: %x RodataEnd: %x\n",
-        &linker_rodataStart, &linker_rodataEnd);
-
-    kprintf("DataStart: %x DataEnd: %x\n",
-        &linker_dataStart, &linker_dataEnd);
-
-    kprintf("BssStart: %x BssEnd: %x\n",
-        &linker_bssStart, &linker_bssEnd);
-
     kprintf("Memory end: %x\n", memoryEnd);
-
-    kprintf("Placement address: %x\n", PAA_getCurrentAddress());
 
     g_kernelArea.textStartAddr      = (size_t) &linker_textStart;
     g_kernelArea.textEndAddr        = (size_t) &linker_textEnd;
