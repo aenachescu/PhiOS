@@ -131,7 +131,7 @@ size_t kprintf(const char *a_format, ...)
                         args += 2;
 
                         bufferSize = 64;
-                        kutoa(eaddress, ebuffer, &bufferSize, 16);
+                        ku64toa(eaddress, ebuffer, &bufferSize, 16);
 
                         VGA_WriteChar('0');
                         VGA_WriteChar('x');
