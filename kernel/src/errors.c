@@ -3,6 +3,8 @@
 #include "cpu.h"
 #include "types.h"
 
+#define ERROR_KPRINTF(message) kprintf("\n[%s] In file %s at line %d.", message, file, line); stopCpu();
+
 void __kernel_check(size_t err, const char *file, size_t line)
 {
     switch (err)
@@ -11,147 +13,75 @@ void __kernel_check(size_t err, const char *file, size_t line)
             break;
 
         case ERROR_NULL_POINTER:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_NULL_POINTER",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_NULL_POINTER");
             break;
         
         case ERROR_INSUFFICIENT_BUFFER:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_INSUFFICIENT_BUFFER",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_INSUFFICIENT_BUFFER");
             break;
 
         case ERROR_UNKNOWN:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_UNKNOWN",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_UNKNOWN");
             break;
             
         case ERROR_UNSUPPORTED:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_UNSUPPORTED",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_UNSUPPORTED");
             break;
             
         case ERROR_SAME_POINTERS:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_SAME_POINTERS",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_SAME_POINTERS");
             break;
             
         case ERROR_EMPTY_BUFFER:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_EMPTY_BUFFER",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_EMPTY_BUFFER");
             break;
             
         case ERROR_NOT_FOUND:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_NOT_FOUND",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_NOT_FOUND");
             break;
             
         case ERROR_UNINITIALIZED:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_UNINITIALIZED",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_UNINITIALIZED");
             break;
             
         case ERROR_INVALID_PARAMETER:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_INVALID_PARAMETER",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_INVALID_PARAMETER");
             break;
             
         case ERROR_ALREADY_INITIALIZED:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_ALREADY_INITIALIZED",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_ALREADY_INITIALIZED");
             break;
             
         case ERROR_NO_FREE_MEMORY:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_NO_FREE_MEMORY",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_NO_FREE_MEMORY");
             break;
             
         case ERROR_INVALID_STATE:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_INVALID_STATE",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_INVALID_STATE");
             break;
             
         case ERROR_UNALIGNED_ADDRESS:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_UNALIGNED_ADDRESS",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_UNALIGNED_ADDRESS");
             break;
             
         case ERROR_UNKNOWN_FLAG:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_UNKNOWN_FLAG",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_UNKNOWN_FLAG");
             break;
             
         case ERROR_LIMIT_REACHED:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_LIMIT_REACHED",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_LIMIT_REACHED");
             break;
             
         case ERROR_INVALID_FUNCTION:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_INVALID_FUNCTION",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_INVALID_FUNCTION");
             break;
             
         case ERROR_NOT_IMPLEMENTED:
-            kprintf("\n[%s] In file %s at line %d.",
-                "ERROR_NOT_IMPLEMENTED",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("ERROR_NOT_IMPLEMENTED");
             break;
         
         default:
-            kprintf("\n[%s] In file %s at line %d.",
-                "UNKNOWN_ERROR_CODE",
-                file,
-                line);
-            stopCpu();
+            ERROR_KPRINTF("UNKNOWN_ERROR_CODE");
             break;
     }
 }
