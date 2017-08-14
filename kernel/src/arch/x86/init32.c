@@ -12,6 +12,8 @@
 
 #include "kernel/include/multiboot2.h"
 
+#include "cpu.h"
+
 struct KernelArea g_kernelArea;
 
 extern uint32 linker_kernelStart;
@@ -73,12 +75,12 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     VGA_WriteString("GRUB multiboot2\n");
 
     // Iterate over tags and collect info
-    uint32 memoryEnd = 0x0;
+    uint64 memoryEnd = 0x0;
     struct reservedArea {
-        uint32 addr;
-        uint32 len;
+        uint64 addr;
+        uint64 len;
     } areasToReserve[256];
-    uint32 areasNumber = 0;
+    uint64 areasNumber = 0;
 
     struct multiboot_tag *tag;
     for (tag = (struct multiboot_tag*) (mboot2Addr + 8);
@@ -103,19 +105,18 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                      mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
                             + mmapTag->entry_size))
                 {
-                    kprintf("Memory area starting at %x with "
-                            "length of %x and type %x",
-                            (unsigned) (mmap->addr),
-                            (unsigned) (mmap->len),
-                            (unsigned) mmap->type);
+                    kprintf("Memory area starting at %llx with "
+                            "length of %llx and type %x\n",
+                            mmap->addr,
+                            mmap->len,
+                            mmap->type);
                     
-                    memoryEnd += (uint32) mmap->len;
+                    memoryEnd += mmap->len;
 
                     if (mmap->type == MULTIBOOT_MEMORY_RESERVED)
                     {
                         areasToReserve[areasNumber].addr = mmap->addr;
                         areasToReserve[areasNumber].len = mmap->len;
-                        kprintf("%x %x\n", areasToReserve[areasNumber].addr , areasToReserve[areasNumber].len);
                         areasNumber++;
                     }
                 }
@@ -139,15 +140,16 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     for (uint32 i = 0; i < areasNumber; i++)
     {
         // If memory area exceed 4 GB space, ignore
-        uint64 sum = (uint64) areasToReserve[i].addr + (uint64) areasToReserve[i].len;
+        uint64 sum = areasToReserve[i].addr + areasToReserve[i].len;
         if (sum > 0xFFFFFFFF) continue;
 
         PMM_reserve(areasToReserve[i].addr, areasToReserve[i].len, PMM_FOR_VIRTUAL_MEMORY);
+        kprintf("Reserve: %x %x\n", areasToReserve[i].addr, areasToReserve[i].len);
     }
 
-    kprintf("Memory size: %d MiBs\n", memoryEnd / 1024 / 1024);
+    kprintf("Memory size: %lld MiBs\n", memoryEnd / 1024 / 1024);
 
-    kprintf("Memory end: %x\n", memoryEnd);
+    kprintf("Memory end: %llx\n", memoryEnd);
 
     g_kernelArea.textStartAddr      = (size_t) &linker_textStart;
     g_kernelArea.textEndAddr        = (size_t) &linker_textEnd;
