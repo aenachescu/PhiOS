@@ -173,10 +173,10 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     g_kernelArea.bssEndAddr         = (size_t) &linker_bssEnd;
     g_kernelArea.endPlacementAddr   = PAA_getCurrentAddress();
 
-    PMM_reserve(g_kernelArea.textStartAddr,
+    KERNEL_CHECK(PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
-               PMM_FOR_VIRTUAL_MEMORY);
-    IA32_4KB_initKernelPaging(&g_kernelPaging);
+               PMM_FOR_VIRTUAL_MEMORY));
+    KERNEL_CHECK(IA32_4KB_initKernelPaging(&g_kernelPaging));
 
     for (size_t i = 0; i < memoryZonesCount; i++)
     {
@@ -184,8 +184,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     }
     g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
 //freezeCpu();
-    IA32_4KB_switchDirectory(&g_kernelPaging,
-        (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct);
+    KERNEL_CHECK(IA32_4KB_switchDirectory(&g_kernelPaging,
+        (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct));
 
     return ERROR_SUCCESS;
 }

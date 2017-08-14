@@ -60,34 +60,34 @@ void kernel_main()
     kprintf("paging enabled\n");
 
     // Inits CPUID detection
-    CPUID_Init();
+    KERNEL_CHECK(CPUID_Init());
     const char *cpuVendorName = NULL;
     CPUID_GetVendorName(&cpuVendorName);
     kprintf("[CPU] %s\n", cpuVendorName);
 
     // Inits real time clock
-    RTC_init();
+    KERNEL_CHECK(RTC_init());
     kprintf("[SYSTEM] Initialized real time clock.\n");
 
     // Inits GDT for 32-bit
-    GDT32_init();
+    KERNEL_CHECK(GDT32_init());
 
     // Sets kernel stack in TSS struct
-    TSS32_setKernelStack((uint32) &g_kernelStack[2047]);
+    KERNEL_CHECK(TSS32_setKernelStack((uint32) &g_kernelStack[2047]));
 
     // Inits IDT for 32-bit
-    IDT32_init();
+    KERNEL_CHECK(IDT32_init());
 
     // Inits PIC
-    PIC_init();
-    PIC_maskUnusedIRQs();
+    KERNEL_CHECK(PIC_init());
+    KERNEL_CHECK(PIC_maskUnusedIRQs());
 
     // Inits timer
-    PIT_init((uint16) -1);
+    KERNEL_CHECK(PIT_init((uint16) -1));
     kprintf("[SYSTEM] Initialized timer at %d frequency.\n", OSCILLATOR_FREQUENCY);
 
     // Inits keyboard
-    keyboard_init();
+    KERNEL_CHECK(keyboard_init());
     kprintf("[SYSTEM] Initialized keyboard.\n");
 
     return;
