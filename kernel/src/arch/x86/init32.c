@@ -140,7 +140,6 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                 break;
         }
     }
-    //freezeCpu();
 
     // Inits Placement Address Allocator
     KERNEL_CHECK(PAA_init((size_t) &linker_kernelEnd));
@@ -158,7 +157,6 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         {
             KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_DMA,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
-            kprintf("DMA\n");
         }
         else
         {
@@ -190,7 +188,7 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + 0xC0000000 - 0x00100000);
     }
     g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
-//freezeCpu();
+
     KERNEL_CHECK(IA32_4KB_switchDirectory(&g_kernelPaging,
         (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct));
 
