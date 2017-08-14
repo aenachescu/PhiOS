@@ -82,6 +82,7 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma, size_t a_frameSize,
     if (a_endAddress & (~(a_frameSize - 1)))
     {
         a_endAddress &= (~(a_frameSize - 1));
+        a_endAddress -= a_frameSize;
     }
 
     if (a_frameSize < 2 || a_endAddress <= a_startAddress ||

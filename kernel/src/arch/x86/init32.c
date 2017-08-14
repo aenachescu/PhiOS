@@ -153,12 +153,19 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
         KERNEL_CHECK(BitmapPMA_createAllocator(&g_PMAVM[i], FRAME_SIZE, 
                                   (size_t) memoryZones[i].startAddr,
                                   (size_t) memoryZones[i].endAddr));        
-        KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_VIRTUAL_MEMORY,
+        
+        if (memoryZones[i].endAddr < 0x100000)
+        {
+            KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_DMA,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
+            kprintf("DMA\n");
+        }
+        else
+        {
+            KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_VIRTUAL_MEMORY,
+                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
+        }
     }
-
-    KERNEL_CHECK(PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY));
-
     kprintf("Memory size: %lld MiBs\n", memoryEnd / 1024 / 1024);
 
     kprintf("Memory end: %llx\n", memoryEnd);
