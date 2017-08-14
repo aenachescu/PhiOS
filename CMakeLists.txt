@@ -89,6 +89,7 @@ if (DEFINED ARCH)
     if (ARCH STREQUAL "x86_32")
         list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
         list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
+        list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/errors.c")
     endif()
 endif()
 
