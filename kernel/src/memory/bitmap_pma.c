@@ -1,6 +1,9 @@
 #include "bitmap_pma.h"
 #include "paa.h"
 
+#define CHECK_ALIGN(addr, align) ((addr & (align - 1)) != 0)
+#define ALIGN(addr, align) addr = addr & (~(align - 1))
+#define IS_POWER_OF_2(x) (!(x & (x - 1)))
 
 /*
  * This function doesn't checks if the input is correct because is a helper
@@ -74,27 +77,23 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma, size_t a_frameSize,
         return ERROR_NULL_POINTER;
     }
 
-    if (a_startAddress & ~((a_frameSize - 1)))
-    {
-        a_startAddress &= (~(a_frameSize - 1));
-    }
-
-    if (a_endAddress & (~(a_frameSize - 1)))
-    {
-        a_endAddress &= (~(a_frameSize - 1));
-        a_endAddress -= a_frameSize;
-    }
-
-    if (a_frameSize < 2 || a_endAddress <= a_startAddress ||
-        ((a_frameSize - 1) & a_frameSize) != 0)
+    if (a_endAddress <= a_startAddress ||
+        IS_POWER_OF_2(a_frameSize) == 0)
     {
         return ERROR_INVALID_PARAMETER;
     }
 
-    if ((a_startAddress & (a_frameSize - 1)) != 0 ||
-        (a_endAddress & (a_frameSize - 1)) != 0)
+    // align start address
+    if (CHECK_ALIGN(a_startAddress, a_frameSize))
     {
-        return ERROR_INVALID_PARAMETER;
+        ALIGN(a_startAddress, a_frameSize);
+        a_startAddress += a_frameSize;
+    }
+
+    // align end address
+    if (CHECK_ALIGN(a_endAddress, a_frameSize))
+    {
+        ALIGN(a_endAddress, a_frameSize);
     }
 
     a_bpma->startAddress                 = a_startAddress;
@@ -226,7 +225,7 @@ Searching:
                     // computes the physical address
                     size_t frames = i_start * WORDSIZE;
                     frames += (WORDSIZE - 1 - j_start);
-                    *a_physicalAddress = frames * bpma->frameSize;
+                    *a_physicalAddress = frames * bpma->frameSize + bpma->startAddress;
 
                     // set the last position
                     bpma->positionLastAllocatedFrame = i;
@@ -275,14 +274,19 @@ size_t BitmapPMA_free(void *a_bpma,
         return ERROR_UNINITIALIZED;
     }
 
+    if (a_size == 0)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
+
     size_t framesNumber = a_size / bpma->frameSize + (a_size % bpma->frameSize ? 1 : 0);
     size_t totalFramesNumber = (bpma->endAddress - bpma->startAddress) / bpma->frameSize;
 
-    if (framesNumber == 0                                     ||
-        framesNumber > totalFramesNumber                           ||
-        (a_physicalAddress & (bpma->frameSize - 1)) != 0       ||
-        a_physicalAddress < bpma->startAddress                 ||
-        a_physicalAddress >= bpma->endAddress)
+    if (framesNumber == 0
+        || framesNumber > totalFramesNumber
+        || (a_physicalAddress & (bpma->frameSize - 1)) != 0
+        || a_physicalAddress < bpma->startAddress
+        || a_physicalAddress >= bpma->endAddress)
     {
         return ERROR_INVALID_PARAMETER;
     }
@@ -294,6 +298,7 @@ size_t BitmapPMA_free(void *a_bpma,
     }
 
     // computes indexBitmap and indexBits
+    a_physicalAddress -= bpma->startAddress;
     totalFramesNumber = a_physicalAddress / bpma->frameSize;
     size_t startIndexBitmap = totalFramesNumber / WORDSIZE;
     size_t startIndexBits   = WORDSIZE - 1 - totalFramesNumber % WORDSIZE;
@@ -354,15 +359,16 @@ size_t BitmapPMA_reserve(void *a_bpma,
     a_physicalAddress = a_physicalAddress & (~(bpma->frameSize - 1));
     size_t endAddress = a_physicalAddress + a_size;
 
-    if (a_size == NULL || 
+    if (a_size == 0 ||
         endAddress > bpma->endAddress || 
         a_physicalAddress < bpma->startAddress ||
-        a_size == 0 ||
         a_physicalAddress >= endAddress)
     {
         return ERROR_INVALID_PARAMETER;
     }
 
+    a_physicalAddress -= bpma->startAddress;
+    endAddress -= bpma->startAddress;
     size_t frameNumber = a_physicalAddress / bpma->frameSize + 
                         (a_physicalAddress % bpma->frameSize ? 1 : 0);
     size_t framesToReserve = endAddress / bpma->frameSize +
