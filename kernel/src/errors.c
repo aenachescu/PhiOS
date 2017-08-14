@@ -1,6 +1,7 @@
 #include "errors.h"
 #include "util/kstdlib/include/kstdio.h"
 #include "cpu.h"
+#include "types.h"
 
 void __kernel_check(size_t err, const char *file, size_t line)
 {
