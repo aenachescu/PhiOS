@@ -32,7 +32,7 @@ extern uint32 linker_bssEnd;
 // TODO: remove this when tasks are available
 size_t g_kernelStack[2048]; // temporary kernel mode
 
-struct BitmapPMA g_PMAVM; // physical memory allocator for virtual memory
+struct BitmapPMA *g_PMAVM;
 struct Paging g_kernelPaging;
 
 extern struct PMA *g_allocators;
@@ -76,11 +76,11 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 
     // Iterate over tags and collect info
     uint64 memoryEnd = 0x0;
-    struct reservedArea {
-        uint64 addr;
-        uint64 len;
-    } areasToReserve[256];
-    uint64 areasNumber = 0;
+    struct {
+        uint64 startAddr;
+        uint64 endAddr;
+    } memoryZones[256];
+    uint64 memoryZonesCount = 0;
 
     struct multiboot_tag *tag;
     for (tag = (struct multiboot_tag*) (mboot2Addr + 8);
@@ -97,6 +97,7 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                 //        mem->mem_upper);
                 break;
             case MULTIBOOT_TAG_TYPE_MMAP: ;
+                kprintf("[GRUB] Memory map:\n");
                 multiboot_memory_map_t *mmap;
                 struct multiboot_tag_mmap *mmapTag = (struct multiboot_tag_mmap*) tag;
 
@@ -105,19 +106,32 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                      mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
                             + mmapTag->entry_size))
                 {
-                    kprintf("Memory area starting at %llx with "
-                            "length of %llx and type %x\n",
+                    kprintf("[addr %llx, len %llx] ",
                             mmap->addr,
-                            mmap->len,
-                            mmap->type);
+                            mmap->len);
                     
                     memoryEnd += mmap->len;
 
-                    if (mmap->type == MULTIBOOT_MEMORY_RESERVED)
+                    switch (mmap->type)
                     {
-                        areasToReserve[areasNumber].addr = mmap->addr;
-                        areasToReserve[areasNumber].len = mmap->len;
-                        areasNumber++;
+                        case MULTIBOOT_MEMORY_AVAILABLE:
+                            memoryZones[memoryZonesCount].startAddr = mmap->addr;
+                            memoryZones[memoryZonesCount].endAddr = mmap->addr + mmap->len;
+                            memoryZonesCount++;
+
+                            kprintf("AVAILABLE\n");
+                            break;
+                        case MULTIBOOT_MEMORY_RESERVED:
+                            kprintf("RESERVED\n");
+                            break;
+                        case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE:
+                            kprintf("ACPI RECLAIMABLE\n");
+                            break;
+                        case MULTIBOOT_MEMORY_NVS:
+                            kprintf("NVS\n");
+                            break;
+                        case MULTIBOOT_MEMORY_BADRAM:
+                            kprintf("BAD RAM\n");
                     }
                 }
                 break;
@@ -126,26 +140,24 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                 break;
         }
     }
+    //freezeCpu();
 
     // Inits Placement Address Allocator
-    PAA_init((size_t) &linker_kernelEnd);
+    KERNEL_CHECK(PAA_init((size_t) &linker_kernelEnd));
+    KERNEL_CHECK(PAA_alloc(sizeof(struct BitmapPMA) * memoryZonesCount, (void*) &g_PMAVM, 0x1000));
 
     // Inits Physical Memory Manager
-    PMM_init(1);
-    BitmapPMA_createAllocator(&g_PMAVM, FRAME_SIZE, 0x0, memoryEnd);
-    PMM_addAllocator((void*) &g_PMAVM, PMM_FOR_VIRTUAL_MEMORY,
-                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve);
-    PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY);
-
-    for (uint32 i = 0; i < areasNumber; i++)
+    KERNEL_CHECK(PMM_init(memoryZonesCount));
+    for (size_t i = 0; i < memoryZonesCount; i++)
     {
-        // If memory area exceed 4 GB space, ignore
-        uint64 sum = areasToReserve[i].addr + areasToReserve[i].len;
-        if (sum > 0xFFFFFFFF) continue;
-
-        PMM_reserve(areasToReserve[i].addr, areasToReserve[i].len, PMM_FOR_VIRTUAL_MEMORY);
-        kprintf("Reserve: %x %x\n", areasToReserve[i].addr, areasToReserve[i].len);
+        KERNEL_CHECK(BitmapPMA_createAllocator(&g_PMAVM[i], FRAME_SIZE, 
+                                  (size_t) memoryZones[i].startAddr,
+                                  (size_t) memoryZones[i].endAddr));        
+        KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_VIRTUAL_MEMORY,
+                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
     }
+
+    KERNEL_CHECK(PMM_reserve(0x0, 0x100000, PMM_FOR_VIRTUAL_MEMORY));
 
     kprintf("Memory size: %lld MiBs\n", memoryEnd / 1024 / 1024);
 
@@ -166,9 +178,12 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                PMM_FOR_VIRTUAL_MEMORY);
     IA32_4KB_initKernelPaging(&g_kernelPaging);
 
-    g_PMAVM.bitmap = (size_t*) ((size_t)g_PMAVM.bitmap + 0xC0000000 - 0x00100000);
+    for (size_t i = 0; i < memoryZonesCount; i++)
+    {
+        g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + 0xC0000000 - 0x00100000);
+    }
     g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
-
+//freezeCpu();
     IA32_4KB_switchDirectory(&g_kernelPaging,
         (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct);
 
