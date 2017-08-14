@@ -1,6 +1,8 @@
 #ifndef PhiOS_errors
 #define PhiOS_errors
 
+#include "types.h"
+
 #define ERROR_SUCCESS               0
 #define ERROR_NULL_POINTER          1
 #define ERROR_INSUFFICIENT_BUFFER   2
