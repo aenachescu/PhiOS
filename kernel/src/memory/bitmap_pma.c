@@ -9,16 +9,16 @@
  * This function doesn't checks if the input is correct because is a helper
  * function and it expects the input to be correct.
  */
-static void helper_marksBits(struct BitmapPMA *a_bpma,
-                             size_t indexBitmap, size_t indexBits,
-                             size_t requiredFrames)
+static void helper_marksBits(
+    struct BitmapPMA *a_bpma,
+    uint32 indexBitmap,
+    uint32 indexBits,
+    uint32 requiredFrames)
 {
     indexBits++;
 
-    do
-    {
-        do
-        {
+    do {
+        do {
             indexBits--;
 
             // set bit
@@ -26,8 +26,7 @@ static void helper_marksBits(struct BitmapPMA *a_bpma,
 
             // checks if all the bits was marked
             requiredFrames--;
-            if (requiredFrames == 0)
-            {
+            if (requiredFrames == 0) {
                 return;
             }
         } while(indexBits > 0); // iterates through bits
@@ -41,16 +40,16 @@ static void helper_marksBits(struct BitmapPMA *a_bpma,
  * This function doesn't checks if the input is correct because is a helper
  * function and it expects the input to be correct.
  */
- static void helper_freesBits(struct BitmapPMA *a_bpma,
-                              size_t indexBitmap, size_t indexBits,
-                              size_t requiredFrames)
+ static void helper_freesBits(
+    struct BitmapPMA *a_bpma,
+    uint32 indexBitmap,
+    uint32 indexBits,
+    uint32 requiredFrames)
 {
     indexBits++;
 
-    do
-    {
-        do
-        {
+    do {
+        do {
             indexBits--;
 
             // frees bit
@@ -58,8 +57,7 @@ static void helper_marksBits(struct BitmapPMA *a_bpma,
 
             // checks if all the bits was marked
             requiredFrames--;
-            if (requiredFrames == 0)
-            {
+            if (requiredFrames == 0) {
                 return;
             }
         } while(indexBits > 0); // iterates through bits
@@ -69,30 +67,29 @@ static void helper_marksBits(struct BitmapPMA *a_bpma,
     } while (true); // iterates through bitmap
 }
 
-size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma, size_t a_frameSize,
-                                size_t a_startAddress, size_t a_endAddress)
+uint32 BitmapPMA_createAllocator(
+    struct BitmapPMA *a_bpma,
+    uint32 a_frameSize,
+    uint64 a_startAddress,
+    uint64 a_endAddress)
 {
-    if (a_bpma == NULL)
-    {
+    if (a_bpma == NULL) {
         return ERROR_NULL_POINTER;
     }
 
     if (a_endAddress <= a_startAddress ||
-        IS_POWER_OF_2(a_frameSize) == 0)
-    {
+        IS_POWER_OF_2(a_frameSize) == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
     // align start address
-    if (CHECK_ALIGN(a_startAddress, a_frameSize))
-    {
+    if (CHECK_ALIGN(a_startAddress, a_frameSize)) {
         ALIGN(a_startAddress, a_frameSize);
         a_startAddress += a_frameSize;
     }
 
     // align end address
-    if (CHECK_ALIGN(a_endAddress, a_frameSize))
-    {
+    if (CHECK_ALIGN(a_endAddress, a_frameSize)) {
         ALIGN(a_endAddress, a_frameSize);
     }
 
@@ -104,21 +101,21 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma, size_t a_frameSize,
     a_bpma->bitmap                       = NULL;
     a_bpma->bitmapSize                   = 0;
 
-    size_t framesNumber     = (a_endAddress - a_startAddress) / a_frameSize;
-    size_t bitmapSize       = framesNumber / WORDSIZE;
-    size_t remainingBits    = framesNumber % WORDSIZE;
+    uint32 framesNumber     = (a_endAddress - a_startAddress) / a_frameSize;
+    uint32 bitmapSize       = framesNumber / WORDSIZE;
+    uint32 remainingBits    = framesNumber % WORDSIZE;
 
-    if (remainingBits != 0)
-    {
+    if (remainingBits != 0) {
         bitmapSize++;
     }
 
-    size_t error = PAA_alloc(sizeof(size_t) * bitmapSize,
-                             (size_t*) &a_bpma->bitmap,
-                             WORDSIZE_BYTES);
+    uint32 error = PAA_alloc(
+        sizeof(size_t) * bitmapSize,
+        (size_t*) &a_bpma->bitmap,
+        WORDSIZE_BYTES
+    );
 
-    if (error != ERROR_SUCCESS)
-    {
+    if (error != ERROR_SUCCESS) {
         a_bpma->bitmap       = NULL;
         a_bpma->bitmapSize   = 0;
 
@@ -126,48 +123,48 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma, size_t a_frameSize,
     }
 
     a_bpma->bitmapSize = bitmapSize;
-    for (size_t i = 0; i < bitmapSize; i++)
-    {
+    for (uint32 i = 0; i < bitmapSize; i++) {
         a_bpma->bitmap[i] = (size_t) 0;
     }
 
     // if framesNumber is not multiple of WORDSIZE, marks the bits from bitmap
     // that exceed framesNumber.
-    if (remainingBits != 0)
-    {
-        helper_marksBits(a_bpma, bitmapSize - 1, WORDSIZE - 1 - remainingBits,
-                         WORDSIZE - remainingBits);
+    if (remainingBits != 0) {
+        helper_marksBits(
+            a_bpma,
+            bitmapSize - 1,
+            WORDSIZE - 1 - remainingBits,
+            WORDSIZE - remainingBits
+        );
     }
 
     return ERROR_SUCCESS;
 }
 
-size_t BitmapPMA_alloc(void *a_bpma,
-                       size_t a_size, size_t *a_physicalAddress)
+uint32 BitmapPMA_alloc(
+    void *a_bpma,
+    uint64 a_size,
+    uint64 *a_physicalAddress)
 {
     struct BitmapPMA *bpma = (struct BitmapPMA*) a_bpma;
 
-    if (bpma == NULL || a_physicalAddress == NULL)
-    {
+    if (bpma == NULL || a_physicalAddress == NULL) {
         return ERROR_NULL_POINTER;
     }
 
     *a_physicalAddress = 0;
 
-    if (bpma->bitmap == NULL)
-    {
+    if (bpma->bitmap == NULL) {
         return ERROR_UNINITIALIZED;
     }
 
-    size_t framesNumber = a_size / bpma->frameSize + (a_size % bpma->frameSize ? 1 : 0);
+    uint32 framesNumber = a_size / (uint64) bpma->frameSize + (a_size % (uint64) bpma->frameSize ? 1 : 0);
 
-    if (framesNumber == 0)
-    {
+    if (framesNumber == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
-    if (framesNumber > bpma->freeFramesNumber)
-    {
+    if (framesNumber > bpma->freeFramesNumber) {
         return ERROR_NO_FREE_MEMORY;
     }
 
@@ -189,12 +186,12 @@ size_t BitmapPMA_alloc(void *a_bpma,
     }
 
     //search from bpma->positionLastAllocatedFrame to the last frame
-    size_t requiredFrames = framesNumber;
-    size_t i = bpma->positionLastAllocatedFrame;
-    size_t j = 0;
-    size_t limit = bpma->bitmapSize;
-    size_t i_start = 0;
-    size_t j_start = 0;
+    uint32 requiredFrames = framesNumber;
+    uint32 i = bpma->positionLastAllocatedFrame;
+    uint32 j = 0;
+    uint32 limit = bpma->bitmapSize;
+    uint32 i_start = 0;
+    uint32 j_start = 0;
     uint8 processing = 0;
     uint8 keepSearching = 1;
 
@@ -223,9 +220,9 @@ Searching:
                     helper_marksBits(bpma, i_start, j_start, framesNumber);
 
                     // computes the physical address
-                    size_t frames = i_start * WORDSIZE;
+                    uint32 frames = i_start * WORDSIZE;
                     frames += (WORDSIZE - 1 - j_start);
-                    *a_physicalAddress = frames * bpma->frameSize + bpma->startAddress;
+                    *a_physicalAddress = (uint64) frames * (uint64) bpma->frameSize + bpma->startAddress;
 
                     // set the last position
                     bpma->positionLastAllocatedFrame = i;
@@ -259,8 +256,10 @@ Searching:
 #undef RESET_PROCESSING
 }
 
-size_t BitmapPMA_free(void *a_bpma,
-                      size_t a_size, size_t a_physicalAddress)
+uint32 BitmapPMA_free(
+    void *a_bpma,
+    uint64 a_size,
+    uint64 a_physicalAddress)
 {
     struct BitmapPMA *bpma = (struct BitmapPMA*) a_bpma;
 
@@ -279,11 +278,10 @@ size_t BitmapPMA_free(void *a_bpma,
         return ERROR_INVALID_PARAMETER;
     }
 
-    size_t framesNumber = a_size / bpma->frameSize + (a_size % bpma->frameSize ? 1 : 0);
-    size_t totalFramesNumber = (bpma->endAddress - bpma->startAddress) / bpma->frameSize;
+    uint32 framesNumber = a_size / bpma->frameSize + (a_size % bpma->frameSize ? 1 : 0);
+    uint32 totalFramesNumber = (bpma->endAddress - bpma->startAddress) / bpma->frameSize;
 
-    if (framesNumber == 0
-        || framesNumber > totalFramesNumber
+    if (framesNumber > totalFramesNumber
         || (a_physicalAddress & (bpma->frameSize - 1)) != 0
         || a_physicalAddress < bpma->startAddress
         || a_physicalAddress >= bpma->endAddress)
@@ -300,11 +298,11 @@ size_t BitmapPMA_free(void *a_bpma,
     // computes indexBitmap and indexBits
     a_physicalAddress -= bpma->startAddress;
     totalFramesNumber = a_physicalAddress / bpma->frameSize;
-    size_t startIndexBitmap = totalFramesNumber / WORDSIZE;
-    size_t startIndexBits   = WORDSIZE - 1 - totalFramesNumber % WORDSIZE;
+    uint32 startIndexBitmap = totalFramesNumber / WORDSIZE;
+    uint32 startIndexBits   = WORDSIZE - 1 - totalFramesNumber % WORDSIZE;
 
-    size_t indexBitmap = startIndexBitmap;
-    size_t indexBits   = startIndexBits;
+    uint32 indexBitmap = startIndexBitmap;
+    uint32 indexBits   = startIndexBits;
 
     // checks if the all framesNumber frames are marked
     totalFramesNumber = framesNumber;
@@ -340,43 +338,48 @@ FreesBits:
     return ERROR_SUCCESS;
 }
 
-size_t BitmapPMA_reserve(void *a_bpma,
-                         size_t a_size, size_t a_physicalAddress)
+uint32 BitmapPMA_reserve(
+    void *a_bpma,
+    uint64 a_size,
+    uint64 a_physicalAddress)
 {
-
     struct BitmapPMA *bpma = (struct BitmapPMA*) a_bpma;
 
-    if (bpma == NULL)
-    {
+    if (bpma == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (bpma->bitmap == NULL)
-    {
+    if (bpma->bitmap == NULL) {
         return ERROR_UNINITIALIZED;
     }
 
-    a_physicalAddress = a_physicalAddress & (~(bpma->frameSize - 1));
-    size_t endAddress = a_physicalAddress + a_size;
+    if (a_size == 0) {
+        return ERROR_INVALID_PARAMETER;
+    }
 
-    if (a_size == 0 ||
-        endAddress > bpma->endAddress || 
-        a_physicalAddress < bpma->startAddress ||
-        a_physicalAddress >= endAddress)
+    uint64 startAddress = a_physicalAddress;
+    ALIGN(startAddress, bpma->frameSize);
+
+    uint64 endAddress = a_physicalAddress + a_size;
+    ALIGN(endAddress, bpma->frameSize);
+    endAddress += bpma->frameSize;
+
+    if (startAddress < bpma->startAddress ||
+        endAddress   > bpma->endAddress)
     {
         return ERROR_INVALID_PARAMETER;
     }
 
-    a_physicalAddress -= bpma->startAddress;
+    startAddress -= bpma->startAddress;
     endAddress -= bpma->startAddress;
-    size_t frameNumber = a_physicalAddress / bpma->frameSize + 
-                        (a_physicalAddress % bpma->frameSize ? 1 : 0);
-    size_t framesToReserve = endAddress / bpma->frameSize +
+    uint32 frameNumber = startAddress / bpma->frameSize + 
+                        (startAddress % bpma->frameSize ? 1 : 0);
+    uint32 framesToReserve = endAddress / bpma->frameSize +
                              (endAddress % bpma->frameSize ? 1 : 0) -
                              frameNumber;
 
-    size_t bitmapIndex = frameNumber / WORDSIZE;
-    size_t indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
+    uint32 bitmapIndex = frameNumber / WORDSIZE;
+    uint32 indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
 
     helper_marksBits(bpma, bitmapIndex, indexBits, framesToReserve);
     
