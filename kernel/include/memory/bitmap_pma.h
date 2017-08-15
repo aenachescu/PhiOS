@@ -31,7 +31,7 @@ struct BitmapPMA
  *      If a_frameSize is not a multiple of 2 or it's less than 2.
  *  ERROR_UNINITIALIZED - if placement address allocator is not initialized.
  */
-size_t BitmapPMA_createAllocator(
+uint32 BitmapPMA_createAllocator(
     struct BitmapPMA *a_bpma,
     uint32 a_frameSize,
     uint64 a_startAddress,
@@ -57,7 +57,7 @@ size_t BitmapPMA_createAllocator(
  *  ERROR_NULL_POINTER - if a_physicalAddress or a_pma is null
  *  ERROR_INVALID_PARAMETER - if a_framesNumber is 0.
  */
-size_t BitmapPMA_alloc(
+uint32 BitmapPMA_alloc(
     void *a_bpma,
     uint64 a_size,
     uint64 *a_physicalAddress
@@ -85,14 +85,14 @@ size_t BitmapPMA_alloc(
  *      a_physicalAddress and the ending address.
  *  ERROR_NULL_POINTER - if a_pma is null.
  */
-size_t BitmapPMA_free(
+uint32 BitmapPMA_free(
     void *a_bpma,
     uint64 a_size,
     uint64 a_physicalAddress
 );
 
 
-size_t BitmapPMA_reserve(
+uint32 BitmapPMA_reserve(
     void *a_bpma,
     uint64 a_size,
     uint64 a_physicalAddress
