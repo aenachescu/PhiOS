@@ -1,6 +1,7 @@
 #include "arch/x86/paging/ia32.h"
 #include "memory/pmm.h"
 #include "cpu.h"
+#include "util/kstdlib/include/kstdio.h"
 
 extern struct KernelArea g_kernelArea;
 
@@ -38,13 +39,16 @@ extern struct KernelArea g_kernelArea;
 static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
 {
     size_t error = ERROR_SUCCESS;
-    size_t pdAddr = 0;
+    uint64 pdAddr = 0;
     struct IA32_PageDirectory_4KB *pd = NULL;
 
     do
     {
-        error = PMM_alloc(&pdAddr, sizeof(struct IA32_PageDirectory_4KB),
-                          PMM_FOR_VIRTUAL_MEMORY);
+        error = PMM_alloc(
+            &pdAddr,
+            (uint64) sizeof(struct IA32_PageDirectory_4KB),
+            (uint8) PMM_FOR_VIRTUAL_MEMORY
+        );
         if (error != ERROR_SUCCESS)
         {
             a_paging->pagingStruct = NULL;
@@ -52,7 +56,7 @@ static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
         }
 
         // TODO: optimize using kmemset()
-        pd = (struct IA32_PageDirectory_4KB*) pdAddr;
+        pd = (struct IA32_PageDirectory_4KB*) ((uint32)pdAddr);
         for (uint32 i = 0; i < PAGING_IA32_PDE_NUMBER; i++)
         {
             pd->entries[i].data = 0;
@@ -75,15 +79,17 @@ static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
 static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
 {
     size_t error = ERROR_SUCCESS;
-    size_t pdAddr = (size_t) a_paging->pagingStruct;
+    uint64 pdAddr = (uint64) a_paging->pagingStruct;
 
     do
     {
         if (pdAddr != 0)
         {
-            error = PMM_free(pdAddr,
-                             sizeof(struct IA32_PageDirectory_4KB),
-                             PMM_FOR_VIRTUAL_MEMORY);
+            error = PMM_free(
+                pdAddr,
+                (uint64) sizeof(struct IA32_PageDirectory_4KB),
+                (uint8) PMM_FOR_VIRTUAL_MEMORY
+            );
             if (error != ERROR_SUCCESS)
             {
                 break;
@@ -202,17 +208,21 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
         struct IA32_PageTable_4KB *pt0 = NULL;
         struct IA32_PageTable_4KB *pt1 = NULL;
         uint32 pageFlags = 0, pageTableFlags = 0;
+        uint64 tmpAddr = 0;
 
         // alloc physical memory for 2 PTs
-        error = PMM_alloc(&pt0Addr,
-                          2 * sizeof(struct IA32_PageTable_4KB),
-                          PMM_FOR_VIRTUAL_MEMORY);
+        error = PMM_alloc(
+            &tmpAddr,
+            (uint64) 2 * sizeof(struct IA32_PageTable_4KB),
+            (uint8) PMM_FOR_VIRTUAL_MEMORY
+        );
         if (error != ERROR_SUCCESS)
         {
             // cleanup...
             break;
         }
 
+        pt0Addr = (uint32) tmpAddr;
         pt1Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
 
         pdAddr = (uint32) a_paging->pagingStruct;
@@ -264,8 +274,12 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
             ptNum++;
 
         uint32 ptAddr = 0;
-        PMM_alloc(&ptAddr, ptNum * sizeof(struct IA32_PageTable_4KB),
-                  PMM_FOR_VIRTUAL_MEMORY);
+        PMM_alloc(
+            &tmpAddr,
+            (uint64) ptNum * sizeof(struct IA32_PageTable_4KB),
+            (uint8) PMM_FOR_VIRTUAL_MEMORY
+        );
+        ptAddr = (uint32) tmpAddr;
 
         uint32 physicalAddr = g_kernelArea.textStartAddr;
         for (uint32 i = 0; i < ptNum; i++)

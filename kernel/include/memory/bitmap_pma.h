@@ -6,12 +6,12 @@
 
 struct BitmapPMA
 {
-    size_t startAddress;
-    size_t endAddress;
-    size_t frameSize; // in bytes
-    size_t positionLastAllocatedFrame;
-    size_t freeFramesNumber;
-    size_t bitmapSize;
+    uint64 startAddress;
+    uint64 endAddress;
+    uint32 frameSize; // in bytes
+    uint32 positionLastAllocatedFrame; // enough for 16TiBs
+    uint32 freeFramesNumber; // enough for 16TiBs
+    uint32 bitmapSize; // enough for 128TiBs
     size_t *bitmap;
 };
 
@@ -31,10 +31,12 @@ struct BitmapPMA
  *      If a_frameSize is not a multiple of 2 or it's less than 2.
  *  ERROR_UNINITIALIZED - if placement address allocator is not initialized.
  */
-size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma,
-                                 size_t a_frameSize,
-                                 size_t a_startAddress,
-                                 size_t a_endAddress);
+size_t BitmapPMA_createAllocator(
+    struct BitmapPMA *a_bpma,
+    uint32 a_frameSize,
+    uint64 a_startAddress,
+    uint64 a_endAddress
+);
 
 /*
  * @brief Allocates physical memory.
@@ -55,9 +57,11 @@ size_t BitmapPMA_createAllocator(struct BitmapPMA *a_bpma,
  *  ERROR_NULL_POINTER - if a_physicalAddress or a_pma is null
  *  ERROR_INVALID_PARAMETER - if a_framesNumber is 0.
  */
-size_t BitmapPMA_alloc(void *a_bpma,
-                       size_t a_size,
-                       size_t *a_physicalAddress);
+size_t BitmapPMA_alloc(
+    void *a_bpma,
+    uint64 a_size,
+    uint64 *a_physicalAddress
+);
 
 /*
  * @brief Frees physical memory.
@@ -81,12 +85,17 @@ size_t BitmapPMA_alloc(void *a_bpma,
  *      a_physicalAddress and the ending address.
  *  ERROR_NULL_POINTER - if a_pma is null.
  */
-size_t BitmapPMA_free(void *a_bpma,
-                      size_t a_size,
-                      size_t a_physicalAddress);
+size_t BitmapPMA_free(
+    void *a_bpma,
+    uint64 a_size,
+    uint64 a_physicalAddress
+);
 
 
-size_t BitmapPMA_reserve(void *a_bpma,
-                         size_t a_size, size_t a_physicalAddress);
+size_t BitmapPMA_reserve(
+    void *a_bpma,
+    uint64 a_size,
+    uint64 a_physicalAddress
+);
 
 #endif
