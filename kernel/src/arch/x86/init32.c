@@ -54,6 +54,33 @@ static __attribute__ ((unused)) void printKernelArea()
     kprintf("Placement address: %x\n", g_kernelArea.endPlacementAddr);
 }
 
+void detectSMBios()
+{
+    uint8 *p = (uint8*) 0xF0000;
+    uint8 length = 0;
+
+    while (p < (uint8*) 0x100000) {
+        if (p[0] == '_' && p[1] == 'S' && p[2] == 'M' && p[3] == '_') {
+            length = p[5];
+            uint8 checksum = 0;
+            for (uint8 i = 0; i < length; i++) {
+                checksum += p[i];
+            }
+            if (checksum == 0) {
+                kprintf("Found SMBios32 at address: %p\n", p);
+                kprintf("SMBios32 info: majorVersion[%u], minorVersion[%u], revision[%u]\n", (uint32)p[6], (uint32)p[7], (uint32)p[30]);
+                break;
+            }
+        }
+        p += 16;
+    }
+
+    if (p >= (uint8*) 0x100000) {
+        kprintf("NOT found SMBios32\n");
+        return;
+    }
+}
+
 size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 {
     // Inits VGA
@@ -73,6 +100,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     }
 
     VGA_WriteString("GRUB multiboot2\n");
+
+    detectSMBios();
 
     // Iterate over tags and collect info
     uint64 memoryEnd = 0x0;
