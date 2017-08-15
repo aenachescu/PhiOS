@@ -5,29 +5,29 @@ struct PMA *g_allocators        = NULL;
 uint8       g_index             = 0;
 uint8       g_allocatorsNumber  = 0;
 
-size_t PMM_init(uint8 a_allocatorsNumber)
+uint32 PMM_init(
+    uint8 a_allocatorsNumber)
 {
     size_t address = 0;
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
 
-    do
-    {
-        if (g_allocators != NULL)
-        {
+    do {
+        if (g_allocators != NULL) {
             error = ERROR_ALREADY_INITIALIZED;
             break;
         }
 
-        if (a_allocatorsNumber == 0)
-        {
+        if (a_allocatorsNumber == 0) {
             error = ERROR_INVALID_PARAMETER;
             break;
         }
 
-        error = PAA_alloc(sizeof(struct PMA) * a_allocatorsNumber,
-                          &address, WORDSIZE_BYTES);
-        if (error != ERROR_SUCCESS)
-        {
+        error = PAA_alloc(
+            sizeof(struct PMA) * a_allocatorsNumber,
+            &address,
+            WORDSIZE_BYTES
+        );
+        if (error != ERROR_SUCCESS) {
             break;
         }
 
@@ -39,33 +39,33 @@ size_t PMM_init(uint8 a_allocatorsNumber)
     return error;
 }
 
-size_t PMM_addAllocator(void *a_pma, uint8 a_flag,
-                        PMA_ALLOC_PFN a_allocFn, PMA_FREE_PFN a_freeFn, PMA_RESERVE_PFN a_reserveFn)
+uint32 PMM_addAllocator(
+    void *a_pma,
+    uint8 a_flag,
+    PMA_ALLOC_PFN a_allocFn,
+    PMA_FREE_PFN a_freeFn,
+    PMA_RESERVE_PFN a_reserveFn)
 {
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
 
     do
     {
-        if (g_allocators == NULL)
-        {
+        if (g_allocators == NULL) {
             error = ERROR_UNINITIALIZED;
             break;
         }
 
-        if (g_index == g_allocatorsNumber)
-        {
+        if (g_index == g_allocatorsNumber) {
             error = ERROR_LIMIT_REACHED;
             break;
         }
 
-        if (a_pma == NULL)
-        {
+        if (a_pma == NULL) {
             error = ERROR_NULL_POINTER;
             break;
         }
 
-        if (a_allocFn == NULL || a_freeFn == NULL || a_reserveFn == NULL)
-        {
+        if (a_allocFn == NULL || a_freeFn == NULL || a_reserveFn == NULL) {
             error = ERROR_INVALID_FUNCTION;
             break;
         }
@@ -82,22 +82,21 @@ size_t PMM_addAllocator(void *a_pma, uint8 a_flag,
     return error;
 }
 
-size_t PMM_alloc(size_t *a_address, size_t a_size, uint8 a_flag)
+uint32 PMM_alloc(
+    uint64 *a_address,
+    uint64 a_size,
+    uint8 a_flag)
 {
-    size_t error = ERROR_UNKNOWN_FLAG;
+    uint32 error = ERROR_UNKNOWN_FLAG;
 
-    do
-    {
-        if (g_allocators == NULL)
-        {
+    do {
+        if (g_allocators == NULL) {
             error = ERROR_UNINITIALIZED;
             break;
         }
 
-        for (uint8 i = 0; i < g_index; i++)
-        {
-            if (g_allocators[i].type != a_flag)
-            {
+        for (uint8 i = 0; i < g_index; i++) {
+            if (g_allocators[i].type != a_flag) {
                 continue;
             }
 
@@ -106,11 +105,12 @@ size_t PMM_alloc(size_t *a_address, size_t a_size, uint8 a_flag)
              * Here should checked if the structure is locked or not.
              */
 
-            error = g_allocators[i].allocFn((void*) g_allocators[i].PMAStruct,
-                                            a_size,
-                                            a_address);
-            if (error == ERROR_SUCCESS)
-            {
+            error = g_allocators[i].allocFn(
+                (void*) g_allocators[i].PMAStruct,
+                a_size,
+                a_address
+            );
+            if (error == ERROR_SUCCESS) {
                 break;
             }
         }
@@ -119,22 +119,21 @@ size_t PMM_alloc(size_t *a_address, size_t a_size, uint8 a_flag)
     return error;
 }
 
-size_t PMM_free(size_t a_address, size_t a_size, uint8 a_flag)
+uint32 PMM_free(
+    uint64 a_address,
+    uint64 a_size,
+    uint8 a_flag)
 {
-    size_t error = ERROR_UNKNOWN_FLAG;
+    uint32 error = ERROR_UNKNOWN_FLAG;
 
-    do
-    {
-        if (g_allocators == NULL)
-        {
+    do {
+        if (g_allocators == NULL) {
             error = ERROR_UNINITIALIZED;
             break;
         }
 
-        for (uint8 i = 0; i < g_index; i++)
-        {
-            if (g_allocators[i].type != a_flag)
-            {
+        for (uint8 i = 0; i < g_index; i++) {
+            if (g_allocators[i].type != a_flag) {
                 continue;
             }
 
@@ -143,11 +142,12 @@ size_t PMM_free(size_t a_address, size_t a_size, uint8 a_flag)
              * Here should checked if the structure is locked or not.
              */
 
-            error = g_allocators[i].freeFn((void*) g_allocators[i].PMAStruct,
-                                           a_size,
-                                           a_address);
-            if (error == ERROR_SUCCESS)
-            {
+            error = g_allocators[i].freeFn(
+                (void*) g_allocators[i].PMAStruct,
+                a_size,
+                a_address
+            );
+            if (error == ERROR_SUCCESS) {
                 break;
             }
         }
@@ -156,22 +156,21 @@ size_t PMM_free(size_t a_address, size_t a_size, uint8 a_flag)
     return error;
 }
 
-size_t PMM_reserve(size_t a_address, size_t a_size, uint8 a_flag)
+uint32 PMM_reserve(
+    uint64 a_address,
+    uint64 a_size,
+    uint8 a_flag)
 {
-    size_t error = ERROR_UNKNOWN_FLAG;
+    uint32 error = ERROR_UNKNOWN_FLAG;
 
-    do
-    {
-        if (g_allocators == NULL)
-        {
+    do {
+        if (g_allocators == NULL) {
             error = ERROR_UNINITIALIZED;
             break;
         }
 
-        for (uint8 i = 0; i < g_index; i++)
-        {
-            if (g_allocators[i].type != a_flag)
-            {
+        for (uint8 i = 0; i < g_index; i++) {
+            if (g_allocators[i].type != a_flag) {
                 continue;
             }
 
@@ -180,11 +179,12 @@ size_t PMM_reserve(size_t a_address, size_t a_size, uint8 a_flag)
              * Here should checked if the structure is locked or not.
              */
 
-            error = g_allocators[i].reserveFn((void*) g_allocators[i].PMAStruct,
-                                            a_size,
-                                            a_address);
-            if (error == ERROR_SUCCESS)
-            {
+            error = g_allocators[i].reserveFn(
+                (void*) g_allocators[i].PMAStruct,
+                a_size,
+                a_address
+            );
+            if (error == ERROR_SUCCESS){
                 break;
             }
         }
