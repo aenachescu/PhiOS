@@ -3,14 +3,14 @@
 #include "errors.h"
 #include "kstdlib.h"
 
+#include <stdarg.h>
+
 size_t kprintf(const char *a_format, ...)
 {
     if (a_format == NULL)
     {
         return ERROR_NULL_POINTER;
     }
-
-    char **args = (char**) &a_format;
 
     char c;
     const char *str = NULL;
@@ -30,7 +30,9 @@ size_t kprintf(const char *a_format, ...)
     char tmp[3] = { 0 };
     tmp[0] = '%';
 
-    ++args;
+
+    va_list arg;
+    va_start(arg, a_format);
 
     while ((c = *a_format) != '\0')
     {
@@ -43,8 +45,7 @@ size_t kprintf(const char *a_format, ...)
                 case 'd':
                     if (extend)
                     {
-                        esvalue = *((sint64*) args);
-                        args += 2;
+                        esvalue = va_arg(arg, sint64);
 
                         bufferSize = 64;
                         ki64toa(esvalue, ebuffer, &bufferSize, 10);
@@ -53,8 +54,7 @@ size_t kprintf(const char *a_format, ...)
                     }
                     else
                     {
-                        svalue = *((sint32*)args);
-                        args++;
+                        svalue = va_arg(arg, sint32);
 
                         bufferSize = 32;
                         kitoa(svalue, buffer, &bufferSize, 10);
@@ -67,8 +67,7 @@ size_t kprintf(const char *a_format, ...)
                 case 'u':
                     if (extend)
                     {
-                        euvalue = *((uint64*)args);
-                        args += 2;
+                        euvalue = va_arg(arg, uint64);
 
                         bufferSize = 64;
                         ku64toa(euvalue, ebuffer, &bufferSize, 10);
@@ -77,8 +76,7 @@ size_t kprintf(const char *a_format, ...)
                     }
                     else
                     {
-                        uvalue = *((uint32*)args);
-                        args++;
+                        uvalue = va_arg(arg, uint32);
 
                         bufferSize = 32;
                         kutoa(uvalue, buffer, &bufferSize, 10);
@@ -89,8 +87,7 @@ size_t kprintf(const char *a_format, ...)
                     break;
 
                 case 's':
-                    str = *args;
-                    ++args;
+                    str = va_arg(arg, const char*);
 
                     if (str == NULL)
                     {
@@ -104,16 +101,14 @@ size_t kprintf(const char *a_format, ...)
                     break;
 
                 case 'c':
-                    c = *((const char*)args);
-                    args++;
+                    c = va_arg(arg, int);
 
                     VGA_WriteChar(c);
                     extend = false;
                     break;
 
                 case 'p':
-                    address = *((uint32*)args);
-                    args++;
+                    address = va_arg(arg, uint32);
 
                     bufferSize = 32;
                     kutoa(address, buffer, &bufferSize, 16);
@@ -127,8 +122,7 @@ size_t kprintf(const char *a_format, ...)
                 case 'x':
                     if (extend)
                     {
-                        eaddress = *((uint64*)args);
-                        args += 2;
+                        eaddress = va_arg(arg, uint64);
 
                         bufferSize = 64;
                         ku64toa(eaddress, ebuffer, &bufferSize, 16);
@@ -142,8 +136,7 @@ size_t kprintf(const char *a_format, ...)
                     }
                     else
                     {
-                        address = *((size_t*)args);
-                        args++;
+                        address = va_arg(arg, uint32);
 
                         bufferSize = 32;
                         kutoa(address, buffer, &bufferSize, 16);
@@ -176,6 +169,8 @@ size_t kprintf(const char *a_format, ...)
             VGA_WriteChar(c);
         }
     }
+
+    va_end(arg);
 
     return ERROR_SUCCESS;
 }
