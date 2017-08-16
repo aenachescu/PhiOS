@@ -87,7 +87,11 @@ add_subdirectory("${PRJ_PATH}/util")
 
 if (DEFINED ARCH)
     if (ARCH STREQUAL "x86_32")
+        # use libgcc.a
         list(APPEND STATIC_LIBS "${PRJ_PATH}/build/linux-x86_64/gcc-x86_32/lib/gcc/i686-elf/4.9.1/libgcc.a")
+
+        # use -fstack-protector-all
+        set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -fstack-protector-all")
     endif()
 endif()
 
