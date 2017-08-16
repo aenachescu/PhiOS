@@ -27,6 +27,8 @@ extern uint32 linker_dataEnd;
 extern uint32 linker_bssStart;
 extern uint32 linker_bssEnd;
 
+extern size_t __stack_chk_guard;
+
 #define FRAME_SIZE 4096
 
 // TODO: remove this when tasks are available
@@ -83,6 +85,9 @@ void detectSMBios()
 
 size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 {
+    // Inits stack smashing protector
+    //__stack_chk_guard = kernel_random();
+
     // Inits VGA
     VGA_Init();
     kprintf("PhiOS v0.0.1 32-bit\n");
