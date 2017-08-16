@@ -9,8 +9,8 @@ uint64 drng_pseudoRandom()
     uint64 time;
     asm volatile ("rdtsc" : "=A" (time));
 
-    g_random = (((time * 310412 + 1101352L)));
-    value = (((g_random * 214013L + 2531011L)));
+    g_random = time * 310412 + 1101352L;
+    value = g_random * 214013L + 2531011L;
 
     return value;
 }
