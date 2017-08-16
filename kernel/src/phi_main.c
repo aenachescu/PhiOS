@@ -11,6 +11,22 @@
 #include "util/kstdlib/include/kstdio.h"
 
 extern size_t g_kernelStack[2048];
+ 
+// Temporary value until the random one is generated
+size_t __stack_chk_guard = 0xdeadbeef;
+ 
+__attribute__((noreturn))
+void __stack_chk_fail(void)
+{
+    kprintf("[PANIC] Stack smashing detected!\n");
+    freezeCpu();
+}
+
+void __attribute__ ((noreturn))
+__stack_chk_fail_local (void)
+{
+  __stack_chk_fail ();
+}
 
 // TODO: remove this when tasks are available
 size_t g_userStack[2048]; // temporary user mode
