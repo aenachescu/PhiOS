@@ -13,7 +13,7 @@ static uint64 g_random;
 
 static size_t helper_hardwareSeed()
 {
-    size_t value;
+    size_t value = 0;
 
     uint64 time;
     asm volatile ("rdtsc" : "=A" (time));
@@ -26,7 +26,7 @@ static size_t helper_hardwareSeed()
 
 uint16 kernel_random16()
 {
-    uint16 value;
+    uint16 value = 0;
 
 #if defined PhiOS_ARCH_x86_32 || defined PhiOS_ARCH_x86_64
     if (CPUID_HasFeature(CPU_FEATURE_RDRAND) == ERROR_SUCCESS) while (drng_uint16(&value) == ERROR_DRNG_NOT_READY) {}
@@ -41,7 +41,7 @@ uint16 kernel_random16()
 
 uint32 kernel_random32()
 {
-    uint32 value;
+    uint32 value = 0;
 
 #if defined PhiOS_ARCH_x86_32 || defined PhiOS_ARCH_x86_64
     if (CPUID_HasFeature(CPU_FEATURE_RDRAND) == ERROR_SUCCESS) while (drng_uint32(&value) == ERROR_DRNG_NOT_READY) {}
@@ -56,7 +56,7 @@ uint32 kernel_random32()
 
 uint64 kernel_random64()
 {
-    uint64 value;
+    uint64 value = 0;
 
 #if defined PhiOS_ARCH_x86_64
     if (CPUID_HasFeature(CPU_FEATURE_RDRAND) == ERROR_SUCCESS) while (drng_uint64(&value) == ERROR_DRNG_NOT_READY) {}
@@ -71,7 +71,7 @@ uint64 kernel_random64()
 
 size_t kernel_random()
 {
-    size_t value;
+    size_t value = 0;
 
 #ifdef PhiOS_ARCH_x86_32
     if (CPUID_HasFeature(CPU_FEATURE_RDRAND) == ERROR_SUCCESS) while (drng_uint32(&value) == ERROR_DRNG_NOT_READY) {}

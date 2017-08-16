@@ -8,9 +8,14 @@ list(APPEND KERNEL_STATIC_LIBS "")
 list(APPEND KERNEL_INCLUDE_PATH "")
 
 list(APPEND INCLUDE_PATH "${PRJ_PATH}/util/kstdlib/include")
-list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
-list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/errors.c")
-list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/random.c")
+
+if (DEFINED ARCH)
+    if (ARCH STREQUAL "x86_32")
+        list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
+        list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/errors.c")
+        list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/random.c")
+    endif()
+endif()
 
 # Add include paths
 include_directories(${INCLUDE_PATH})
