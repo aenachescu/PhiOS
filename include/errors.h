@@ -21,6 +21,7 @@
 #define ERROR_LIMIT_REACHED         15
 #define ERROR_INVALID_FUNCTION      16
 #define ERROR_NOT_IMPLEMENTED       17
+#define ERROR_DRNG_NOT_READY        18
 
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)

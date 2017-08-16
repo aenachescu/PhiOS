@@ -6,10 +6,11 @@
 /*
  * The interval time (in ms) in which it's called helper_pitHandler().
  */
-static size_t g_time;
+size_t g_time;
 
 static void helper_pitHandler(__attribute__((unused)) CpuState *a_state)
 {
+    g_time++;
     return;
 }
 
