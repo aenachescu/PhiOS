@@ -1,6 +1,7 @@
 #include "kstdlib.h"
 #include "errors.h"
 #include "kstring.h"
+#include "kernel/include/random.h"
 
 size_t kitoa(sint32 a_value, char *a_buffer, size_t *a_length, size_t a_base)
 {
@@ -198,6 +199,50 @@ size_t ku64toa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base)
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
+
+    return ERROR_SUCCESS;
+}
+
+static size_t g_seed;
+
+size_t krand(size_t *a_value)
+{
+    if (a_value == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    size_t value;
+
+    value = (((g_seed * 214013L + 2531011L) >> 16) & 0x7fff);
+    g_seed = (((g_seed * 310412 + 1101352L) >> 16) & 0x7fff);
+
+    *a_value = value;
+    return ERROR_SUCCESS;
+}
+
+size_t kranduint(size_t *a_value, size_t a_start, size_t a_end)
+{
+    if (a_value == NULL)
+    {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (a_start >= a_end)
+    {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    krand(a_value);
+
+    // TODO: implement this
+
+    return ERROR_SUCCESS;
+}
+
+size_t ksrand(uint64 a_seed)
+{
+    g_seed = a_seed ^ kernel_random32();
 
     return ERROR_SUCCESS;
 }
