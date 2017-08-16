@@ -80,6 +80,10 @@ void __kernel_check(size_t err, const char *file, size_t line)
             ERROR_KPRINTF("ERROR_NOT_IMPLEMENTED");
             break;
         
+        case ERROR_DRNG_NOT_READY:
+            ERROR_KPRINTF("ERROR_DRNG_NOT_READY");
+            break;
+
         default:
             ERROR_KPRINTF("UNKNOWN_ERROR_CODE");
             break;
