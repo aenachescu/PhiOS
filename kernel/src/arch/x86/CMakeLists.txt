@@ -16,6 +16,7 @@ if (DEFINED ARCH)
         list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/cpu.c")
         list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/pic.c")
         list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/tss32.c")
+        list(APPEND ARCH_C_SOURCES "${MODULE_PATH}/drng.c")
 
         # add asm sources for x86_32
         list(APPEND ARCH_ASM_SOURCES "${MODULE_PATH}/registers.s")
