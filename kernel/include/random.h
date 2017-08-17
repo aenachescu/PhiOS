@@ -1,7 +1,7 @@
 #ifndef PhiOS_Random
 #define PhiOS_Random
 
-#include "types.h"
+#include "include/types.h"
 
 uint16 kernel_random16();
 

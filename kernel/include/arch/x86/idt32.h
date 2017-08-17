@@ -1,8 +1,9 @@
 #ifndef PhiOS_InterruptDescriptorTable32
 #define PhiOS_InterruptDescriptorTable32
 
-#include "types.h"
-#include "cpu.h"
+#include "include/types.h"
+#include "include/errors.h"
+#include "include/cpu.h"
 
 #define IDT_ENTRIES 256
 

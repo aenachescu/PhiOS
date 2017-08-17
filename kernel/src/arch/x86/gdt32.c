@@ -1,7 +1,5 @@
-#include "types.h"
 #include "kernel/include/arch/x86/gdt32.h"
 #include "kernel/include/arch/x86/tss32.h"
-#include "errors.h"
 
 static struct GDT32         g_GDT32Struct[GDT_ENTRIES];
 static struct GDT32_Entry   g_GDT32Entries[GDT_ENTRIES];

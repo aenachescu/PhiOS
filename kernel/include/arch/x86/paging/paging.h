@@ -1,8 +1,8 @@
 #ifndef PhiOS_arch_x86_paging
 #define PhiOS_arch_x86_paging
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 #define PAGING_TYPE_NONE        0
 

@@ -1,5 +1,5 @@
-#include "pmm.h"
-#include "paa.h"
+#include "kernel/include/memory/pmm.h"
+#include "kernel/include/memory/paa.h"
 
 struct PMA *g_allocators        = NULL;
 uint8       g_index             = 0;

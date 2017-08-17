@@ -1,8 +1,8 @@
 #ifndef PhiOS_RealTimeClock
 #define PhiOS_RealTimeClock
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 typedef struct rtc
 {
@@ -15,9 +15,9 @@ typedef struct rtc
     uint8 centuries;
 } RTC;
 
-size_t RTC_init();
+uint32 RTC_init();
 
-size_t RTC_getDateAndTime(
+uint32 RTC_getDateAndTime(
     RTC *a_rtc
 );
 

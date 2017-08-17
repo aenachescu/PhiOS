@@ -1,8 +1,6 @@
-#include "arch/x86/idt32.h"
-#include "arch/x86/handlers32.h"
-#include "kstdio.h"
-#include "cpu.h"
-#include "vga/text_mode.h"
+#include "kernel/include/arch/x86/handlers32.h"
+#include "include/cpu.h"
+#include "drivers/video/include/vga/text_mode.h"
 
 void handlers32_default(IntCpuState32 *a_state)
 {

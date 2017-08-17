@@ -1,8 +1,8 @@
 #ifndef PhiOS_PhysicalMemoryManager
 #define PhiOS_PhysicalMemoryManager
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 #define PMM_FOR_VIRTUAL_MEMORY  1
 #define PMM_FOR_DMA             2

@@ -1,7 +1,7 @@
-#include "kstdio.h"
-#include "vga/text_mode.h"
-#include "errors.h"
-#include "kstdlib.h"
+#include "util/kstdlib/include/kstdio.h"
+#include "util/kstdlib/include/kstdlib.h"
+
+#include "drivers/video/include/vga/text_mode.h"
 
 #include <stdarg.h>
 
@@ -10,7 +10,6 @@ uint32 kprintf(
     ...)
 {
     if (a_format == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
@@ -37,25 +36,19 @@ uint32 kprintf(
     va_start(arg, a_format);
 
     while ((c = *a_format) != '\0') {
-
         ++a_format;
 
         if (c == '%' || extend) {
-
             switch (*a_format) {
-
                 case 'd':
                     if (extend) {
-
                         esvalue = va_arg(arg, sint64);
 
                         bufferSize = 64;
                         ki64toa(esvalue, ebuffer, &bufferSize, 10);
 
                         VGA_WriteString(ebuffer);
-                    }
-                    else {
-
+                    } else {
                         svalue = va_arg(arg, sint32);
 
                         bufferSize = 32;
@@ -68,16 +61,13 @@ uint32 kprintf(
 
                 case 'u':
                     if (extend) {
-
                         euvalue = va_arg(arg, uint64);
 
                         bufferSize = 64;
                         ku64toa(euvalue, ebuffer, &bufferSize, 10);
 
                         VGA_WriteString(ebuffer);
-                    }
-                    else {
-
+                    } else {
                         uvalue = va_arg(arg, uint32);
 
                         bufferSize = 32;
@@ -92,11 +82,8 @@ uint32 kprintf(
                     str = va_arg(arg, const char*);
 
                     if (str == NULL) {
-
                         VGA_WriteString("(null)");
-                    }
-                    else {
-
+                    } else {
                         VGA_WriteString(str);
                     }
                     extend = false;
@@ -123,7 +110,6 @@ uint32 kprintf(
 
                 case 'x':
                     if (extend) {
-
                         eaddress = va_arg(arg, uint64);
 
                         bufferSize = 64;
@@ -132,12 +118,10 @@ uint32 kprintf(
                         VGA_WriteChar('0');
                         VGA_WriteChar('x');
 
-                        for (size_t i = 64 / 4 - bufferSize; i > 0; i--)
+                        for (uint32 i = 64 / 4 - bufferSize; i > 0; i--)
                         VGA_WriteChar('0');
                         VGA_WriteString(ebuffer);
-                    }
-                    else {
-
+                    } else {
                         address = va_arg(arg, uint32);
 
                         bufferSize = 32;
@@ -146,8 +130,9 @@ uint32 kprintf(
                         VGA_WriteChar('0');
                         VGA_WriteChar('x');
 
-                        for (size_t i = WORDSIZE / 4 - bufferSize; i > 0; i--)
-                        VGA_WriteChar('0');
+                        for (uint32 i = WORDSIZE / 4 - bufferSize; i > 0; i--) {
+                            VGA_WriteChar('0');
+                        }
                         VGA_WriteString(buffer);
                     }
                     extend = false;
@@ -155,7 +140,6 @@ uint32 kprintf(
 
                 case 'l':
                     if (*(a_format + 1) == 'l')  {
-
                         extend = true;
                     }
                     break;
@@ -165,9 +149,7 @@ uint32 kprintf(
                     VGA_WriteString(tmp);
             }
             ++a_format;
-        }
-        else {
-
+        } else {
             VGA_WriteChar(c);
         }
     }
