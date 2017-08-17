@@ -40,6 +40,10 @@ _start32:
     # Push magic value
     pushl %eax
 
+    # Setup protector for stack
+    call kernel_random32
+    mov %eax, (__stack_chk_guard)
+
     # Call main OS function
     call init_init32
 
