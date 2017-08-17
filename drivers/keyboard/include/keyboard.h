@@ -68,9 +68,17 @@
 #define KRDEL 0x53
 
 size_t keyboard_init();
-size_t keyboard_setLayout(char *a_layout, char *a_shiftLayout,
-                            char *a_capsOnLayout);
+
+size_t keyboard_setLayout(
+    char *a_layout, 
+    char *a_shiftLayout,
+    char *a_capsOnLayout
+);
+
 char keyboard_readKey();
-void keyboard_intHandler(__attribute__((unused)) CpuState *a_state);
+
+void keyboard_intHandler(
+    __attribute__((unused)) CpuState *a_state
+);
 
 #endif

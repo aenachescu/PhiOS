@@ -7,8 +7,14 @@
 #define PIC2_DATA                   0xA1
 
 size_t PIC_init();
-size_t PIC_setMask(uint8 a_irqLine);
-size_t PIC_clearMask(uint8 a_irqLine);
+size_t PIC_setMask(
+    uint8 a_irqLine
+);
+
+size_t PIC_clearMask(
+    uint8 a_irqLine
+);
+
 size_t PIC_maskUnusedIRQs();
 
 #endif
