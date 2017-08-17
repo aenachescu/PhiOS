@@ -7,15 +7,14 @@
 
 void __kernel_check(size_t err, const char *file, size_t line)
 {
-    switch (err)
-    {
+    switch (err) {
         case ERROR_SUCCESS:
             break;
 
         case ERROR_NULL_POINTER:
             ERROR_KPRINTF("ERROR_NULL_POINTER");
             break;
-        
+
         case ERROR_INSUFFICIENT_BUFFER:
             ERROR_KPRINTF("ERROR_INSUFFICIENT_BUFFER");
             break;
@@ -23,63 +22,63 @@ void __kernel_check(size_t err, const char *file, size_t line)
         case ERROR_UNKNOWN:
             ERROR_KPRINTF("ERROR_UNKNOWN");
             break;
-            
+
         case ERROR_UNSUPPORTED:
             ERROR_KPRINTF("ERROR_UNSUPPORTED");
             break;
-            
+
         case ERROR_SAME_POINTERS:
             ERROR_KPRINTF("ERROR_SAME_POINTERS");
             break;
-            
+
         case ERROR_EMPTY_BUFFER:
             ERROR_KPRINTF("ERROR_EMPTY_BUFFER");
             break;
-            
+
         case ERROR_NOT_FOUND:
             ERROR_KPRINTF("ERROR_NOT_FOUND");
             break;
-            
+
         case ERROR_UNINITIALIZED:
             ERROR_KPRINTF("ERROR_UNINITIALIZED");
             break;
-            
+
         case ERROR_INVALID_PARAMETER:
             ERROR_KPRINTF("ERROR_INVALID_PARAMETER");
             break;
-            
+
         case ERROR_ALREADY_INITIALIZED:
             ERROR_KPRINTF("ERROR_ALREADY_INITIALIZED");
             break;
-            
+
         case ERROR_NO_FREE_MEMORY:
             ERROR_KPRINTF("ERROR_NO_FREE_MEMORY");
             break;
-            
+
         case ERROR_INVALID_STATE:
             ERROR_KPRINTF("ERROR_INVALID_STATE");
             break;
-            
+
         case ERROR_UNALIGNED_ADDRESS:
             ERROR_KPRINTF("ERROR_UNALIGNED_ADDRESS");
             break;
-            
+
         case ERROR_UNKNOWN_FLAG:
             ERROR_KPRINTF("ERROR_UNKNOWN_FLAG");
             break;
-            
+
         case ERROR_LIMIT_REACHED:
             ERROR_KPRINTF("ERROR_LIMIT_REACHED");
             break;
-            
+
         case ERROR_INVALID_FUNCTION:
             ERROR_KPRINTF("ERROR_INVALID_FUNCTION");
             break;
-            
+
         case ERROR_NOT_IMPLEMENTED:
             ERROR_KPRINTF("ERROR_NOT_IMPLEMENTED");
             break;
-        
+
         case ERROR_DRNG_NOT_READY:
             ERROR_KPRINTF("ERROR_DRNG_NOT_READY");
             break;

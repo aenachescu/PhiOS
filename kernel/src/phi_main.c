@@ -11,10 +11,10 @@
 #include "util/kstdlib/include/kstdio.h"
 
 extern size_t g_kernelStack[2048];
- 
+
 // Temporary value until the random one is generated
 size_t __stack_chk_guard = 0xdeadbeef;
- 
+
 __attribute__((noreturn))
 void __stack_chk_fail(void)
 {
@@ -35,20 +35,16 @@ void user_main()
 {
     kprintf("Hello, world!\n");
     kprintf("> ");
-    while (1)
-    {
+    while (1) {
         char c = keyboard_readKey();
-        if (c == '\n')
-        {
+        if (c == '\n') {
             kprintf("\n> ");
         }
 
-        if (c == 'q')
-        {
+        if (c == 'q') {
             break;
         }
-        else
-        {
+        else {
             kprintf("%c", c);
         }
     }
