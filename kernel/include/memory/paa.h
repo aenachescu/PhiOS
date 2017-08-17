@@ -14,7 +14,9 @@
  *  ERROR_ALREADY_INITIALIZED - if the placement address allocator is already
  *      initialized
  */
-size_t PAA_init(size_t a_startAddress);
+size_t PAA_init(
+    size_t a_startAddress
+);
 
 /*
  * @brief This function allocates memory at the end of the kernel. It should be
@@ -31,7 +33,11 @@ size_t PAA_init(size_t a_startAddress);
  *  ERROR_INVALID_PARAMETER - If a_size is 0.
  *  ERROR_NULL_POINTER - If a_address is null.
  */
-size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment);
+size_t PAA_alloc(
+    size_t a_size, 
+    size_t *a_address, 
+    size_t a_alignment
+);
 
 /*
  * @brief Get current address for placement
