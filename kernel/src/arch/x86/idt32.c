@@ -16,13 +16,12 @@ extern void IDT32_Load(
     uint32 a_table);
 
 static uint32 helper_setEntry32(
-    uint32 a_index, 
+    uint32 a_index,
     uint32 a_base,
-    uint16 a_selector, 
+    uint16 a_selector,
     uint8 a_flags)
 {
-    if (a_index >= IDT_ENTRIES)
-    {
+    if (a_index >= IDT_ENTRIES) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -42,8 +41,7 @@ uint32 IDT32_init()
 
     kmemset(&g_IDTEntries32, 0, sizeof(struct IDT32_Entry) * IDT_ENTRIES);
 
-    for (uint32 i = 0; i < IDT_ENTRIES; i++)
-    {
+    for (uint32 i = 0; i < IDT_ENTRIES; i++) {
         IDT32_registerHandler(i, &handlers32_default);
     }
 
@@ -126,16 +124,14 @@ uint32 IDT32_init()
 }
 
 uint32 IDT32_registerHandler(
-    uint32 a_index, 
+    uint32 a_index,
     ISR32_PFN a_handler)
 {
-    if (a_handler == NULL)
-    {
+    if (a_handler == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_index >= IDT_ENTRIES)
-    {
+    if (a_index >= IDT_ENTRIES) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -154,8 +150,7 @@ void IDT32_isrHandler(
 void IDT32_irqHandler(
     IntCpuState32 *a_state)
 {
-    if (a_state->intNo >= 40)
-    {
+    if (a_state->intNo >= 40) {
         // Reset signal to slave
         io_outb(0xA0, 0x20);
     }

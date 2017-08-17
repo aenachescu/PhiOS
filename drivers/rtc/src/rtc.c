@@ -81,8 +81,7 @@ static void helper_readDateAndTime()
 
     READ_REGISTERS
 
-    do
-    {
+    do {
         g_rtc.seconds      = seconds;
         g_rtc.minutes      = minutes;
         g_rtc.hours        = hours;
@@ -97,8 +96,7 @@ static void helper_readDateAndTime()
     uint8 registerB = helper_getRegisterValue(RTC_REGISTER_B);
 
     // check if is BCD mode
-    if ((registerB & RTC_MODE) == 0)
-    {
+    if ((registerB & RTC_MODE) == 0) {
         g_rtc.hours      = (g_rtc.hours       & 0x0F) + (g_rtc.hours       / 16) * 10;
         g_rtc.seconds    = (g_rtc.seconds     & 0x0F) + (g_rtc.seconds     / 16) * 10;
         g_rtc.minutes    = (g_rtc.minutes     & 0x0F) + (g_rtc.minutes     / 16) * 10;
@@ -109,8 +107,7 @@ static void helper_readDateAndTime()
     }
 
     // check if is in 12 hour format
-    if ((registerB & RTC_HOUR_FLAG) == 0 && (g_rtc.hours & RTC_HOUR_FORMAT) != 0)
-    {
+    if ((registerB & RTC_HOUR_FLAG) == 0 && (g_rtc.hours & RTC_HOUR_FORMAT) != 0) {
         g_rtc.hours = ((g_rtc.hours & 0x7F) + 12) % 24;
     }
 }
@@ -125,8 +122,7 @@ size_t RTC_init()
 size_t RTC_getDateAndTime(
     RTC *a_rtc)
 {
-    if (a_rtc == NULL)
-    {
+    if (a_rtc == NULL) {
         return ERROR_NULL_POINTER;
     }
 

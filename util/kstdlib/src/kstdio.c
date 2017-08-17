@@ -6,11 +6,11 @@
 #include <stdarg.h>
 
 uint32 kprintf(
-    const char *a_format, 
+    const char *a_format,
     ...)
 {
-    if (a_format == NULL)
-    {
+    if (a_format == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
@@ -36,17 +36,17 @@ uint32 kprintf(
     va_list arg;
     va_start(arg, a_format);
 
-    while ((c = *a_format) != '\0')
-    {
+    while ((c = *a_format) != '\0') {
+
         ++a_format;
 
-        if (c == '%' || extend)
-        {
-            switch (*a_format)
-            {
+        if (c == '%' || extend) {
+
+            switch (*a_format) {
+
                 case 'd':
-                    if (extend)
-                    {
+                    if (extend) {
+
                         esvalue = va_arg(arg, sint64);
 
                         bufferSize = 64;
@@ -54,8 +54,8 @@ uint32 kprintf(
 
                         VGA_WriteString(ebuffer);
                     }
-                    else
-                    {
+                    else {
+
                         svalue = va_arg(arg, sint32);
 
                         bufferSize = 32;
@@ -67,8 +67,8 @@ uint32 kprintf(
                     break;
 
                 case 'u':
-                    if (extend)
-                    {
+                    if (extend) {
+
                         euvalue = va_arg(arg, uint64);
 
                         bufferSize = 64;
@@ -76,8 +76,8 @@ uint32 kprintf(
 
                         VGA_WriteString(ebuffer);
                     }
-                    else
-                    {
+                    else {
+
                         uvalue = va_arg(arg, uint32);
 
                         bufferSize = 32;
@@ -91,12 +91,12 @@ uint32 kprintf(
                 case 's':
                     str = va_arg(arg, const char*);
 
-                    if (str == NULL)
-                    {
+                    if (str == NULL) {
+
                         VGA_WriteString("(null)");
                     }
-                    else
-                    {
+                    else {
+
                         VGA_WriteString(str);
                     }
                     extend = false;
@@ -122,8 +122,8 @@ uint32 kprintf(
                     break;
 
                 case 'x':
-                    if (extend)
-                    {
+                    if (extend) {
+
                         eaddress = va_arg(arg, uint64);
 
                         bufferSize = 64;
@@ -136,8 +136,8 @@ uint32 kprintf(
                         VGA_WriteChar('0');
                         VGA_WriteString(ebuffer);
                     }
-                    else
-                    {
+                    else {
+
                         address = va_arg(arg, uint32);
 
                         bufferSize = 32;
@@ -154,8 +154,8 @@ uint32 kprintf(
                     break;
 
                 case 'l':
-                    if (*(a_format + 1) == 'l') 
-                    {
+                    if (*(a_format + 1) == 'l')  {
+
                         extend = true;
                     }
                     break;
@@ -166,8 +166,8 @@ uint32 kprintf(
             }
             ++a_format;
         }
-        else
-        {
+        else {
+
             VGA_WriteChar(c);
         }
     }

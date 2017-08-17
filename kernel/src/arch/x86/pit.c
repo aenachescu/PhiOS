@@ -18,14 +18,12 @@ static void helper_pitHandler(
 uint32 PIT_init(
     uint16 a_divisor)
 {
-    if (a_divisor == 0)
-    {
+    if (a_divisor == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
     g_time = 1000 / (OSCILLATOR_FREQUENCY / a_divisor);
-    if (g_time == 0)
-    {
+    if (g_time == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 

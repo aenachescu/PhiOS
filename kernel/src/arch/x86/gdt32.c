@@ -33,13 +33,12 @@ uint32 GDT32_init()
 }
 
 uint32 GDT32_setStruct(
-    struct GDT32 *a_gdt, 
+    struct GDT32 *a_gdt,
     uint32 a_base,
-    uint32 a_limit, 
+    uint32 a_limit,
     uint16 a_type)
 {
-    if (a_gdt == NULL)
-    {
+    if (a_gdt == NULL) {
         return ERROR_NULL_POINTER;
     }
 
@@ -51,16 +50,14 @@ uint32 GDT32_setStruct(
 }
 
 uint32 GDT32_getStruct(
-    uint32 a_num, 
+    uint32 a_num,
     struct GDT32 **a_gdt)
 {
-    if (a_num >= GDT_ENTRIES)
-    {
+    if (a_num >= GDT_ENTRIES) {
         return ERROR_UNSUPPORTED;
     }
 
-    if (a_gdt == NULL)
-    {
+    if (a_gdt == NULL) {
         return ERROR_NULL_POINTER;
     }
 
@@ -71,13 +68,11 @@ uint32 GDT32_getStruct(
 uint32 GDT32_createEntries(
     struct GDT32 *a_gdtArray)
 {
-    if (a_gdtArray == NULL)
-    {
+    if (a_gdtArray == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    for (int i = 0; i < GDT_ENTRIES; i++)
-    {
+    for (int i = 0; i < GDT_ENTRIES; i++) {
         struct GDT32_Entry descriptor;
         uint32 base = a_gdtArray[i].base;
         uint32 limit = a_gdtArray[i].limit;
