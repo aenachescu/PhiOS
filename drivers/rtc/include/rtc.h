@@ -17,6 +17,8 @@ typedef struct rtc
 
 size_t RTC_init();
 
-size_t RTC_getDateAndTime(RTC *a_rtc);
+size_t RTC_getDateAndTime(
+    RTC *a_rtc
+);
 
 #endif

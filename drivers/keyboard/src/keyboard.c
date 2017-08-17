@@ -117,8 +117,10 @@ size_t keyboard_init()
     return ERROR_SUCCESS;
 }
 
-size_t keyboard_setLayout(char *a_layout, char *a_shiftLayout,
-                            char *a_capsOnLayout)
+size_t keyboard_setLayout(
+    char *a_layout,
+    char *a_shiftLayout,
+    char *a_capsOnLayout)
 {
     if (a_layout == NULL || a_shiftLayout == NULL || a_capsOnLayout == NULL)
     {
@@ -158,7 +160,8 @@ char keyboard_readKey()
     return ret;
 }
 
-void keyboard_intHandler(__attribute__((unused)) CpuState *a_state)
+void keyboard_intHandler(
+    __attribute__((unused)) CpuState *a_state)
 {
     helper_keyboardReadScanCode();
 }

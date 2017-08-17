@@ -54,7 +54,8 @@ static uint8 helper_checkIfUpdateIsInProgress()
     return ret;
 }
 
-static uint8 helper_getRegisterValue(uint8 a_reg)
+static uint8 helper_getRegisterValue(
+    uint8 a_reg)
 {
     turnOffInts();
 
@@ -121,7 +122,8 @@ size_t RTC_init()
     return ERROR_SUCCESS;
 }
 
-size_t RTC_getDateAndTime(RTC *a_rtc)
+size_t RTC_getDateAndTime(
+    RTC *a_rtc)
 {
     if (a_rtc == NULL)
     {

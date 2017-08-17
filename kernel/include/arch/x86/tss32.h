@@ -34,8 +34,13 @@ struct TSS32_Entry
     uint16 iomap_base;
 } __attribute__((packed));
 
-size_t TSS32_init(uint16 ss0, uint32 esp0);
-size_t TSS32_setKernelStack(uint32 a_esp);
+size_t TSS32_init(
+	uint16 ss0, 
+	uint32 esp0
+);
+size_t TSS32_setKernelStack(
+	uint32 a_esp
+);
 
 extern void TSS32_Load();
 
