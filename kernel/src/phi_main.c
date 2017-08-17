@@ -36,7 +36,7 @@ void user_main()
 {
     //KERNEL_CHECK(PMM_free(0x100000, 0x5000, PMM_FOR_VIRTUAL_MEMORY));
 
-    freezeCpu();
+    //freezeCpu();
 
     kprintf("Hello, world!\n");
     kprintf("> ");

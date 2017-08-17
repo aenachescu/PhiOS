@@ -1,7 +1,5 @@
-#include "types.h"
 #include "kernel/include/arch/x86/pic.h"
 #include "kernel/include/arch/x86/asm_io.h"
-#include "errors.h"
 
 uint32 PIC_init()
 {
@@ -27,8 +25,7 @@ uint32 PIC_setMask(
 
     if (a_irqLine < 8) {
         port = PIC1_DATA;
-    }
-    else {
+    } else {
         port = PIC2_DATA;
         a_irqLine -= 8;
     }
@@ -47,8 +44,7 @@ uint32 PIC_clearMask(
 
     if (a_irqLine < 8) {
         port = PIC1_DATA;
-    }
-    else {
+    } else {
         port = PIC2_DATA;
         a_irqLine -= 8;
     }

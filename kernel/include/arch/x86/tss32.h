@@ -1,7 +1,8 @@
 #ifndef PhiOS_TaskStateSegment32
 #define PhiOS_TaskStateSegment32
 
-#include "types.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 struct TSS32_Entry
 {
@@ -34,11 +35,11 @@ struct TSS32_Entry
     uint16 iomap_base;
 } __attribute__((packed));
 
-size_t TSS32_init(
+uint32 TSS32_init(
 	uint16 ss0, 
 	uint32 esp0
 );
-size_t TSS32_setKernelStack(
+uint32 TSS32_setKernelStack(
 	uint32 a_esp
 );
 

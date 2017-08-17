@@ -1,8 +1,8 @@
 #ifndef PhiOS_ProgrammableIntervalTimer
 #define PhiOS_ProgrammableIntervalTimer
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 #define OSCILLATOR_FREQUENCY 1193182
 

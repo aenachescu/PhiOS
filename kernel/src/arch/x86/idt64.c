@@ -1,11 +1,4 @@
-#include "types.h"
-#include "arch/x86/idt32.h"
-#include "arch/x86/idt64.h"
-#include "arch/x86/asm_io.h"
-//#include "arch/x86/handlers.h"
-#include "errors.h"
-#include "cpu.h"
-#include "kstring.h"
+#include "kernel/include/arch/x86/idt64.h"
 
 static struct IDT64_Entry   g_IDTEntries64[IDT_ENTRIES];
 static struct IDT64         g_IDTPointer64;

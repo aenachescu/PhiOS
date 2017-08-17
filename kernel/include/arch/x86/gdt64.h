@@ -1,10 +1,10 @@
 #ifndef PhiOS_GlobalDescriptorTable64
 #define PhiOS_GlobalDescriptorTable64
 
-#include "types.h"
-#include "kernel/include/arch/x86/gdt32.h"
+#include "include/types.h"
+#include "include/errors.h"
 
-size_t GDT64_init();
+uint32 GDT64_init();
 
 extern void GDT_Load64(
     uint64 a_table

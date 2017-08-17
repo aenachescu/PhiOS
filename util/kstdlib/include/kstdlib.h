@@ -1,7 +1,8 @@
 #ifndef PhiOS_kstdlib
 #define PhiOS_kstdlib
 
-#include "types.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 /*
  * @brief Converts an integer value (signed/unsigned on 32/64 bits) to a null

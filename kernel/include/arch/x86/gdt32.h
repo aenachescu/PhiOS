@@ -1,7 +1,8 @@
 #ifndef PhiOS_GlobalDescriptorTable32
 #define PhiOS_GlobalDescriptorTable32
 
-#include "types.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 #define GDT_ENTRIES 6
 
@@ -80,10 +81,11 @@ uint32 GDT32_getStruct(
 );
 
 uint32 GDT32_createEntries(
-    struct GDT32 *a_gdtArray);
+    struct GDT32 *a_gdtArray
+);
 
 extern void GDT32_Load(
-    uint32 a_table);
-
+    uint32 a_table
+);
 
 #endif
