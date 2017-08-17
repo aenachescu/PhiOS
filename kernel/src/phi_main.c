@@ -34,10 +34,6 @@ size_t g_userStack[2048]; // temporary user mode
 
 void user_main()
 {
-    //KERNEL_CHECK(PMM_free(0x100000, 0x5000, PMM_FOR_VIRTUAL_MEMORY));
-
-    //freezeCpu();
-
     kprintf("Hello, world!\n");
     kprintf("> ");
     while (1) {
@@ -55,25 +51,8 @@ void user_main()
     }
 }
 
-extern uint32 linker_gotStart;
-extern uint32 linker_gotEnd;
-
-void adjust_got()
-{
-    uint32 begin = (uint32) &linker_gotStart;
-    uint32 end = (uint32) &linker_gotEnd;
-    uint32 num = (end - begin) / 4;
-    uint32 *ptr = (uint32*) begin;
-
-    for (uint32 i = 0; i < num; i++) {
-        ptr[i] += 0xBFF00000;
-    }
-}
-
 void kernel_main()
 {
-    adjust_got();
-
     kprintf("paging enabled\n");
 
     // Inits CPUID detection
