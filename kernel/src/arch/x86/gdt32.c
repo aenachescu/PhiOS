@@ -1,6 +1,6 @@
 #include "types.h"
-#include "arch/x86/gdt32.h"
-#include "arch/x86/tss32.h"
+#include "kernel/include/arch/x86/gdt32.h"
+#include "kernel/include/arch/x86/tss32.h"
 #include "errors.h"
 
 static struct GDT32         g_GDT32Struct[GDT_ENTRIES];
@@ -8,7 +8,7 @@ static struct GDT32_Entry   g_GDT32Entries[GDT_ENTRIES];
 static struct GDT32_Pointer g_GDT32Pointer;
 extern struct TSS32_Entry   g_TSSKernelEntry;
 
-size_t GDT32_init()
+uint32 GDT32_init()
 {
     GDT32_setStruct(&g_GDT32Struct[0], 0, 0, 0);
     GDT32_setStruct(&g_GDT32Struct[1], 0, 0xFFFFFFFF, GDT_CODE_PL0);
@@ -32,8 +32,11 @@ size_t GDT32_init()
     return ERROR_SUCCESS;
 }
 
-size_t GDT32_setStruct(struct GDT32 *a_gdt, uint32 a_base,
-                       uint32 a_limit, uint16 a_type)
+uint32 GDT32_setStruct(
+    struct GDT32 *a_gdt, 
+    uint32 a_base,
+    uint32 a_limit, 
+    uint16 a_type)
 {
     if (a_gdt == NULL)
     {
@@ -47,7 +50,9 @@ size_t GDT32_setStruct(struct GDT32 *a_gdt, uint32 a_base,
     return ERROR_SUCCESS;
 }
 
-size_t GDT32_getStruct(uint32 a_num, struct GDT32 **a_gdt)
+uint32 GDT32_getStruct(
+    uint32 a_num, 
+    struct GDT32 **a_gdt)
 {
     if (a_num >= GDT_ENTRIES)
     {
@@ -63,7 +68,8 @@ size_t GDT32_getStruct(uint32 a_num, struct GDT32 **a_gdt)
     return ERROR_SUCCESS;
 }
 
-size_t GDT32_createEntries(struct GDT32 *a_gdtArray)
+uint32 GDT32_createEntries(
+    struct GDT32 *a_gdtArray)
 {
     if (a_gdtArray == NULL)
     {

@@ -3,7 +3,9 @@
 
 struct KernelArea g_kernelArea;
 
-size_t init_init64(uint32 mboot2Magic, uint32 mboot2Addr)
+uint32 init_init64(
+    uint32 mboot2Magic, 
+    uint32 mboot2Addr)
 {
     return ERROR_NOT_IMPLEMENTED;
 }
