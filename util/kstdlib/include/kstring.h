@@ -3,39 +3,39 @@
 
 #include "types.h"
 
-size_t kmemchr(
+uint32 kmemchr(
     const void *a_buffer, 
     uint8 a_value,
     size_t a_length, 
     void **a_result
 );
 
-size_t kmemcmp(
+uint32 kmemcmp(
     const void *a_buffer1, 
     const void *a_buffer2,
     size_t a_length, 
     sint32 *a_result
 );
 
-size_t kmemcpy(
+uint32 kmemcpy(
     void *a_dest, 
     const void *a_src, 
     size_t a_length
 );
 
-size_t kmemmove(
+uint32 kmemmove(
     void *a_dest, 
     const void *a_src, 
     size_t a_length
 );
 
-size_t kmemset(
+uint32 kmemset(
     void *a_buffer, 
     sint8 a_value, 
     size_t a_length
 );
 
-size_t kstrcmp(
+uint32 kstrcmp(
     const char *a_str1, 
     const char *a_str2, 
     sint32 *a_result
@@ -57,7 +57,7 @@ size_t kstrcmp(
  *      strings).
  *  ERROR_NULL_POINTER - if at least one pointer is null.
  */
-size_t kstrcpy(
+uint32 kstrcpy(
     char *a_dest, 
     size_t *a_destLength, 
     const char *a_src
@@ -73,7 +73,7 @@ size_t kstrcpy(
  *  ERROR_SUCCESS       - if the function ends successfully
  *  ERROR_POINTER_NULL  - if a_str is null
  */
-size_t kstrlen(
+uint32 kstrlen(
     const char *a_str, 
     size_t *a_length
 );
@@ -88,7 +88,7 @@ size_t kstrlen(
  *  ERROR_SUCCESS       - if the function ends successfully
  *  ERROR_POINTER_NULL  - if a_str is null
  */
-size_t kstrrev(
+uint32 kstrrev(
     char *a_str, 
     size_t a_length
 );

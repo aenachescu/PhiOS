@@ -21,9 +21,9 @@ struct IDT32 {
 
 typedef void (*ISR32_PFN)(IntCpuState32*);
 
-size_t IDT32_init();
+uint32 IDT32_init();
 
-size_t IDT32_registerHandler(
+uint32 IDT32_registerHandler(
     uint32 a_n, 
     ISR32_PFN a_handler
 );
