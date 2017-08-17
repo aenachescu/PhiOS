@@ -26,6 +26,8 @@ extern uint32 linker_dataStart;
 extern uint32 linker_dataEnd;
 extern uint32 linker_bssStart;
 extern uint32 linker_bssEnd;
+extern uint32 linker_gotStart;
+extern uint32 linker_gotEnd;
 
 extern size_t __stack_chk_guard;
 
@@ -35,6 +37,7 @@ extern size_t __stack_chk_guard;
 size_t g_kernelStack[2048]; // temporary kernel mode
 
 struct BitmapPMA *g_PMAVM;
+uint32 g_PMAVM_num = 0;
 struct Paging g_kernelPaging;
 
 extern struct PMA *g_allocators;
@@ -83,13 +86,35 @@ void detectSMBios()
     }
 }
 
+void adjust_got()
+{
+    uint32 begin = (uint32) &linker_gotStart;
+    uint32 end = (uint32) &linker_gotEnd;
+    uint32 num = (end - begin) / 4;
+    uint32 *ptr = (uint32*) begin;
+
+    for (uint32 i = 0; i < num; i++) {
+        ptr[i] += 0xBFF00000;
+    }
+}
+
+void adjustPointers()
+{
+    for (size_t i = 0; i < g_PMAVM_num; i++) {
+        g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + 0xBFF00000);
+    }
+
+    g_allocators = (struct PMA*) ((size_t)g_allocators + 0xBFF00000);
+
+    PMM_adjustPfn(0xBFF00000);
+
+    adjust_got();
+}
+
 uint32 init_init32(
     uint32 mboot2Magic,
     uint32 mboot2Addr)
 {
-    // Inits stack smashing protector
-    //__stack_chk_guard = kernel_random();
-
     // Inits VGA
     VGA_Init();
     kprintf("PhiOS v0.0.1 32-bit\n");
@@ -175,6 +200,8 @@ uint32 init_init32(
     KERNEL_CHECK(PAA_init((size_t) &linker_kernelEnd));
     KERNEL_CHECK(PAA_alloc(sizeof(struct BitmapPMA) * memoryZonesCount, (void*) &g_PMAVM, 0x1000));
 
+    g_PMAVM_num = memoryZonesCount;
+
     // Inits Physical Memory Manager
     KERNEL_CHECK(PMM_init(memoryZonesCount));
     for (size_t i = 0; i < memoryZonesCount; i++) {
@@ -212,13 +239,10 @@ uint32 init_init32(
 
     KERNEL_CHECK(IA32_4KB_initKernelPaging(&g_kernelPaging));
 
-    for (size_t i = 0; i < memoryZonesCount; i++) {
-        g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + 0xC0000000 - 0x00100000);
-    }
-    g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);
-
     KERNEL_CHECK(IA32_4KB_switchDirectory(&g_kernelPaging,
         (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct));
+
+    adjustPointers();
 
     return ERROR_SUCCESS;
 }

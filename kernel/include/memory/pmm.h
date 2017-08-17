@@ -81,4 +81,8 @@ uint32 PMM_check(
     uint8 a_flag
 );
 
+uint32 PMM_adjustPfn(
+    uint32 a_offset
+);
+
 #endif
