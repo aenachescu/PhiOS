@@ -4,6 +4,9 @@
 #include "types.h"
 #include "errors.h"
 
-size_t init_init64(uint32 mboot2Magic, uint32 mboot2Addr);
+uint32 init_init64(
+    uint32 mboot2Magic, 
+    uint32 mboot2Addr
+);
 
 #endif

@@ -1,29 +1,29 @@
-#include "arch/x86/pit.h"
-#include "arch/x86/asm_io.h"
+#include "kernel/include/arch/x86/pit.h"
+#include "kernel/include/arch/x86/asm_io.h"
 #include "cpu.h"
-#include "arch/x86/idt.h"
+#include "kernel/include/arch/x86/idt.h"
 
 /*
  * The interval time (in ms) in which it's called helper_pitHandler().
  */
 size_t g_time;
 
-static void helper_pitHandler(__attribute__((unused)) CpuState *a_state)
+static void helper_pitHandler(
+    __attribute__((unused)) CpuState *a_state)
 {
     g_time++;
     return;
 }
 
-size_t PIT_init(uint16 a_divisor)
+uint32 PIT_init(
+    uint16 a_divisor)
 {
-    if (a_divisor == 0)
-    {
+    if (a_divisor == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
     g_time = 1000 / (OSCILLATOR_FREQUENCY / a_divisor);
-    if (g_time == 0)
-    {
+    if (g_time == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 

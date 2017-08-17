@@ -83,7 +83,9 @@ void detectSMBios()
     }
 }
 
-size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
+uint32 init_init32(
+    uint32 mboot2Magic,
+    uint32 mboot2Addr)
 {
     // Inits stack smashing protector
     //__stack_chk_guard = kernel_random();
@@ -92,14 +94,12 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     VGA_Init();
     kprintf("PhiOS v0.0.1 32-bit\n");
 
-    if (mboot2Magic != MULTIBOOT2_BOOTLOADER_MAGIC)
-    {
+    if (mboot2Magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
         VGA_WriteString("[PANIC] GRUB not multiboot2");
         return ERROR_NOT_FOUND;
     }
 
-    if (mboot2Addr & 7)
-    {
+    if (mboot2Addr & 7) {
         VGA_WriteString("[PANIC] Multiboot2 structure is not aligned");
         return ERROR_UNALIGNED_ADDRESS;
     }
@@ -120,10 +120,8 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
     for (tag = (struct multiboot_tag*) (mboot2Addr + 8);
          tag->type != MULTIBOOT_TAG_TYPE_END;
          tag = (struct multiboot_tag*) ((multiboot_uint8_t *) tag
-                                        + ((tag->size + 7) & ~7)))
-    {
-        switch (tag->type)
-        {
+                                        + ((tag->size + 7) & ~7))) {
+        switch (tag->type) {
             case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO: ;
                 //struct multiboot_tag_basic_meminfo *mem = (struct multiboot_tag_basic_meminfo*) tag;
                 //kprintf("Basic memory area %x - %x\n",
@@ -138,16 +136,14 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                 for (mmap = mmapTag->entries;
                      (multiboot_uint8_t*) mmap < (multiboot_uint8_t*) tag + tag->size;
                      mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
-                            + mmapTag->entry_size))
-                {
+                            + mmapTag->entry_size)) {
                     kprintf("[addr %llx, len %llx] ",
                             mmap->addr,
                             mmap->len);
-                    
+
                     memoryEnd += mmap->len;
 
-                    switch (mmap->type)
-                    {
+                    switch (mmap->type) {
                         case MULTIBOOT_MEMORY_AVAILABLE:
                             memoryZones[memoryZonesCount].startAddr = mmap->addr;
                             memoryZones[memoryZonesCount].endAddr = mmap->addr + mmap->len;
@@ -181,19 +177,16 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
 
     // Inits Physical Memory Manager
     KERNEL_CHECK(PMM_init(memoryZonesCount));
-    for (size_t i = 0; i < memoryZonesCount; i++)
-    {
-        KERNEL_CHECK(BitmapPMA_createAllocator(&g_PMAVM[i], FRAME_SIZE, 
+    for (size_t i = 0; i < memoryZonesCount; i++) {
+        KERNEL_CHECK(BitmapPMA_createAllocator(&g_PMAVM[i], FRAME_SIZE,
                                   (size_t) memoryZones[i].startAddr,
-                                  (size_t) memoryZones[i].endAddr));        
-        
-        if (memoryZones[i].endAddr < 0x100000)
-        {
+                                  (size_t) memoryZones[i].endAddr));
+
+        if (memoryZones[i].endAddr < 0x100000) {
             KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_DMA,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
         }
-        else
-        {
+        else {
             KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_VIRTUAL_MEMORY,
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
         }
@@ -217,8 +210,7 @@ size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
                PMM_FOR_VIRTUAL_MEMORY));
     KERNEL_CHECK(IA32_4KB_initKernelPaging(&g_kernelPaging));
 
-    for (size_t i = 0; i < memoryZonesCount; i++)
-    {
+    for (size_t i = 0; i < memoryZonesCount; i++) {
         g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + 0xC0000000 - 0x00100000);
     }
     g_allocators = (struct PMA*) ((size_t)g_allocators + 0xC0000000 - 0x00100000);

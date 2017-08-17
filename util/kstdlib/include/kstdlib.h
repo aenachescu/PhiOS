@@ -26,13 +26,48 @@
  *
  *  ERROR_UNSUPPORTED - If a_base is different of 2, 10, 16.
  */
-size_t kitoa(sint32 a_value, char *a_buffer, size_t *a_length, size_t a_base);
-size_t kutoa(uint32 a_value, char *a_buffer, size_t *a_length, size_t a_base);
-size_t ku64toa(uint64 a_value, char *a_buffer, size_t *a_length, size_t a_base);
-size_t ki64toa(sint64 a_value, char *a_buffer, size_t *a_length, size_t a_base);
+uint32 kitoa(
+    sint32 a_value, 
+    char *a_buffer, 
+    size_t *a_length, 
+    size_t a_base
+);
 
-size_t krand(size_t *a_value);
-size_t kranduint(size_t *a_value, size_t a_start, size_t a_end);
-size_t ksrand(uint64 a_seed);
+uint32 kutoa(
+    uint32 a_value, 
+    char *a_buffer, 
+    size_t *a_length, 
+    size_t a_base
+);
+
+uint32 ku64toa(
+    uint64 a_value, 
+    char *a_buffer, 
+    size_t *a_length, 
+    size_t a_base
+);
+
+uint32 ki64toa(
+    sint64 a_value, 
+    char *a_buffer, 
+    size_t *a_length, 
+    size_t a_base
+);
+
+
+uint32 krand(
+    size_t *a_value
+);
+
+uint32 kranduint(
+    size_t *a_value,
+    size_t a_start,
+    size_t a_end
+);
+
+uint32 ksrand(
+    uint64 a_seed
+);
+
 
 #endif

@@ -20,7 +20,9 @@ void VGA_Init()
     VGA_Clear();
 }
 
-void VGA_MoveCursor(uint16 a_column, uint16 a_row)
+void VGA_MoveCursor(
+    uint16 a_column,
+    uint16 a_row)
 {
     uint16 position = (a_row * 80) + a_column;
     g_VGA_row = a_row;
@@ -32,49 +34,60 @@ void VGA_MoveCursor(uint16 a_column, uint16 a_row)
     io_outb(0x3D5, (uint8) ((position >> 8) & 0xFF));
 }
 
-void VGA_SetBackgroundColor(enum VGA_Colors a_bg)
+void VGA_SetBackgroundColor(
+    enum VGA_Colors a_bg)
 {
     g_VGA_backgroundColor = a_bg;
 }
 
-void VGA_SetForegroundColor(enum VGA_Colors a_fg)
+void VGA_SetForegroundColor(
+    enum VGA_Colors a_fg)
 {
     g_VGA_foregroundColor = a_fg;
 }
 
-uint16 VGA_CreateEntry(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
+uint16 VGA_CreateEntry(
+    char a_c, enum VGA_Colors
+    a_bg, enum VGA_Colors a_fg)
 {
     return (uint16) a_c | ((uint16) (a_fg | (a_bg << 4)) << 8);
 }
 
-void VGA_WriteChar(char a_c)
+void VGA_WriteChar(
+    char a_c)
 {
     VGA_WriteColoredChar(a_c, g_VGA_backgroundColor, g_VGA_foregroundColor);
 }
 
-void VGA_WriteString(const char *a_str)
+void VGA_WriteString(
+    const char *a_str)
 {
     VGA_WriteColoredString(a_str, g_VGA_backgroundColor,
                                 g_VGA_foregroundColor);
 }
 
-void VGA_WriteBuffer(const char *a_buffer, size_t a_len)
+void VGA_WriteBuffer(
+    const char *a_buffer,
+    size_t a_len)
 {
     VGA_WriteColoredBuffer(a_buffer, a_len, g_VGA_backgroundColor,
                                             g_VGA_foregroundColor);
 }
 
-void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
+void VGA_WriteColoredChar(
+    char a_c,
+    enum VGA_Colors a_bg,
+    enum VGA_Colors a_fg)
 {
     size_t index;
     uint16 entry;
 
-    switch (a_c)
-    {
+    switch (a_c) {
+
         case '\n':
             g_VGA_column = 0;
-            if (++g_VGA_row == VGA_HEIGHT)
-            {
+            if (++g_VGA_row == VGA_HEIGHT) {
+
                 VGA_Scroll();
             }
             break;
@@ -96,11 +109,11 @@ void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
             entry = VGA_CreateEntry(a_c, a_bg, a_fg);
 
             g_VGA_buffer[index] = entry;
-            if (++g_VGA_column == VGA_WIDTH)
-            {
+            if (++g_VGA_column == VGA_WIDTH) {
+
                 g_VGA_column = 0;
-                if (++g_VGA_row == VGA_HEIGHT)
-                {
+                if (++g_VGA_row == VGA_HEIGHT) {
+
                     VGA_Scroll();
                 }
             }
@@ -110,37 +123,42 @@ void VGA_WriteColoredChar(char a_c, enum VGA_Colors a_bg, enum VGA_Colors a_fg)
     VGA_MoveCursor(g_VGA_column, g_VGA_row);
 }
 
-void VGA_WriteColoredString(const char *a_str, enum VGA_Colors a_bg,
-                            enum VGA_Colors a_fg)
+void VGA_WriteColoredString(
+    const char *a_str,
+    enum VGA_Colors a_bg,
+    enum VGA_Colors a_fg)
 {
-    for (size_t i = 0; a_str[i] != '\0'; i++)
-    {
+    for (size_t i = 0; a_str[i] != '\0'; i++) {
+
         VGA_WriteColoredChar(a_str[i], a_bg, a_fg);
     }
 }
 
-void VGA_WriteColoredBuffer(const char *a_buffer, size_t a_len,
-                            enum VGA_Colors a_bg, enum VGA_Colors a_fg)
+void VGA_WriteColoredBuffer(
+    const char *a_buffer,
+    size_t a_len,
+    enum VGA_Colors a_bg,
+    enum VGA_Colors a_fg)
 {
-    for (size_t i = 0; i < a_len; i++)
-    {
+    for (size_t i = 0; i < a_len; i++) {
+
         VGA_WriteColoredChar(a_buffer[i], a_bg, a_fg);
     }
 }
 
 void VGA_Scroll()
 {
-    for (size_t i = 0; i < VGA_HEIGHT - 1; i++) 
-    {
-        for (size_t j = 0; j < VGA_WIDTH; j++)
-        {
+    for (size_t i = 0; i < VGA_HEIGHT - 1; i++)  {
+
+        for (size_t j = 0; j < VGA_WIDTH; j++) {
+
             g_VGA_buffer[i * VGA_WIDTH + j] = g_VGA_buffer[(i + 1) * VGA_WIDTH + j];
         }
     }
     uint16 blank = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
 
-    for (size_t i = 0; i < VGA_WIDTH; i++)
-    {
+    for (size_t i = 0; i < VGA_WIDTH; i++) {
+
         g_VGA_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + i] = blank;
     }
     g_VGA_row = VGA_HEIGHT - 1;
@@ -148,10 +166,10 @@ void VGA_Scroll()
 
 void VGA_Clear()
 {
-    for (size_t y = 0; y < VGA_HEIGHT; y++)
-    {
-        for (size_t x = 0; x < VGA_WIDTH; x++)
-        {
+    for (size_t y = 0; y < VGA_HEIGHT; y++) {
+
+        for (size_t x = 0; x < VGA_WIDTH; x++) {
+
             size_t index = y * VGA_WIDTH + x;
             g_VGA_buffer[index] = VGA_CreateEntry(' ', g_VGA_backgroundColor,
                                                   g_VGA_foregroundColor);
