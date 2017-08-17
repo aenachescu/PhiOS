@@ -232,3 +232,25 @@ uint32 PMM_check(
 
     return error;
 }
+
+uint32 PMM_adjustPfn(
+    uint32 a_offset)
+{
+    uint32 error = ERROR_SUCCESS;
+
+    do {
+        if (g_allocators == NULL) {
+            error = ERROR_UNINITIALIZED;
+            break;
+        }
+
+        for (uint8 i = 0; i < g_index; i++) {
+            g_allocators[i].allocFn += a_offset;
+            g_allocators[i].freeFn += a_offset;
+            g_allocators[i].reserveFn += a_offset;
+            g_allocators[i].checkFn += a_offset;
+        }
+    } while (false);
+
+    return error;
+}
