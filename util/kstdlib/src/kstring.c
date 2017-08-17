@@ -1,6 +1,4 @@
-#include "types.h"
-#include "kstring.h"
-#include "errors.h"
+#include "util/kstdlib/include/kstring.h"
 
 uint32 kmemchr(
     const void *a_buffer, 
@@ -25,8 +23,7 @@ uint32 kmemchr(
             --a_length;
             ++p;
         }
-    }
-    else {
+    } else {
         return ERROR_EMPTY_BUFFER;
     }
 
@@ -63,8 +60,7 @@ uint32 kmemcmp(
 
         *a_result = 0;
         return ERROR_SUCCESS;
-    }
-    else {
+    } else {
         return ERROR_EMPTY_BUFFER;
     }
 
@@ -134,8 +130,7 @@ uint32 kmemmove(
             pSrc--;
             a_length--;
         }
-    }
-    else {
+    } else {
         while (a_length != 0) {
             *pDest = *pSrc;
             pDest++;
@@ -232,8 +227,7 @@ uint32 kstrcpy(
     if (length < *a_destLength) {
         *a_dest = '\0';
         *a_destLength = length;
-    }
-    else {
+    } else {
         *a_destLength = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }

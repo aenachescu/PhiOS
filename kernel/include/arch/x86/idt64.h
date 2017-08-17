@@ -1,8 +1,8 @@
 #ifndef PhiOS_InterruptDescriptorTable64
 #define PhiOS_InterruptDescriptorTable64
 
-#include "types.h"
-#include "cpu.h"
+#include "include/types.h"
+#include "include/cpu.h"
 
 struct IDT64_Entry
 {

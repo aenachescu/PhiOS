@@ -1,12 +1,9 @@
-#include "types.h"
 #include "kernel/include/arch/x86/idt32.h"
 #include "kernel/include/arch/x86/asm_io.h"
 #include "kernel/include/arch/x86/handlers32.h"
 #include "kernel/include/arch/x86/pic.h"
-#include "errors.h"
-#include "cpu.h"
+
 #include "util/kstdlib/include/kstring.h"
-#include "drivers/keyboard/include/keyboard.h"
 
 static struct IDT32_Entry   g_IDTEntries32[IDT_ENTRIES];
 static struct IDT32         g_IDTPointer32;

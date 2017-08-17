@@ -1,5 +1,4 @@
-#include "random.h"
-#include "errors.h"
+#include "kernel/include/random.h"
 
 #if defined PhiOS_ARCH_x86_32 || defined PhiOS_ARCH_x86_64
 

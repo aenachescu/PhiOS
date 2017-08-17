@@ -1,7 +1,7 @@
 #ifndef _PhiOS_drivers_text_mode
 #define _PhiOS_drivers_text_mode
 
-#include "types.h"
+#include "include/types.h"
 
 #define VGA_WIDTH    80
 #define VGA_HEIGHT   25

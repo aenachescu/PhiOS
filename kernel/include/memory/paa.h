@@ -1,8 +1,8 @@
 #ifndef PhiOS_PlacementAddressAllocator
 #define PhiOS_PlacementAddressAllocator
 
-#include "errors.h"
-#include "types.h"
+#include "include/errors.h"
+#include "include/types.h"
 
 /*
  * @brief Initializes the placement address allocator.

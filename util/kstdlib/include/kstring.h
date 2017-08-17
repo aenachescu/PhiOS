@@ -1,7 +1,8 @@
 #ifndef PhiOS_kstring
 #define PhiOS_kstring
 
-#include "types.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 uint32 kmemchr(
     const void *a_buffer, 

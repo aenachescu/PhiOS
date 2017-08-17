@@ -1,9 +1,10 @@
 #ifndef PhiOS_arch_x86_paging_ia32
 #define PhiOS_arch_x86_paging_ia32
 
-#include "types.h"
-#include "errors.h"
-#include "paging.h"
+#include "include/types.h"
+#include "include/errors.h"
+
+#include "kernel/include/arch/x86/paging/paging.h"
 
 #define PAGING_IA32_PTE_NUMBER   1024
 #define PAGING_IA32_PDE_NUMBER   1024

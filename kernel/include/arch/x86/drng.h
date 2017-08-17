@@ -1,8 +1,8 @@
 #ifndef PhiOS_DigitalRandomNumberGenerator
 #define PhiOS_DigitalRandomNumberGenerator
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 uint64 drng_pseudoRandom();
 
