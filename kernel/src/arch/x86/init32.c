@@ -83,7 +83,9 @@ void detectSMBios()
     }
 }
 
-size_t init_init32(uint32 mboot2Magic, uint32 mboot2Addr)
+uint32 init_init32(
+    uint32 mboot2Magic, 
+    uint32 mboot2Addr)
 {
     // Inits stack smashing protector
     //__stack_chk_guard = kernel_random();

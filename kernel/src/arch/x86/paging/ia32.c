@@ -1,7 +1,6 @@
-#include "arch/x86/paging/ia32.h"
-#include "memory/pmm.h"
+#include "kernel/include/arch/x86/paging/ia32.h"
+#include "kernel/include/memory/pmm.h"
 #include "cpu.h"
-#include "util/kstdlib/include/kstdio.h"
 
 extern struct KernelArea g_kernelArea;
 
@@ -36,7 +35,8 @@ extern struct KernelArea g_kernelArea;
 #define IA32_4KB_PAGE_TABLE_IGNORED2        ((uint32) 0x00000F00)
 #define IA32_4KB_PAGE_TABLE_ADDRESS         ((uint32) 0xFFFFF000)
 
-static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
+static uint32 helper_IA32_4KB_createPaging(
+    struct Paging *a_paging)
 {
     size_t error = ERROR_SUCCESS;
     uint64 pdAddr = 0;
@@ -76,7 +76,8 @@ static size_t helper_IA32_4KB_createPaging(struct Paging *a_paging)
     return error;
 }
 
-static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
+static uint32 helper_IA32_4KB_deletePaging(
+    struct Paging *a_paging)
 {
     size_t error = ERROR_SUCCESS;
     uint64 pdAddr = (uint64) a_paging->pagingStruct;
@@ -110,8 +111,9 @@ static size_t helper_IA32_4KB_deletePaging(struct Paging *a_paging)
     return error;
 }
 
-static void helper_IA32_4KB_allocArea(struct Paging *a_paging,
-                                      struct IA32_4KB_Paging_AllocParam *a_request)
+static void helper_IA32_4KB_allocArea(
+    struct Paging *a_paging,
+    struct IA32_4KB_Paging_AllocParam *a_request)
 {
     struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
     struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
@@ -157,7 +159,7 @@ static void helper_IA32_4KB_allocArea(struct Paging *a_paging,
 
 }
 
-static size_t helper_IA32_4KB_getPositionForVirtualAddress(
+static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     uint32 virtualAddress,
     uint32 *pageId,
     uint32 *tableId)
@@ -174,7 +176,8 @@ static size_t helper_IA32_4KB_getPositionForVirtualAddress(
     return ERROR_SUCCESS;
 }
 
-static void helper_IA32_4KB_initPageTable(struct IA32_PageTable_4KB *pt)
+static void helper_IA32_4KB_initPageTable(
+    struct IA32_PageTable_4KB *pt)
 {
     // TODO: optimizes this for using kmemset()
     for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++)
@@ -183,7 +186,8 @@ static void helper_IA32_4KB_initPageTable(struct IA32_PageTable_4KB *pt)
     }
 }
 
-size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
+uint32 IA32_4KB_initKernelPaging(
+    struct Paging *a_paging)
 {
     if (a_paging == NULL)
     {
@@ -316,7 +320,9 @@ size_t IA32_4KB_initKernelPaging(struct Paging *a_paging)
     return error;
 }
 
-size_t IA32_4KB_init(struct Paging *a_paging, struct Paging *a_currentPaging)
+uint32 IA32_4KB_init(
+    struct Paging *a_paging, 
+    struct Paging *a_currentPaging)
 {
     if (a_paging == NULL)
     {
@@ -406,9 +412,10 @@ size_t IA32_4KB_init(struct Paging *a_paging, struct Paging *a_currentPaging)
     return error;
 }
 
-size_t IA32_4KB_alloc(struct Paging *a_paging,
-                      struct AllocFuncParam *a_request,
-                      size_t *a_address)
+uint32 IA32_4KB_alloc(
+    struct Paging *a_paging,
+    struct AllocFuncParam *a_request,
+    size_t *a_address)
 {
     if (a_paging == NULL || a_request == NULL || a_address == NULL ||
         a_paging->pagingStruct == NULL || a_request->param == NULL)
@@ -438,8 +445,9 @@ size_t IA32_4KB_alloc(struct Paging *a_paging,
     return error;
 }
 
-size_t IA32_4KB_free(struct Paging *a_paging,
-                     struct FreeFuncParam *a_request)
+uint32 IA32_4KB_free(
+    struct Paging *a_paging,
+    struct FreeFuncParam *a_request)
 {
     if (a_paging == NULL || a_request == NULL ||
         a_paging->pagingStruct == NULL || a_request->param == NULL)
@@ -465,8 +473,9 @@ size_t IA32_4KB_free(struct Paging *a_paging,
     return error;
 }
 
-size_t IA32_4KB_switchDirectory(struct Paging *a_paging,
-                                struct IA32_PageDirectory_4KB *a_pageDirectory)
+uint32 IA32_4KB_switchDirectory(
+    struct Paging *a_paging,
+    struct IA32_PageDirectory_4KB *a_pageDirectory)
 {
     if (a_paging == NULL || a_pageDirectory == NULL)
     {
@@ -479,7 +488,8 @@ size_t IA32_4KB_switchDirectory(struct Paging *a_paging,
     return ERROR_SUCCESS;
 }
 
-size_t IA32_4KB_enablePaging(struct Paging *a_paging)
+uint32 IA32_4KB_enablePaging(
+    struct Paging *a_paging)
 {
     if (a_paging == NULL)
     {

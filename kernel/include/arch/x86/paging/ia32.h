@@ -74,32 +74,32 @@ struct IA32_PageDirectory_4KB
  * public functions for ia32 paging with page size of 4KB
  */
 
-size_t IA32_4KB_initKernelPaging(
+uint32 IA32_4KB_initKernelPaging(
     struct Paging *a_paging
 );
 
-size_t IA32_4KB_init(
+uint32 IA32_4KB_init(
     struct Paging *a_paging,
     struct Paging *a_currentPaging
 );
 
-size_t IA32_4KB_alloc(
+uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
     struct AllocFuncParam *a_request,
     size_t *a_address
 );
 
-size_t IA32_4KB_free(
+uint32 IA32_4KB_free(
     struct Paging *a_paging,
     struct FreeFuncParam *a_request
 );
 
-size_t IA32_4KB_switchDirectory(
+uint32 IA32_4KB_switchDirectory(
     struct Paging *a_paging,
     struct IA32_PageDirectory_4KB *a_pageDirectory
 );
 
-size_t IA32_4KB_enablePaging(
+uint32 IA32_4KB_enablePaging(
     struct Paging *a_paging
 );
 
