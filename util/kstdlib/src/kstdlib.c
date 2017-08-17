@@ -1,6 +1,6 @@
-#include "kstdlib.h"
-#include "errors.h"
-#include "kstring.h"
+#include "util/kstdlib/include/kstdlib.h"
+#include "util/kstdlib/include/kstring.h"
+
 #include "kernel/include/random.h"
 
 uint32 kitoa(
@@ -10,28 +10,22 @@ uint32 kitoa(
     size_t a_base)
 {
     if (a_buffer == NULL || a_length == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
     if (a_value < 0 && a_base == 10) {
-
         size_t length = *a_length;
-
         if (length > 0) {
-
             a_buffer[0] = '-';
             length--;
             a_buffer++;
         }
 
-        size_t error = kutoa(-a_value, a_buffer, &length, a_base);
+        uint32 error = kutoa(-a_value, a_buffer, &length, a_base);
         *a_length = length + 1; // +1 from '-'
 
         return error;
-    }
-    else {
-
+    } else {
         return kutoa(a_value, a_buffer, a_length, a_base);
     }
 
@@ -45,7 +39,6 @@ uint32 kutoa(
     size_t a_base)
 {
     if (a_buffer == NULL || a_length == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
@@ -53,12 +46,9 @@ uint32 kutoa(
     char hexa[] = "0123456789ABCDEF";
 
     switch (a_base) {
-
         case 2:
             for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
-
                 if (length < (*a_length)) {
-
                     a_buffer[length] = (a_value & (1 << i));
                 }
 
@@ -68,9 +58,7 @@ uint32 kutoa(
 
         case 10:
             do {
-
                 if (length < (*a_length)) {
-
                     a_buffer[length] = '0' + (a_value % 10);
                 }
 
@@ -81,9 +69,7 @@ uint32 kutoa(
 
         case 16:
             do {
-
                 if (length < (*a_length)) {
-
                     a_buffer[length] = hexa[a_value % 16];
                 }
 
@@ -97,13 +83,10 @@ uint32 kutoa(
     }
 
     if (length < (*a_length)) {
-
         a_buffer[length] = '\0';
         kstrrev(a_buffer, length);
         *a_length = length;
-    }
-    else {
-
+    } else {
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
@@ -118,16 +101,12 @@ uint32 ki64toa(
     size_t a_base)
 {
     if (a_buffer == NULL || a_length == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
     if (a_value < 0 && a_base == 10) {
-
         size_t length = *a_length;
-
         if (length > 0) {
-
             a_buffer[0] = '-';
             length--;
             a_buffer++;
@@ -137,9 +116,7 @@ uint32 ki64toa(
         *a_length = length + 1; // +1 from '-'
 
         return error;
-    }
-    else {
-
+    } else {
         return kutoa(a_value, a_buffer, a_length, a_base);
     }
 
@@ -153,7 +130,6 @@ uint32 ku64toa(
     size_t a_base)
 {
     if (a_buffer == NULL || a_length == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
@@ -161,12 +137,9 @@ uint32 ku64toa(
     char hexa[] = "0123456789ABCDEF";
 
     switch (a_base) {
-
         case 2:
             for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
-
                 if (length < (*a_length)) {
-
                     a_buffer[length] = (a_value & (1 << i));
                 }
 
@@ -176,9 +149,7 @@ uint32 ku64toa(
 
         case 10:
             do {
-
                 if (length < (*a_length)) {
-
                     a_buffer[length] = '0' + (a_value % 10);
                 }
 
@@ -189,9 +160,7 @@ uint32 ku64toa(
 
         case 16:
             do {
-
                 if (length < (*a_length)) {
-
                     a_buffer[length] = hexa[a_value % 16];
                 }
 
@@ -205,13 +174,10 @@ uint32 ku64toa(
     }
 
     if (length < (*a_length)) {
-
         a_buffer[length] = '\0';
         kstrrev(a_buffer, length);
         *a_length = length;
-    }
-    else {
-
+    } else {
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
@@ -225,7 +191,6 @@ uint32 krand(
     size_t *a_value)
 {
     if (a_value == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
@@ -244,12 +209,10 @@ uint32 kranduint(
     size_t a_end)
 {
     if (a_value == NULL) {
-
         return ERROR_NULL_POINTER;
     }
 
     if (a_start >= a_end) {
-
         return ERROR_INVALID_PARAMETER;
     }
 

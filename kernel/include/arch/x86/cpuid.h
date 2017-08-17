@@ -1,8 +1,8 @@
 #ifndef PhiOS_CPUID
 #define PhiOS_CPUID
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 /*
  * These defines are for CPUID EAX = 01H, features from ECX
@@ -83,7 +83,7 @@
  *  ERROR_SUCCESS - if the function ends successfully.
  *  ERROR_UNSUPPORTED - if the cpu does not support cpuid instruction.
  */
-size_t CPUID_Init();
+uint32 CPUID_Init();
 
 /*
  * @brief Check if the processor has a certain feature.
@@ -96,8 +96,8 @@ size_t CPUID_Init();
  *  ERROR_UNINITIALIZED - if the informations abous cpu wasn't initialized.
  *  ERROR_INVALID_PARAMETER - if a_featureId is not defined.
  */
-size_t CPUID_HasFeature(
-    size_t a_featureId
+uint32 CPUID_HasFeature(
+    uint32 a_featureId
 );
 
 /*
@@ -113,7 +113,7 @@ size_t CPUID_HasFeature(
  *  ERROR_UNINITIALIZED - if before calling this function was not called
  *      CPUID_Init() function.
  */
-size_t CPUID_GetVendorName(
+uint32 CPUID_GetVendorName(
     const char **a_vendorName
 );
 

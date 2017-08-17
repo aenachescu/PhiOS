@@ -1,11 +1,9 @@
-#include "arch/x86/tss32.h"
-#include "types.h"
-#include "errors.h"
-#include "kstring.h"
+#include "kernel/include/arch/x86/tss32.h"
+#include "util/kstdlib/include/kstring.h"
 
 struct TSS32_Entry g_TSSKernelEntry;
 
-size_t TSS32_init(uint16 a_ss0, uint32 a_esp0)
+uint32 TSS32_init(uint16 a_ss0, uint32 a_esp0)
 {
     kmemset(&g_TSSKernelEntry, 0, sizeof(struct TSS32_Entry));
 
@@ -22,7 +20,7 @@ size_t TSS32_init(uint16 a_ss0, uint32 a_esp0)
     return ERROR_SUCCESS;
 }
 
-size_t TSS32_setKernelStack(uint32 a_esp)
+uint32 TSS32_setKernelStack(uint32 a_esp)
 {
     g_TSSKernelEntry.esp0 = a_esp;
 

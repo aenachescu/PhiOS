@@ -1,6 +1,6 @@
 #include "kernel/include/arch/x86/paging/ia32.h"
 #include "kernel/include/memory/pmm.h"
-#include "cpu.h"
+#include "include/cpu.h"
 
 extern struct KernelArea g_kernelArea;
 

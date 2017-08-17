@@ -1,11 +1,9 @@
-#include "keyboard.h"
-#include "cpu.h"
-#include "types.h"
-#include "errors.h"
-#include "kstring.h"
-#include "arch/x86/asm_io.h"
-#include "arch/x86/idt.h"
-#include "kstdio.h"
+#include "drivers/keyboard/include/keyboard.h"
+
+#include "util/kstdlib/include/kstring.h"
+
+#include "kernel/include/arch/x86/asm_io.h"
+#include "kernel/include/arch/x86/idt.h"
 
 char g_USasciiNonShift[] = {
 0, ESC, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', BACKSPACE,
@@ -88,25 +86,30 @@ void helper_keyboardReadScanCode()
     }
 }
 
-size_t keyboard_init()
+uint32 keyboard_init()
 {
-    size_t err = keyboard_setLayout(g_USasciiNonShift, g_USasciiShift,
-                                    g_USasciiCapsOn);
+    uint32 err = keyboard_setLayout(
+        g_USasciiNonShift,
+        g_USasciiShift,
+        g_USasciiCapsOn
+    );
     if (err != ERROR_SUCCESS) {
         return err;
     }
 
     kmemset(g_keyboardBuffer, 0, KEYBOARD_BUFFER_SIZE);
     g_keyboardBufferPos = 0;
+
     g_capsOn = false;
     g_shift = false;
     g_special = false;
+
     IDT_registerHandler(IRQ1, &keyboard_intHandler);
 
     return ERROR_SUCCESS;
 }
 
-size_t keyboard_setLayout(
+uint32 keyboard_setLayout(
     char *a_layout,
     char *a_shiftLayout,
     char *a_capsOnLayout)
@@ -137,8 +140,9 @@ char keyboard_readKey()
 
     char ret = g_keyboardBuffer[0];
 
-    for (uint32 i = 1; i < g_keyboardBufferPos; i++)
+    for (uint32 i = 1; i < g_keyboardBufferPos; i++) {
         g_keyboardBuffer[i - 1] = g_keyboardBuffer[i];
+    }
 
     g_keyboardBufferPos--;
 

@@ -1,6 +1,6 @@
-#include "types.h"
-#include "cpu.h"
-#include "kstdio.h"
+#include "include/cpu.h"
+
+#include "util/kstdlib/include/kstdio.h"
 
 void cpu_printState32(
     IntCpuState32 *a_state)
@@ -21,7 +21,7 @@ void cpu_printState32(
 }
 
 void cpu_printState64(
-    IntCpuState64 *a_state)
+    __attribute__((unused)) IntCpuState64 *a_state)
 {
     kprintf("--- CPU STATE DUMP---\n");
 

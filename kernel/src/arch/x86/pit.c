@@ -1,7 +1,7 @@
 #include "kernel/include/arch/x86/pit.h"
 #include "kernel/include/arch/x86/asm_io.h"
-#include "cpu.h"
 #include "kernel/include/arch/x86/idt.h"
+#include "include/cpu.h"
 
 /*
  * The interval time (in ms) in which it's called helper_pitHandler().

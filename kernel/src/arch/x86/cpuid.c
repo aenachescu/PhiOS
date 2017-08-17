@@ -21,21 +21,21 @@ void CPUID_Call(
 
 struct CPUID_eax_01h
 {
-    size_t eax;
-    size_t ebx;
-    size_t ecx;
-    size_t edx;
+    uint32 eax;
+    uint32 ebx;
+    uint32 ecx;
+    uint32 edx;
 };
 
 struct CPUID_eax_00h
 {
-    size_t eax;
+    uint32 eax;
     char vendor[13];
 };
 
 struct CPUInfo
 {
-    size_t isInitialized;
+    uint32 isInitialized;
     struct CPUID_eax_00h cpuid_eax_00h;
     struct CPUID_eax_01h cpuid_eax_01h;
 };
@@ -50,7 +50,7 @@ static struct CPUInfo g_cpuInfo;
 
 uint32 CPUID_Init()
 {
-    size_t error = kmemset((void*) &g_cpuInfo, 0, sizeof(struct CPUInfo));
+    uint32 error = kmemset((void*) &g_cpuInfo, 0, sizeof(struct CPUInfo));
     if (error != ERROR_SUCCESS) {
         return error;
     }
@@ -61,7 +61,7 @@ uint32 CPUID_Init()
         return ERROR_UNSUPPORTED;
     }
 
-    size_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+    uint32 eax = 0, ebx = 0, ecx = 0, edx = 0;
 
     CPUID_Call(0, 0, 0, 0, &eax, &ebx, &ecx, &edx);
     g_cpuInfo.cpuid_eax_00h.eax = eax;
@@ -97,7 +97,7 @@ uint32 CPUID_GetVendorName(
 }
 
 uint32 CPUID_HasFeature(
-    size_t a_featureId)
+    uint32 a_featureId)
 {
     if (g_cpuInfo.isInitialized == 0) {
         return ERROR_UNINITIALIZED;
@@ -110,8 +110,8 @@ uint32 CPUID_HasFeature(
                 return ERROR_INVALID_PARAMETER;
         }
 
-        size_t rangBit = a_featureId ^ 0x00000100;
-        size_t ret = g_cpuInfo.cpuid_eax_01h.ecx & (1 << rangBit);
+        uint32 rangBit = a_featureId ^ 0x00000100;
+        uint32 ret = g_cpuInfo.cpuid_eax_01h.ecx & (1 << rangBit);
 
         if (ret == 0) {
             return ERROR_UNSUPPORTED;
@@ -128,8 +128,8 @@ uint32 CPUID_HasFeature(
                 return ERROR_INVALID_PARAMETER;
         }
 
-        size_t rangBit = a_featureId ^ 0x00000200;
-        size_t ret = g_cpuInfo.cpuid_eax_01h.edx & (1 << rangBit);
+        uint32 rangBit = a_featureId ^ 0x00000200;
+        uint32 ret = g_cpuInfo.cpuid_eax_01h.edx & (1 << rangBit);
 
         if (ret == 0) {
             return ERROR_UNSUPPORTED;

@@ -1,7 +1,7 @@
-#include "rtc.h"
-#include "arch/x86/asm_io.h"
-#include "cpu.h"
-#include "kstring.h"
+#include "drivers/rtc/include/rtc.h"
+#include "kernel/include/arch/x86/asm_io.h"
+#include "include/cpu.h"
+#include "util/kstdlib/include/kstring.h"
 
 static RTC g_rtc;
 
@@ -112,14 +112,14 @@ static void helper_readDateAndTime()
     }
 }
 
-size_t RTC_init()
+uint32 RTC_init()
 {
     kmemset(&g_rtc, 0, sizeof(RTC));
 
     return ERROR_SUCCESS;
 }
 
-size_t RTC_getDateAndTime(
+uint32 RTC_getDateAndTime(
     RTC *a_rtc)
 {
     if (a_rtc == NULL) {

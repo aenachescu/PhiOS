@@ -1,8 +1,8 @@
 #ifndef PhiOS_BitmapPhysicalMemoryAllocator
 #define PhiOS_BitmapPhysicalMemoryAllocator
 
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 struct BitmapPMA
 {
