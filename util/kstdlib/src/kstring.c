@@ -2,8 +2,11 @@
 #include "kstring.h"
 #include "errors.h"
 
-size_t kmemchr(const void *a_buffer, uint8 a_value,
-               size_t a_length, void **a_result)
+uint32 kmemchr(
+    const void *a_buffer, 
+    uint8 a_value,
+    size_t a_length, 
+    void **a_result)
 {
     if (a_buffer == NULL || a_result == NULL)
     {
@@ -35,8 +38,11 @@ size_t kmemchr(const void *a_buffer, uint8 a_value,
     return ERROR_NOT_FOUND;
 }
 
-size_t kmemcmp(const void *a_buffer1, const void *a_buffer2,
-               size_t a_length, sint32 *a_result)
+uint32 kmemcmp(
+    const void *a_buffer1, 
+    const void *a_buffer2,
+    size_t a_length, 
+    sint32 *a_result)
 {
     if (a_buffer1 == NULL || a_buffer2 == NULL || a_result == NULL)
     {
@@ -76,7 +82,10 @@ size_t kmemcmp(const void *a_buffer1, const void *a_buffer2,
     return ERROR_UNKNOWN;
 }
 
-size_t kmemcpy(void *a_dest, const void *a_src, size_t a_length)
+uint32 kmemcpy(
+    void *a_dest, 
+    const void *a_src, 
+    size_t a_length)
 {
     if (a_dest == NULL || a_src == NULL)
     {
@@ -108,7 +117,10 @@ size_t kmemcpy(void *a_dest, const void *a_src, size_t a_length)
     return ERROR_SUCCESS;
 }
 
-size_t kmemmove(void *a_dest, const void *a_src, size_t a_length)
+uint32 kmemmove(
+    void *a_dest, 
+    const void *a_src, 
+    size_t a_length)
 {
     if (a_dest == NULL || a_src == NULL)
     {
@@ -157,7 +169,10 @@ size_t kmemmove(void *a_dest, const void *a_src, size_t a_length)
     return ERROR_SUCCESS;
 }
 
-size_t kmemset(void *a_buffer, sint8 a_value, size_t a_length)
+uint32 kmemset(
+    void *a_buffer, 
+    sint8 a_value, 
+    size_t a_length)
 {
     if (a_buffer == NULL)
     {
@@ -182,7 +197,10 @@ size_t kmemset(void *a_buffer, sint8 a_value, size_t a_length)
     return ERROR_SUCCESS;
 }
 
-size_t kstrcmp(const char *a_str1, const char *a_str2, sint32 *a_result)
+uint32 kstrcmp(
+    const char *a_str1, 
+    const char *a_str2, 
+    sint32 *a_result)
 {
     if (a_str1 == NULL || a_str2 == NULL || a_result == NULL)
     {
@@ -218,7 +236,10 @@ size_t kstrcmp(const char *a_str1, const char *a_str2, sint32 *a_result)
     return ERROR_SUCCESS;
 }
 
-size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src)
+uint32 kstrcpy(
+    char *a_dest, 
+    size_t *a_destLength, 
+    const char *a_src)
 {
     if (a_dest == NULL || a_destLength == NULL || a_src == NULL)
     {
@@ -257,7 +278,9 @@ size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src)
     return ERROR_SUCCESS;
 }
 
-size_t kstrlen(const char *a_str, size_t *a_length)
+uint32 kstrlen(
+    const char *a_str, 
+    size_t *a_length)
 {
     if (a_str == NULL || a_length == NULL)
     {
@@ -274,7 +297,9 @@ size_t kstrlen(const char *a_str, size_t *a_length)
     return ERROR_SUCCESS;
 }
 
-size_t kstrrev(char *a_str, size_t a_length)
+uint32 kstrrev(
+    char *a_str, 
+    size_t a_length)
 {
     if (a_str == NULL)
     {

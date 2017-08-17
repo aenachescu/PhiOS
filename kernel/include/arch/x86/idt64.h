@@ -23,11 +23,11 @@ struct IDT64
 
 typedef void (*ISR64_PFN)(IntCpuState64*);
 
-size_t IDT64_init();
+uint32 IDT64_init();
 
-size_t IDT64_setEntry(/* TODO: find sizes for args */);
+uint32 IDT64_setEntry(/* TODO: find sizes for args */);
 
-size_t IDT64_registerHandler(
+uint32 IDT64_registerHandler(
     uint32 a_n, 
     ISR64_PFN a_handler
 );
