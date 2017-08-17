@@ -98,4 +98,11 @@ uint32 BitmapPMA_reserve(
     uint64 a_physicalAddress
 );
 
+uint32 BitmapPMA_check(
+    void *a_bpma,
+    uint64 a_startAddr,
+    uint64 a_endAddr,
+    uint8 *a_state
+);
+
 #endif
