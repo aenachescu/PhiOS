@@ -4,6 +4,7 @@
 #include "kernel/include/arch/x86/pit.h"
 #include "kernel/include/arch/x86/pic.h"
 #include "kernel/include/arch/x86/cpuid.h"
+#include "kernel/include/memory/pmm.h"
 
 #include "drivers/keyboard/include/keyboard.h"
 #include "drivers/rtc/include/rtc.h"
@@ -33,6 +34,10 @@ size_t g_userStack[2048]; // temporary user mode
 
 void user_main()
 {
+    //KERNEL_CHECK(PMM_free(0x100000, 0x5000, PMM_FOR_VIRTUAL_MEMORY));
+
+    freezeCpu();
+
     kprintf("Hello, world!\n");
     kprintf("> ");
     while (1) {

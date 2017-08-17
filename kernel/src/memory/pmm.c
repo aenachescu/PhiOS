@@ -44,7 +44,8 @@ uint32 PMM_addAllocator(
     uint8 a_flag,
     PMA_ALLOC_PFN a_allocFn,
     PMA_FREE_PFN a_freeFn,
-    PMA_RESERVE_PFN a_reserveFn)
+    PMA_RESERVE_PFN a_reserveFn,
+    PMA_CHECK_PFN a_checkFn)
 {
     uint32 error = ERROR_SUCCESS;
 
@@ -75,6 +76,7 @@ uint32 PMM_addAllocator(
         g_allocators[g_index].allocFn     = a_allocFn;
         g_allocators[g_index].freeFn      = a_freeFn;
         g_allocators[g_index].reserveFn   = a_reserveFn;
+        g_allocators[g_index].checkFn     = a_checkFn;
         g_index++;
     } while (false);
 
@@ -182,6 +184,45 @@ uint32 PMM_reserve(
                 (void*) g_allocators[i].PMAStruct,
                 a_size,
                 a_address
+            );
+            if (error == ERROR_SUCCESS){
+                break;
+            }
+        }
+    } while (false);
+
+    return error;
+}
+
+uint32 PMM_check(
+    uint64 a_startAddr,
+    uint64 a_endAddr,
+    uint8 *a_state,
+    uint8 a_flag)
+{
+    uint32 error = ERROR_UNKNOWN_FLAG;
+
+    do {
+        if (g_allocators == NULL) {
+            error = ERROR_UNINITIALIZED;
+            break;
+        }
+
+        for (uint8 i = 0; i < g_index; i++) {
+            if (g_allocators[i].type != a_flag) {
+                continue;
+            }
+
+            /*
+             * TODO when will be implemented the multitasking.
+             * Here should checked if the structure is locked or not.
+             */
+
+            error = g_allocators[i].checkFn(
+                (void*) g_allocators[i].PMAStruct,
+                a_startAddr,
+                a_endAddr,
+                a_state
             );
             if (error == ERROR_SUCCESS){
                 break;

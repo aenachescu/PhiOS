@@ -184,11 +184,11 @@ uint32 init_init32(
 
         if (memoryZones[i].endAddr < 0x100000) {
             KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_DMA,
-                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
+                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve, &BitmapPMA_check));
         }
         else {
             KERNEL_CHECK(PMM_addAllocator((void*) &g_PMAVM[i], PMM_FOR_VIRTUAL_MEMORY,
-                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve));
+                    &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve, &BitmapPMA_check));
         }
     }
     kprintf("Memory size: %lld MiBs\n", memoryEnd / 1024 / 1024);
@@ -208,6 +208,8 @@ uint32 init_init32(
     KERNEL_CHECK(PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
                PMM_FOR_VIRTUAL_MEMORY));
+    //KERNEL_CHECK(PMM_free(0x100000, 0x5000, PMM_FOR_VIRTUAL_MEMORY));
+
     KERNEL_CHECK(IA32_4KB_initKernelPaging(&g_kernelPaging));
 
     for (size_t i = 0; i < memoryZonesCount; i++) {
