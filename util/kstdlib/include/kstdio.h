@@ -3,7 +3,10 @@
 
 #include "types.h"
 
-size_t kprintf(const char *a_format, ...);
+uint32 kprintf(
+    const char *a_format, 
+    ...
+);
 
 #endif
 

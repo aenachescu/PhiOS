@@ -96,7 +96,9 @@ size_t CPUID_Init();
  *  ERROR_UNINITIALIZED - if the informations abous cpu wasn't initialized.
  *  ERROR_INVALID_PARAMETER - if a_featureId is not defined.
  */
-size_t CPUID_HasFeature(size_t a_featureId);
+size_t CPUID_HasFeature(
+    size_t a_featureId
+);
 
 /*
  * @brief Get the vendor name from CPUID EAX = 00H
@@ -111,6 +113,8 @@ size_t CPUID_HasFeature(size_t a_featureId);
  *  ERROR_UNINITIALIZED - if before calling this function was not called
  *      CPUID_Init() function.
  */
-size_t CPUID_GetVendorName(const char **a_vendorName);
+size_t CPUID_GetVendorName(
+    const char **a_vendorName
+);
 
 #endif

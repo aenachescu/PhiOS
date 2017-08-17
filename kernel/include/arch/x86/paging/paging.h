@@ -42,12 +42,16 @@ struct FreeFuncParam
 
 struct Paging;
 
-typedef size_t (*VMA_ALLOC_PFN)(struct Paging *a_paging,
-                                struct AllocFuncParam *a_request,
-                                size_t *a_address);
+typedef size_t (*VMA_ALLOC_PFN)(
+    struct Paging *a_paging,
+    struct AllocFuncParam *a_request,
+    size_t *a_address
+);
 
-typedef size_t (*VMA_FREE_PFN)(struct Paging *a_paging,
-                               struct FreeFuncParam *a_request);
+typedef size_t (*VMA_FREE_PFN)(
+    struct Paging *a_paging,
+    struct FreeFuncParam *a_request
+);
 
 struct Paging
 {
