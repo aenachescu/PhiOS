@@ -169,16 +169,14 @@ uint32 BitmapPMA_alloc(
     }
 
 #define SET_PROCESSING          \
-    if (processing == 0)        \
-    {                           \
+    if (processing == 0)        \ {                           \
         processing = 1;         \
         i_start = i;            \
         j_start = j;            \
     }
 
 #define RESET_PROCESSING                    \
-    if (processing == 1)                    \
-    {                                       \
+    if (processing == 1)                    \ {                                       \
         processing = 0;                     \
         i_start = 0;                        \
         j_start = 0;                        \
@@ -196,26 +194,21 @@ uint32 BitmapPMA_alloc(
     uint8 keepSearching = 1;
 
 Searching:
-    for (; i < limit; i++)
-    {
+    for (; i < limit; i++) {
         // checks if the all bits are marked
-        if (bpma->bitmap[i] == (~((size_t) 0)))
-        {
+        if (bpma->bitmap[i] == (~((size_t) 0))) {
             RESET_PROCESSING;
             continue;
         }
 
         j = WORDSIZE;
-        do
-        {
+        do {
             j--;
-            if ((bpma->bitmap[i] & (((size_t) 1) << j)) == 0)
-            {
+            if ((bpma->bitmap[i] & (((size_t) 1) << j)) == 0) {
                 SET_PROCESSING
 
                 requiredFrames--;
-                if (requiredFrames == 0)
-                {
+                if (requiredFrames == 0) {
                     // marks bits
                     helper_marksBits(bpma, i_start, j_start, framesNumber);
 
@@ -232,16 +225,14 @@ Searching:
                     return ERROR_SUCCESS;
                 }
             }
-            else
-            {
+            else {
                 RESET_PROCESSING;
             }
         } while (j > 0);
     }
 
     //search from the first frame to bpma->positionLastAllocatedFrame
-    if (keepSearching == 1)
-    {
+    if (keepSearching == 1) {
         keepSearching = 0;
         RESET_PROCESSING;
         i = 0;
@@ -263,18 +254,15 @@ uint32 BitmapPMA_free(
 {
     struct BitmapPMA *bpma = (struct BitmapPMA*) a_bpma;
 
-    if (bpma == NULL)
-    {
+    if (bpma == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (bpma->bitmap == NULL)
-    {
+    if (bpma->bitmap == NULL) {
         return ERROR_UNINITIALIZED;
     }
 
-    if (a_size == 0)
-    {
+    if (a_size == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -284,14 +272,12 @@ uint32 BitmapPMA_free(
     if (framesNumber > totalFramesNumber
         || (a_physicalAddress & (bpma->frameSize - 1)) != 0
         || a_physicalAddress < bpma->startAddress
-        || a_physicalAddress >= bpma->endAddress)
-    {
+        || a_physicalAddress >= bpma->endAddress) {
         return ERROR_INVALID_PARAMETER;
     }
 
     totalFramesNumber = (bpma->endAddress - a_physicalAddress) / bpma->frameSize;
-    if (totalFramesNumber < framesNumber)
-    {
+    if (totalFramesNumber < framesNumber) {
         return ERROR_INVALID_STATE;
     }
 
@@ -307,21 +293,17 @@ uint32 BitmapPMA_free(
     // checks if the all framesNumber frames are marked
     totalFramesNumber = framesNumber;
     indexBits++;
-    do
-    {
-        do
-        {
+    do {
+        do {
             indexBits--;
 
             // checks if bit is 0
-            if ((bpma->bitmap[indexBitmap] & (((size_t) 1) << indexBits)) == 0)
-            {
+            if ((bpma->bitmap[indexBitmap] & (((size_t) 1) << indexBits)) == 0) {
                 return ERROR_INVALID_STATE;
             }
 
             totalFramesNumber--;
-            if (totalFramesNumber == 0)
-            {
+            if (totalFramesNumber == 0) {
                 goto FreesBits;
             }
         } while(indexBits != 0);
@@ -365,14 +347,13 @@ uint32 BitmapPMA_reserve(
     endAddress += bpma->frameSize;
 
     if (startAddress < bpma->startAddress ||
-        endAddress   > bpma->endAddress)
-    {
+        endAddress   > bpma->endAddress) {
         return ERROR_INVALID_PARAMETER;
     }
 
     startAddress -= bpma->startAddress;
     endAddress -= bpma->startAddress;
-    uint32 frameNumber = startAddress / bpma->frameSize + 
+    uint32 frameNumber = startAddress / bpma->frameSize +
                         (startAddress % bpma->frameSize ? 1 : 0);
     uint32 framesToReserve = endAddress / bpma->frameSize +
                              (endAddress % bpma->frameSize ? 1 : 0) -
@@ -382,6 +363,6 @@ uint32 BitmapPMA_reserve(
     uint32 indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
 
     helper_marksBits(bpma, bitmapIndex, indexBits, framesToReserve);
-    
+
     return ERROR_SUCCESS;
 }

@@ -4,22 +4,22 @@
 #include "kernel/include/random.h"
 
 uint32 kitoa(
-    sint32 a_value, 
-    char *a_buffer, 
-    size_t *a_length, 
+    sint32 a_value,
+    char *a_buffer,
+    size_t *a_length,
     size_t a_base)
 {
-    if (a_buffer == NULL || a_length == NULL)
-    {
+    if (a_buffer == NULL || a_length == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
-    if (a_value < 0 && a_base == 10)
-    {
+    if (a_value < 0 && a_base == 10) {
+
         size_t length = *a_length;
 
-        if (length > 0)
-        {
+        if (length > 0) {
+
             a_buffer[0] = '-';
             length--;
             a_buffer++;
@@ -30,8 +30,8 @@ uint32 kitoa(
 
         return error;
     }
-    else
-    {
+    else {
+
         return kutoa(a_value, a_buffer, a_length, a_base);
     }
 
@@ -39,26 +39,26 @@ uint32 kitoa(
 }
 
 uint32 kutoa(
-    uint32 a_value, 
-    char *a_buffer, 
-    size_t *a_length, 
+    uint32 a_value,
+    char *a_buffer,
+    size_t *a_length,
     size_t a_base)
 {
-    if (a_buffer == NULL || a_length == NULL)
-    {
+    if (a_buffer == NULL || a_length == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
     size_t length = 0;
     char hexa[] = "0123456789ABCDEF";
 
-    switch (a_base)
-    {
+    switch (a_base) {
+
         case 2:
-            for (size_t i = 0; i < sizeof(uint64) * 8; i++)
-            {
-                if (length < (*a_length))
-                {
+            for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
+
+                if (length < (*a_length)) {
+
                     a_buffer[length] = (a_value & (1 << i));
                 }
 
@@ -67,10 +67,10 @@ uint32 kutoa(
             break;
 
         case 10:
-            do
-            {
-                if (length < (*a_length))
-                {
+            do {
+
+                if (length < (*a_length)) {
+
                     a_buffer[length] = '0' + (a_value % 10);
                 }
 
@@ -80,10 +80,10 @@ uint32 kutoa(
             break;
 
         case 16:
-            do
-            {
-                if (length < (*a_length))
-                {
+            do {
+
+                if (length < (*a_length)) {
+
                     a_buffer[length] = hexa[a_value % 16];
                 }
 
@@ -96,14 +96,14 @@ uint32 kutoa(
             return ERROR_UNSUPPORTED;
     }
 
-    if (length < (*a_length))
-    {
+    if (length < (*a_length)) {
+
         a_buffer[length] = '\0';
         kstrrev(a_buffer, length);
         *a_length = length;
     }
-    else
-    {
+    else {
+
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
@@ -112,22 +112,22 @@ uint32 kutoa(
 }
 
 uint32 ki64toa(
-    sint64 a_value, 
-    char *a_buffer, 
-    size_t *a_length, 
+    sint64 a_value,
+    char *a_buffer,
+    size_t *a_length,
     size_t a_base)
 {
-    if (a_buffer == NULL || a_length == NULL)
-    {
+    if (a_buffer == NULL || a_length == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
-    if (a_value < 0 && a_base == 10)
-    {
+    if (a_value < 0 && a_base == 10) {
+
         size_t length = *a_length;
 
-        if (length > 0)
-        {
+        if (length > 0) {
+
             a_buffer[0] = '-';
             length--;
             a_buffer++;
@@ -138,8 +138,8 @@ uint32 ki64toa(
 
         return error;
     }
-    else
-    {
+    else {
+
         return kutoa(a_value, a_buffer, a_length, a_base);
     }
 
@@ -147,26 +147,26 @@ uint32 ki64toa(
 }
 
 uint32 ku64toa(
-    uint64 a_value, 
-    char *a_buffer, 
-    size_t *a_length, 
+    uint64 a_value,
+    char *a_buffer,
+    size_t *a_length,
     size_t a_base)
 {
-    if (a_buffer == NULL || a_length == NULL)
-    {
+    if (a_buffer == NULL || a_length == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
     size_t length = 0;
     char hexa[] = "0123456789ABCDEF";
 
-    switch (a_base)
-    {
+    switch (a_base) {
+
         case 2:
-            for (size_t i = 0; i < sizeof(uint64) * 8; i++)
-            {
-                if (length < (*a_length))
-                {
+            for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
+
+                if (length < (*a_length)) {
+
                     a_buffer[length] = (a_value & (1 << i));
                 }
 
@@ -175,10 +175,10 @@ uint32 ku64toa(
             break;
 
         case 10:
-            do
-            {
-                if (length < (*a_length))
-                {
+            do {
+
+                if (length < (*a_length)) {
+
                     a_buffer[length] = '0' + (a_value % 10);
                 }
 
@@ -188,10 +188,10 @@ uint32 ku64toa(
             break;
 
         case 16:
-            do
-            {
-                if (length < (*a_length))
-                {
+            do {
+
+                if (length < (*a_length)) {
+
                     a_buffer[length] = hexa[a_value % 16];
                 }
 
@@ -204,14 +204,14 @@ uint32 ku64toa(
             return ERROR_UNSUPPORTED;
     }
 
-    if (length < (*a_length))
-    {
+    if (length < (*a_length)) {
+
         a_buffer[length] = '\0';
         kstrrev(a_buffer, length);
         *a_length = length;
     }
-    else
-    {
+    else {
+
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
@@ -224,8 +224,8 @@ static size_t g_seed;
 uint32 krand(
     size_t *a_value)
 {
-    if (a_value == NULL)
-    {
+    if (a_value == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
@@ -239,17 +239,17 @@ uint32 krand(
 }
 
 uint32 kranduint(
-    size_t *a_value, 
-    size_t a_start, 
+    size_t *a_value,
+    size_t a_start,
     size_t a_end)
 {
-    if (a_value == NULL)
-    {
+    if (a_value == NULL) {
+
         return ERROR_NULL_POINTER;
     }
 
-    if (a_start >= a_end)
-    {
+    if (a_start >= a_end) {
+
         return ERROR_INVALID_PARAMETER;
     }
 

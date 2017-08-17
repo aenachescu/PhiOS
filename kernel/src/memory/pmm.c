@@ -48,8 +48,7 @@ uint32 PMM_addAllocator(
 {
     uint32 error = ERROR_SUCCESS;
 
-    do
-    {
+    do {
         if (g_allocators == NULL) {
             error = ERROR_UNINITIALIZED;
             break;

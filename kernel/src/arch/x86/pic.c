@@ -25,12 +25,10 @@ uint32 PIC_setMask(
     uint16 port;
     uint8 value;
 
-    if (a_irqLine < 8)
-    {
+    if (a_irqLine < 8) {
         port = PIC1_DATA;
     }
-    else
-    {
+    else {
         port = PIC2_DATA;
         a_irqLine -= 8;
     }
@@ -47,12 +45,10 @@ uint32 PIC_clearMask(
     uint16 port;
     uint8 value;
 
-    if (a_irqLine < 8)
-    {
+    if (a_irqLine < 8) {
         port = PIC1_DATA;
     }
-    else
-    {
+    else {
         port = PIC2_DATA;
         a_irqLine -= 8;
     }
@@ -65,8 +61,7 @@ uint32 PIC_clearMask(
 
 uint32 PIC_maskUnusedIRQs()
 {
-    for (uint8 i = 2; i < 16; i++)
-    {
+    for (uint8 i = 2; i < 16; i++) {
         PIC_setMask(i);
     }
 
