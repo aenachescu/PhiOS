@@ -45,53 +45,43 @@ bool g_shift;
 
 void helper_keyboardReadScanCode()
 {
-    if (g_keyboardBufferPos == KEYBOARD_BUFFER_SIZE)
-    {
+    if (g_keyboardBufferPos == KEYBOARD_BUFFER_SIZE) {
         kmemset(g_keyboardBuffer, 0, KEYBOARD_BUFFER_SIZE);
         g_keyboardBufferPos = 0;
     }
 
     uint8 code = io_inb(KEYBOARD_IO_PORT);
 
-    if (code & 0x80)
-    {
+    if (code & 0x80) {
         code &= 0x7F;
 
-        if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT)
-        {
+        if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT) {
             g_shift = false;
             g_special = true;
         }
 
-        if (code == KRCAPS_LOCK)
-        {
+        if (code == KRCAPS_LOCK) {
             g_special = true;
             g_capsOn = !g_capsOn;
         }
     }
-    else
-    {
-        if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT)
-        {
+    else {
+        if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT) {
             g_shift = true;
             g_special = true;
         }
 
-        if (g_shift)
-        {
+        if (g_shift) {
             g_keyboardBuffer[g_keyboardBufferPos++] = g_shiftLayout[code];
         }
-        else if (g_capsOn)
-        {
+        else if (g_capsOn) {
             g_keyboardBuffer[g_keyboardBufferPos++] = g_capsOnLayout[code];
         }
-        else
-        {
+        else {
             g_keyboardBuffer[g_keyboardBufferPos++] = g_layout[code];
         }
 
-        if (g_special)
-        {
+        if (g_special) {
             // TODO: implement special features like turn on LED's
             // uint8 key = g_keyboardBuffer[g_keyboardBufferPos - 1];
         }
@@ -102,8 +92,7 @@ size_t keyboard_init()
 {
     size_t err = keyboard_setLayout(g_USasciiNonShift, g_USasciiShift,
                                     g_USasciiCapsOn);
-    if (err != ERROR_SUCCESS)
-    {
+    if (err != ERROR_SUCCESS) {
         return err;
     }
 
@@ -122,8 +111,7 @@ size_t keyboard_setLayout(
     char *a_shiftLayout,
     char *a_capsOnLayout)
 {
-    if (a_layout == NULL || a_shiftLayout == NULL || a_capsOnLayout == NULL)
-    {
+    if (a_layout == NULL || a_shiftLayout == NULL || a_capsOnLayout == NULL) {
         return ERROR_NULL_POINTER;
     }
 
@@ -136,8 +124,7 @@ size_t keyboard_setLayout(
 
 char keyboard_readKey()
 {
-    while (true)
-    {
+    while (true) {
         turnOffInts();
 
         if (g_keyboardBufferPos != 0) {
