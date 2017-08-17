@@ -23,13 +23,26 @@ struct IDT64
 
 typedef void (*ISR64_PFN)(IntCpuState64*);
 
-size_t IDT64_init();
-size_t IDT64_setEntry(/* TODO: find sizes for args */);
-size_t IDT64_registerHandler(uint32 a_n, ISR64_PFN a_handler);
-extern void IDT64_load(uint64 a_table);
+uint32 IDT64_init();
 
-void IDT64_isrHandler(IntCpuState64 *a_state);
-void IDT64_irqHandler(IntCpuState64 *a_state);
+uint32 IDT64_setEntry(/* TODO: find sizes for args */);
+
+uint32 IDT64_registerHandler(
+    uint32 a_n, 
+    ISR64_PFN a_handler
+);
+
+extern void IDT64_load(
+    uint64 a_table
+);
+
+void IDT64_isrHandler(
+    IntCpuState64 *a_state
+);
+
+void IDT64_irqHandler(
+    IntCpuState64 *a_state
+);
 
 
 #define IRQ0 32 // Programmable Interrupt Timer Interrupt (handled)

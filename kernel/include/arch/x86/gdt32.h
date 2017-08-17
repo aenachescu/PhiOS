@@ -66,11 +66,24 @@ struct GDT32
     uint16 type;
 } __attribute__((packed));
 
-size_t GDT32_init();
-size_t GDT32_setStruct(struct GDT32 *a_gdt, uint32 a_base,
-                       uint32 a_limit, uint16 a_type);
-size_t GDT32_getStruct(uint32 a_num, struct GDT32 **a_gdt);
-size_t GDT32_createEntries(struct GDT32 *a_gdtArray);
-extern void GDT32_Load(uint32 a_table);
+uint32 GDT32_init();
+
+uint32 GDT32_setStruct(
+    struct GDT32 *a_gdt, 
+    uint32 a_base,
+    uint32 a_limit, 
+    uint16 a_type);
+
+uint32 GDT32_getStruct(
+    uint32 a_num, 
+    struct GDT32 **a_gdt
+);
+
+uint32 GDT32_createEntries(
+    struct GDT32 *a_gdtArray);
+
+extern void GDT32_Load(
+    uint32 a_table);
+
 
 #endif

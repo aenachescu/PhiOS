@@ -1,24 +1,27 @@
 #include "types.h"
-#include "arch/x86/idt32.h"
-#include "arch/x86/asm_io.h"
-#include "arch/x86/handlers32.h"
-#include "arch/x86/pic.h"
+#include "kernel/include/arch/x86/idt32.h"
+#include "kernel/include/arch/x86/asm_io.h"
+#include "kernel/include/arch/x86/handlers32.h"
+#include "kernel/include/arch/x86/pic.h"
 #include "errors.h"
 #include "cpu.h"
-#include "kstring.h"
-#include "keyboard.h"
+#include "util/kstdlib/include/kstring.h"
+#include "drivers/keyboard/include/keyboard.h"
 
 static struct IDT32_Entry   g_IDTEntries32[IDT_ENTRIES];
 static struct IDT32         g_IDTPointer32;
 static ISR32_PFN            g_intHandlers[IDT_ENTRIES];
 
-extern void IDT32_Load(uint32 a_table);
+extern void IDT32_Load(
+    uint32 a_table);
 
-static size_t helper_setEntry32(uint32 a_index, uint32 a_base,
-                                uint16 a_selector, uint8 a_flags)
+static uint32 helper_setEntry32(
+    uint32 a_index,
+    uint32 a_base,
+    uint16 a_selector,
+    uint8 a_flags)
 {
-    if (a_index >= IDT_ENTRIES)
-    {
+    if (a_index >= IDT_ENTRIES) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -31,15 +34,14 @@ static size_t helper_setEntry32(uint32 a_index, uint32 a_base,
     return ERROR_SUCCESS;
 }
 
-size_t IDT32_init()
+uint32 IDT32_init()
 {
     g_IDTPointer32.limit = sizeof(struct IDT32_Entry) * IDT_ENTRIES - 1;
     g_IDTPointer32.base = (uint32) &g_IDTEntries32;
 
     kmemset(&g_IDTEntries32, 0, sizeof(struct IDT32_Entry) * IDT_ENTRIES);
 
-    for (uint32 i = 0; i < IDT_ENTRIES; i++)
-    {
+    for (uint32 i = 0; i < IDT_ENTRIES; i++) {
         IDT32_registerHandler(i, &handlers32_default);
     }
 
@@ -121,15 +123,15 @@ size_t IDT32_init()
     return ERROR_SUCCESS;
 }
 
-size_t IDT32_registerHandler(uint32 a_index, ISR32_PFN a_handler)
+uint32 IDT32_registerHandler(
+    uint32 a_index,
+    ISR32_PFN a_handler)
 {
-    if (a_handler == NULL)
-    {
+    if (a_handler == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_index >= IDT_ENTRIES)
-    {
+    if (a_index >= IDT_ENTRIES) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -138,16 +140,17 @@ size_t IDT32_registerHandler(uint32 a_index, ISR32_PFN a_handler)
     return ERROR_SUCCESS;
 }
 
-void IDT32_isrHandler(IntCpuState32 *a_state)
+void IDT32_isrHandler(
+    IntCpuState32 *a_state)
 {
     ISR32_PFN handler = g_intHandlers[a_state->intNo];
     handler(a_state);
 }
 
-void IDT32_irqHandler(IntCpuState32 *a_state)
+void IDT32_irqHandler(
+    IntCpuState32 *a_state)
 {
-    if (a_state->intNo >= 40)
-    {
+    if (a_state->intNo >= 40) {
         // Reset signal to slave
         io_outb(0xA0, 0x20);
     }

@@ -3,19 +3,43 @@
 
 #include "types.h"
 
-size_t kmemchr(const void *a_buffer, uint8 a_value,
-               size_t a_length, void **a_result);
+uint32 kmemchr(
+    const void *a_buffer, 
+    uint8 a_value,
+    size_t a_length, 
+    void **a_result
+);
 
-size_t kmemcmp(const void *a_buffer1, const void *a_buffer2,
-               size_t a_length, sint32 *a_result);
+uint32 kmemcmp(
+    const void *a_buffer1, 
+    const void *a_buffer2,
+    size_t a_length, 
+    sint32 *a_result
+);
 
-size_t kmemcpy(void *a_dest, const void *a_src, size_t a_length);
+uint32 kmemcpy(
+    void *a_dest, 
+    const void *a_src, 
+    size_t a_length
+);
 
-size_t kmemmove(void *a_dest, const void *a_src, size_t a_length);
+uint32 kmemmove(
+    void *a_dest, 
+    const void *a_src, 
+    size_t a_length
+);
 
-size_t kmemset(void *a_buffer, sint8 a_value, size_t a_length);
+uint32 kmemset(
+    void *a_buffer, 
+    sint8 a_value, 
+    size_t a_length
+);
 
-size_t kstrcmp(const char *a_str1, const char *a_str2, sint32 *a_result);
+uint32 kstrcmp(
+    const char *a_str1, 
+    const char *a_str2, 
+    sint32 *a_result
+);
 
 /*
  * @brief Copies a_src into a_dest.
@@ -33,7 +57,11 @@ size_t kstrcmp(const char *a_str1, const char *a_str2, sint32 *a_result);
  *      strings).
  *  ERROR_NULL_POINTER - if at least one pointer is null.
  */
-size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src);
+uint32 kstrcpy(
+    char *a_dest, 
+    size_t *a_destLength, 
+    const char *a_src
+);
 
 /*
  * @brief Computes the string length.
@@ -45,7 +73,10 @@ size_t kstrcpy(char *a_dest, size_t *a_destLength, const char *a_src);
  *  ERROR_SUCCESS       - if the function ends successfully
  *  ERROR_POINTER_NULL  - if a_str is null
  */
-size_t kstrlen(const char *a_str, size_t *a_length);
+uint32 kstrlen(
+    const char *a_str, 
+    size_t *a_length
+);
 
 /*
  * @brief Reverse the string
@@ -57,6 +88,9 @@ size_t kstrlen(const char *a_str, size_t *a_length);
  *  ERROR_SUCCESS       - if the function ends successfully
  *  ERROR_POINTER_NULL  - if a_str is null
  */
-size_t kstrrev(char *a_str, size_t a_length);
+uint32 kstrrev(
+    char *a_str, 
+    size_t a_length
+);
 
 #endif

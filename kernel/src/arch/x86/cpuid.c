@@ -1,5 +1,5 @@
-#include "arch/x86/cpuid.h"
-#include "kstring.h"
+#include "kernel/include/arch/x86/cpuid.h"
+#include "util/kstdlib/include/kstring.h"
 
 /*
  * It's implemented in cpuid.s
@@ -9,9 +9,15 @@ uint32 CPUID_IsSuported();
 /*
  * It's implemented in cpuid.s
  */
-void CPUID_Call(uint32 eax_value, uint32 ebx_value,
-                uint32 ecx_value, uint32 edx_value,
-                uint32 *eax, uint32 *ebx, uint32 *ecx, uint32 *edx);
+void CPUID_Call(
+    uint32 eax_value,
+    uint32 ebx_value,
+    uint32 ecx_value,
+    uint32 edx_value,
+    uint32 *eax,
+    uint32 *ebx,
+    uint32 *ecx,
+    uint32 *edx);
 
 struct CPUID_eax_01h
 {
@@ -42,18 +48,16 @@ struct CPUInfo
 
 static struct CPUInfo g_cpuInfo;
 
-size_t CPUID_Init()
+uint32 CPUID_Init()
 {
     size_t error = kmemset((void*) &g_cpuInfo, 0, sizeof(struct CPUInfo));
-    if (error != ERROR_SUCCESS)
-    {
+    if (error != ERROR_SUCCESS) {
         return error;
     }
 
     uint32 isSuported = CPUID_IsSuported();
 
-    if (isSuported == 0)
-    {
+    if (isSuported == 0) {
         return ERROR_UNSUPPORTED;
     }
 
@@ -76,15 +80,14 @@ size_t CPUID_Init()
     return ERROR_SUCCESS;
 }
 
-size_t CPUID_GetVendorName(const char **a_vendorName)
+uint32 CPUID_GetVendorName(
+    const char **a_vendorName)
 {
-    if (a_vendorName == NULL)
-    {
+    if (a_vendorName == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (g_cpuInfo.isInitialized == 0)
-    {
+    if (g_cpuInfo.isInitialized == 0) {
         return ERROR_UNINITIALIZED;
     }
 
@@ -93,17 +96,15 @@ size_t CPUID_GetVendorName(const char **a_vendorName)
     return ERROR_SUCCESS;
 }
 
-size_t CPUID_HasFeature(size_t a_featureId)
+uint32 CPUID_HasFeature(
+    size_t a_featureId)
 {
-    if (g_cpuInfo.isInitialized == 0)
-    {
+    if (g_cpuInfo.isInitialized == 0) {
         return ERROR_UNINITIALIZED;
     }
 
-    if (a_featureId >= 0x00000100 && a_featureId <= 0x0000011F)
-    {
-        switch (a_featureId)
-        {
+    if (a_featureId >= 0x00000100 && a_featureId <= 0x0000011F) {
+        switch (a_featureId) {
             case 0x00000110:
             case 0x0000011F:
                 return ERROR_INVALID_PARAMETER;
@@ -112,18 +113,15 @@ size_t CPUID_HasFeature(size_t a_featureId)
         size_t rangBit = a_featureId ^ 0x00000100;
         size_t ret = g_cpuInfo.cpuid_eax_01h.ecx & (1 << rangBit);
 
-        if (ret == 0)
-        {
+        if (ret == 0) {
             return ERROR_UNSUPPORTED;
         }
 
         return ERROR_SUCCESS;
     }
 
-    if (a_featureId >= 0x00000200 && a_featureId <= 0x0000021F)
-    {
-        switch (a_featureId)
-        {
+    if (a_featureId >= 0x00000200 && a_featureId <= 0x0000021F) {
+        switch (a_featureId) {
             case 0x0000020A:
             case 0x00000214:
             case 0x0000021E:
@@ -133,8 +131,7 @@ size_t CPUID_HasFeature(size_t a_featureId)
         size_t rangBit = a_featureId ^ 0x00000200;
         size_t ret = g_cpuInfo.cpuid_eax_01h.edx & (1 << rangBit);
 
-        if (ret == 0)
-        {
+        if (ret == 0) {
             return ERROR_UNSUPPORTED;
         }
 
