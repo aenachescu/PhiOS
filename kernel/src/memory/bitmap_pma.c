@@ -368,3 +368,75 @@ uint32 BitmapPMA_reserve(
 
     return ERROR_SUCCESS;
 }
+
+uint32 BitmapPMA_check(
+    void *a_bpma,
+    uint64 a_startAddr,
+    uint64 a_endAddr,
+    uint8 *a_state)
+{
+    struct BitmapPMA *bpma = (struct BitmapPMA*) a_bpma;
+
+    if (bpma == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (bpma->bitmap == NULL) {
+        return ERROR_UNINITIALIZED;
+    }
+
+    ALIGN(a_startAddr, bpma->frameSize);
+    ALIGN(a_endAddr, bpma->frameSize);
+
+    if (a_startAddr >= a_endAddr ||
+        a_startAddr < bpma->startAddress ||
+        a_endAddr > bpma->endAddress) {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    if (*a_state != false && *a_state != true) {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    a_startAddr -= bpma->startAddress;
+    a_endAddr -= bpma->startAddress;
+    uint32 frameNumber = a_startAddr / bpma->frameSize +
+                         (a_startAddr % bpma->frameSize ? 1 : 0);
+    uint32 framesToCheck = a_endAddr / bpma->frameSize +
+                           (a_endAddr % bpma->frameSize ? 1 : 0) - frameNumber;
+    
+    uint32 bitmapIndex = frameNumber / WORDSIZE;
+    uint32 indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
+    
+    uint8 state = *a_state;
+    if (state) {
+        *a_state = false;
+    } else {
+        *a_state = true;
+    }
+
+    indexBits++;
+    do {
+        do {
+            indexBits--;
+
+            if (state && (bpma->bitmap[bitmapIndex] & (((size_t) 1) << indexBits))) {
+                *a_state = true;
+                return ERROR_SUCCESS;
+            } else if ((bpma->bitmap[bitmapIndex] & (((size_t) 1) << indexBits)) != 0) {
+                *a_state = false;
+                return ERROR_SUCCESS;
+            }
+
+            framesToCheck--;
+            if (framesToCheck == 0) {
+                return ERROR_SUCCESS;
+            }
+        } while (indexBits != 0);
+
+        indexBits = WORDSIZE;
+        bitmapIndex++;
+    } while (true);
+
+    return ERROR_SUCCESS;
+}
