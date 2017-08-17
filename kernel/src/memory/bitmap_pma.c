@@ -169,14 +169,16 @@ uint32 BitmapPMA_alloc(
     }
 
 #define SET_PROCESSING          \
-    if (processing == 0)        \ {                           \
+    if (processing == 0)        \
+    {    \
         processing = 1;         \
         i_start = i;            \
         j_start = j;            \
     }
 
 #define RESET_PROCESSING                    \
-    if (processing == 1)                    \ {                                       \
+    if (processing == 1)                    \
+    {    \
         processing = 0;                     \
         i_start = 0;                        \
         j_start = 0;                        \
