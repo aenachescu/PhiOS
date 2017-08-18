@@ -29,8 +29,6 @@ extern uint32 linker_bssEnd;
 extern uint32 linker_gotStart;
 extern uint32 linker_gotEnd;
 
-extern size_t __stack_chk_guard;
-
 #define FRAME_SIZE 4096
 
 // TODO: remove this when tasks are available
@@ -235,7 +233,6 @@ uint32 init_init32(
     KERNEL_CHECK(PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
                PMM_FOR_VIRTUAL_MEMORY));
-    //KERNEL_CHECK(PMM_free(0x100000, 0x5000, PMM_FOR_VIRTUAL_MEMORY));
 
     KERNEL_CHECK(IA32_4KB_initKernelPaging(&g_kernelPaging));
 

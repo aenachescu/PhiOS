@@ -14,6 +14,7 @@ if (DEFINED ARCH)
         list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/phi_main.c")
         list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/errors.c")
         list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/random.c")
+        list(APPEND C_SOURCES "${PRJ_PATH}/kernel/src/stack_protector.c")
     endif()
 endif()
 
