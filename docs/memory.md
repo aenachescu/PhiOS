@@ -44,6 +44,12 @@ The virtual memory manager (VMM) should use the paging module to interact with t
 # 5. Memory Map
 PhiOS's kernel is a higher-half one, so it will be placed above 3 GB. In this section should be written all memory areas that would be used as default for any kind of kernel/user structure.
 
-* 0x0 (memory start) - 0xc0000000 (3 GB): user space
-* 0xc0000000 (3 GB) - 0x100000000 (4 GB): kernel space
-* 0x100000000 (4 GB) and above: user space for 64-bit processes
+## 1. Memory map for IA32 with pages of 4KiBs
+
+|     Address usage     |   *   |     Start     |      End      |         Size          |
+|-----------------------|-------|---------------|---------------|-----------------------|
+| Page tables mapping   | PTs   |  0xFFC00000   |  0xFFFFFFFF   | 4 MiBs                |
+| Page dir mapping      | PD    |  0xFFBFF000   |  0xFFBFFFFF   | 4 KiBs                |
+| Kernel space          | K     |  0xC0000000   |  0xFFBFEFFF   | 1019 MiBs & 1024 KiBs |
+| User/driver space     | U/D   |  0x00001000   |  0xBFFFFFFF   | 3 GiBs - 4 KiBs       |
+| Reserved (NULL)       | NULL  |  0x00000000   |  0x00000FFF   | 4 KiBs                |
