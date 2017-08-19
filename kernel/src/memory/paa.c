@@ -19,8 +19,6 @@ size_t PAA_init(size_t a_startAddress)
 
 size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
 {
-    *a_address = 0;
-
     if (g_placementAddress == 0) {
         return ERROR_UNINITIALIZED;
     }
@@ -32,6 +30,7 @@ size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
     if (a_address == NULL) {
         return ERROR_NULL_POINTER;
     }
+    *a_address = 0;
 
     if ((g_placementAddress & (a_alignment - 1)) != 0) {
         g_placementAddress &= (~(a_alignment - 1));
