@@ -38,15 +38,20 @@ typedef char                        bool;
 #define true  1
 #define false 0
 
-#ifdef PhiOS32
+#if defined(PhiOS32) && !defined(UNIT_TEST)
 #define NULL  0x00000000
 typedef uint32 size_t;
 #endif
 
-#ifdef PhiOS64
+#if defined(PhiOS64) && !defined(UNIT_TEST)
 #define NULL  0x0000000000000000
 typedef uint64 size_t;
 #endif
 
+#ifdef UNIT_TEST
+#include <stddef.h>
 #endif
+
+#endif
+
 
