@@ -13,9 +13,13 @@ cd tests
 
 # Configure and compile
 cmake .
+make clean
 make
 
 # Run and return
-./tests
-rc=$?
+rc=0
+./test_paa
+rc=$((rc + $?))
+./test_bitmap
+rc=$((rc + $?))
 exit $rc
