@@ -28,5 +28,6 @@ target_link_libraries(test_paa cut)
 # BitmapPMA test
 list(APPEND BITMAP_SOURCES "${PRJ_PATH}/../kernel/src/memory/bitmap_pma.c")
 list(APPEND BITMAP_SOURCES "src/test_bitmap.c")
+list(APPEND BITMAP_SOURCES "mock/mock_paa.c")
 add_executable(test_bitmap ${BITMAP_SOURCES})
 target_link_libraries(test_bitmap cut)
