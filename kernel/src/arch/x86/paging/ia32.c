@@ -5,10 +5,10 @@
 extern struct KernelArea g_kernelArea;
 
 #define IA32_4KB_PD_VIRTUAL_ADDRESS \
-    ((struct IA32_PageDirectory_4KB*) 0x003FF000) // 3MiB + 1020KiB
+    ((struct IA32_PageDirectory_4KB*) 0xFFBFF000) // 3GiB + 1019MiB + 1020KiB
 
 #define IA32_4KB_PT_VIRTUAL_ADDRESS \
-    ((struct IA32_PageTable_4KB*) 0x00400000) // 4MiB
+    ((struct IA32_PageTable_4KB*) 0xFFC00000) // 3GiB + 1020MiB
 
 #define KERNEL_VIRTUAL_ADDRESS ((uint32) 0xC0000000) // 3GiB
 
@@ -38,27 +38,24 @@ extern struct KernelArea g_kernelArea;
 static uint32 helper_IA32_4KB_createPaging(
     struct Paging *a_paging)
 {
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
     uint64 pdAddr = 0;
     struct IA32_PageDirectory_4KB *pd = NULL;
 
-    do
-    {
+    do {
         error = PMM_alloc(
             &pdAddr,
             (uint64) sizeof(struct IA32_PageDirectory_4KB),
             (uint8) PMM_FOR_VIRTUAL_MEMORY
         );
-        if (error != ERROR_SUCCESS)
-        {
+        if (error != ERROR_SUCCESS) {
             a_paging->pagingStruct = NULL;
             break;
         }
 
         // TODO: optimize using kmemset()
         pd = (struct IA32_PageDirectory_4KB*) ((uint32)pdAddr);
-        for (uint32 i = 0; i < PAGING_IA32_PDE_NUMBER; i++)
-        {
+        for (uint32 i = 0; i < PAGING_IA32_PDE_NUMBER; i++) {
             pd->entries[i].data = 0;
         }
 
@@ -79,20 +76,17 @@ static uint32 helper_IA32_4KB_createPaging(
 static uint32 helper_IA32_4KB_deletePaging(
     struct Paging *a_paging)
 {
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
     uint64 pdAddr = (uint64) a_paging->pagingStruct;
 
-    do
-    {
-        if (pdAddr != 0)
-        {
+    do {
+        if (pdAddr != 0) {
             error = PMM_free(
                 pdAddr,
                 (uint64) sizeof(struct IA32_PageDirectory_4KB),
                 (uint8) PMM_FOR_VIRTUAL_MEMORY
             );
-            if (error != ERROR_SUCCESS)
-            {
+            if (error != ERROR_SUCCESS) {
                 break;
             }
         }
@@ -164,14 +158,15 @@ static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     uint32 *pageId,
     uint32 *tableId)
 {
-    if (pageId == NULL || tableId == NULL)
-    {
-        return ERROR_NULL_POINTER;
+    uint32 tmp = virtualAddress / 4096;
+
+    if (pageId != NULL) {
+        *pageId = tmp % PAGING_IA32_PTE_NUMBER;
     }
 
-    uint32 tmp = virtualAddress / 4096;
-    *pageId = tmp % 1024;
-    *tableId = tmp / 1024;
+    if (tableId != NULL) {
+        *tableId = tmp / PAGING_IA32_PTE_NUMBER;
+    }
 
     return ERROR_SUCCESS;
 }
@@ -186,6 +181,39 @@ static void helper_IA32_4KB_initPageTable(
     }
 }
 
+static uint32 helper_IA32_4KB_getPagesAndPTNum(
+    uint32 start,
+    uint32 end,
+    uint32 *pagesNum,
+    uint32 *ptNum)
+{
+    if (end <= start) {
+        return ERROR_INVALID_PARAMETER;
+    }
+
+    start &= 0xFFFFF000;
+
+    if ((end & 0x00000FFF) != 0) {
+        end &= 0xFFFFF000;
+        end += 4096;
+    }
+
+    uint32 pagesNumber = (end - start) / 4096;
+
+    if (pagesNum != NULL) {
+        *pagesNum = pagesNumber;
+    }
+
+    if (ptNum != NULL) {
+        *ptNum = pagesNumber / PAGING_IA32_PTE_NUMBER;
+        if (pagesNumber % PAGING_IA32_PTE_NUMBER != 0) {
+            (*ptNum)++;
+        }
+    }
+
+    return ERROR_SUCCESS;
+}
+
 uint32 IA32_4KB_initKernelPaging(
     struct Paging *a_paging)
 {
@@ -194,7 +222,7 @@ uint32 IA32_4KB_initKernelPaging(
         return ERROR_NULL_POINTER;
     }
 
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
 
     do
     {
@@ -206,34 +234,38 @@ uint32 IA32_4KB_initKernelPaging(
         }
 
         uint32 pt0Addr = 0; // physical address for PT0
-        uint32 pt1Addr = 0; // physical address for PT1
+        uint32 pt1022Addr = 0; // physical address for PT1022
+        uint32 pt1023Addr = 0; // physical address for PT1023
         uint32 pdAddr  = 0; // physical address for PD
         struct IA32_PageDirectory_4KB *pd = NULL;
-        struct IA32_PageTable_4KB *pt0 = NULL;
-        struct IA32_PageTable_4KB *pt1 = NULL;
+        struct IA32_PageTable_4KB *pt0 = NULL; // used for indentify map
+        struct IA32_PageTable_4KB *pt1022 = NULL; // used to map PD
+        struct IA32_PageTable_4KB *pt1023 = NULL; // used to map the page tables
         uint32 pageFlags = 0, pageTableFlags = 0;
         uint64 tmpAddr = 0;
 
-        // alloc physical memory for 2 PTs
+        // alloc physical memory for 3 PTs
         error = PMM_alloc(
             &tmpAddr,
-            (uint64) 2 * sizeof(struct IA32_PageTable_4KB),
+            (uint64) 3 * sizeof(struct IA32_PageTable_4KB),
             (uint8) PMM_FOR_VIRTUAL_MEMORY
         );
         if (error != ERROR_SUCCESS)
         {
-            // cleanup...
+            helper_IA32_4KB_deletePaging(a_paging);
             break;
         }
 
-        pt0Addr = (uint32) tmpAddr;
-        pt1Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
+        pt0Addr    = (uint32) tmpAddr;
+        pt1022Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
+        pt1023Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
 
         pdAddr = (uint32) a_paging->pagingStruct;
 
         pd = (struct IA32_PageDirectory_4KB*) a_paging->pagingStruct;
-        pt0 = (struct IA32_PageTable_4KB*) pt0Addr;
-        pt1 = (struct IA32_PageTable_4KB*) pt1Addr;
+        pt0    = (struct IA32_PageTable_4KB*) pt0Addr;
+        pt1022 = (struct IA32_PageTable_4KB*) pt1022Addr;
+        pt1023 = (struct IA32_PageTable_4KB*) pt1023Addr;
 
         // create flags for pages
         pageFlags |= IA32_4KB_PAGE_PRESENT;
@@ -245,37 +277,32 @@ uint32 IA32_4KB_initKernelPaging(
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE;
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
 
+        // init the page tables
         helper_IA32_4KB_initPageTable(pt0);
-        helper_IA32_4KB_initPageTable(pt1);
+        helper_IA32_4KB_initPageTable(pt1022);
+        helper_IA32_4KB_initPageTable(pt1023);
 
-        // map the first page table
-        pd->entries[0].data = (pageTableFlags | pt0Addr);
+        // map the page tables
+        pd->entries[0].data    = (pageTableFlags | pt0Addr);
+        pd->entries[1022].data = (pageTableFlags | pt1022Addr);
+        pd->entries[1023].data = (pageTableFlags | pt1023Addr);
 
-        // map the second page table
-        pd->entries[1].data = (pageTableFlags | pt1Addr);
-
-        // map the page where it's stored the first page table
-        pt1->entries[0].data = (pageFlags | pt0Addr);
-
-        // map the page where it's stored the second page table
-        pt1->entries[1].data = (pageFlags | pt1Addr);
+        // map the pages where are stored the page tables
+        pt1023->entries[0].data    = (pageFlags | pt0Addr);
+        pt1023->entries[1022].data = (pageFlags | pt1022Addr);
+        pt1023->entries[1023].data = (pageFlags | pt1023Addr);
 
         // map the page where it's stored the PD
-        pt0->entries[1023].data = (pageFlags | pdAddr);
+        pt1022->entries[1023].data = (pageFlags | pdAddr);
 
-        uint32 kernelEnd = g_kernelArea.endPlacementAddr;
-        if (kernelEnd & 0x00000FFF)
-        {
-            kernelEnd &= 0xFFFFF000;
-            kernelEnd += 0x00001000;
-        }
-
-        // map the page tables where it's stored the kernel
-        uint32 pagesNum = kernelEnd - g_kernelArea.textStartAddr;
-        pagesNum /= 4096;
-        uint32 ptNum = pagesNum / PAGING_IA32_PTE_NUMBER;
-        if (pagesNum % PAGING_IA32_PTE_NUMBER != 0)
-            ptNum++;
+        uint32 pagesNum = 0;
+        uint32 ptNum = 0;
+        helper_IA32_4KB_getPagesAndPTNum(
+            g_kernelArea.textStartAddr,
+            g_kernelArea.endPlacementAddr,
+            &pagesNum,
+            &ptNum
+        );
 
         uint32 ptAddr = 0;
         PMM_alloc(
@@ -285,6 +312,7 @@ uint32 IA32_4KB_initKernelPaging(
         );
         ptAddr = (uint32) tmpAddr;
 
+        // map the page tables where it's stored the kernel
         uint32 physicalAddr = g_kernelArea.textStartAddr;
         for (uint32 i = 0; i < ptNum; i++)
         {
@@ -293,7 +321,7 @@ uint32 IA32_4KB_initKernelPaging(
             helper_IA32_4KB_initPageTable(pt);
 
             pd->entries[768 + i].data = (pageTableFlags | addr);
-            pt1->entries[768 + i].data = (pageFlags | addr);
+            pt1023->entries[768 + i].data = (pageFlags | addr);
 
             uint32 max = PAGING_IA32_PTE_NUMBER;
             if (pagesNum < max)
