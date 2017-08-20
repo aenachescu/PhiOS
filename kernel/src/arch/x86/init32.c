@@ -84,7 +84,7 @@ void detectSMBios()
     }
 }
 
-void adjust_got()
+static void adjust_got(uint32 a_offset)
 {
     uint32 begin = (uint32) &linker_gotStart;
     uint32 end = (uint32) &linker_gotEnd;
@@ -92,21 +92,23 @@ void adjust_got()
     uint32 *ptr = (uint32*) begin;
 
     for (uint32 i = 0; i < num; i++) {
-        ptr[i] += 0xBFF00000;
+        ptr[i] += a_offset;
     }
 }
 
 void adjustPointers()
 {
+    uint32 offset = 0xBFF00000;
+
+    PMM_adjustPfn(offset);
+
     for (size_t i = 0; i < g_PMAVM_num; i++) {
-        g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + 0xBFF00000);
+        g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + offset);
     }
 
-    g_allocators = (struct PMA*) ((size_t)g_allocators + 0xBFF00000);
+    g_allocators = (struct PMA*) ((size_t)g_allocators + offset);
 
-    PMM_adjustPfn(0xBFF00000);
-
-    adjust_got();
+    adjust_got(offset);
 }
 
 uint32 init_init32(
