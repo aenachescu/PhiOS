@@ -87,7 +87,7 @@ uint32 IA32_4KB_init(
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
     struct AllocFuncParam *a_request,
-    size_t *a_address
+    uint32 *a_address
 );
 
 uint32 IA32_4KB_free(
@@ -96,8 +96,7 @@ uint32 IA32_4KB_free(
 );
 
 uint32 IA32_4KB_switchDirectory(
-    struct Paging *a_paging,
-    struct IA32_PageDirectory_4KB *a_pageDirectory
+    struct Paging *a_paging
 );
 
 uint32 IA32_4KB_enablePaging(
