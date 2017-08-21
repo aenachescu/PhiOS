@@ -348,124 +348,32 @@ uint32 IA32_4KB_initKernelPaging(
     return error;
 }
 
-uint32 IA32_4KB_init(
-    struct Paging *a_paging, 
-    struct Paging *a_currentPaging)
-{
-    if (a_paging == NULL)
-    {
-        return ERROR_NULL_POINTER;
-    }
-
-    size_t error = ERROR_SUCCESS;
-
-    error = helper_IA32_4KB_createPaging(a_paging);
-    if (error != ERROR_SUCCESS)
-    {
-        return error;
-    }
-
-    struct IA32_4KB_Paging_AllocParam allocParam;
-    struct AllocFuncParam request;
-    size_t returnedAddress  = 0;
-    size_t requestedAddress = 3221225472; // 3GB
-    size_t difference       = 0;
-
-    do
-    {
-        // init request
-        request.pagingType = PAGING_TYPE_IA32_4KB;
-        request.param      = &allocParam;
-
-        // init allocParam for the kernel code area
-        allocParam.flag             = PAGING_FLAG_ALLOC_SHARED_MEMORY   |
-                                      PAGING_FLAG_ALLOC_AT_ADDRESS      |
-                                      PAGING_FLAG_ALLOC_MAPS_KERNEL;
-        allocParam.user             = false;
-        allocParam.write            = false;
-        allocParam.cacheDisabled    = false;
-        allocParam.writeThrough     = true;
-        allocParam.virtualAddress   = requestedAddress;
-        allocParam.length           = g_kernelArea.textEndAddr -
-                                      g_kernelArea.textStartAddr;
-        allocParam.physicalAddress  = g_kernelArea.textStartAddr;
-
-        error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
-        if (error != ERROR_SUCCESS)
-        {
-            break;
-        }
-
-        requestedAddress = allocParam.length;
-        if ((difference = allocParam.length % 4096) != 0)
-        {
-            requestedAddress += (4096 - difference);
-        }
-
-        allocParam.virtualAddress   = requestedAddress;
-        allocParam.length           = g_kernelArea.rodataEndAddr -
-                                      g_kernelArea.rodataStartAddr;
-        allocParam.physicalAddress  = g_kernelArea.rodataStartAddr;
-
-        error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
-        if (error != ERROR_SUCCESS)
-        {
-            break;
-        }
-
-        requestedAddress = allocParam.length;
-        if ((difference = allocParam.length % 4096) != 0)
-        {
-            requestedAddress += (4096 - difference);
-        }
-
-        allocParam.write            = true;
-        allocParam.virtualAddress   = requestedAddress;
-        allocParam.length           = g_kernelArea.dataEndAddr -
-                                      g_kernelArea.dataStartAddr;
-        allocParam.physicalAddress  = g_kernelArea.dataStartAddr;
-
-        error = IA32_4KB_alloc(a_paging, &request, &returnedAddress);
-        if (error != ERROR_SUCCESS)
-        {
-            break;
-        }
-    } while (false);
-
-    if (error != ERROR_SUCCESS)
-    {
-        helper_IA32_4KB_deletePaging(a_paging);
-    }
-
-    return error;
-}
-
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
     struct AllocFuncParam *a_request,
-    size_t *a_address)
+    uint32 *a_address)
 {
-    if (a_paging == NULL || a_request == NULL || a_address == NULL ||
-        a_paging->pagingStruct == NULL || a_request->param == NULL)
-    {
+    if (a_paging == NULL
+        || a_request == NULL
+        || a_address == NULL
+        || a_paging->pagingStruct == NULL
+        || a_request->param == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_request->pagingType != PAGING_TYPE_IA32_4KB ||
-        a_paging->pagingType != PAGING_TYPE_IA32_4KB)
-    {
+    if (a_request->pagingType != PAGING_TYPE_IA32_4KB
+        || a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
         return ERROR_INVALID_PARAMETER;
     }
 
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
 
     *a_address = NULL;
 
     struct IA32_4KB_Paging_AllocParam *request;
     request = (struct IA32_4KB_Paging_AllocParam*) a_request->param;
 
-    do
-    {
+    do {
         // get physical address and set to request
         // call allocArea
     } while (false);
@@ -477,40 +385,37 @@ uint32 IA32_4KB_free(
     struct Paging *a_paging,
     struct FreeFuncParam *a_request)
 {
-    if (a_paging == NULL || a_request == NULL ||
-        a_paging->pagingStruct == NULL || a_request->param == NULL)
-    {
+    if (a_paging == NULL
+        || a_request == NULL
+        || a_paging->pagingStruct == NULL
+        || a_request->param == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_request->pagingType != PAGING_TYPE_IA32_4KB ||
-        a_paging->pagingType != PAGING_TYPE_IA32_4KB)
-    {
+    if (a_request->pagingType != PAGING_TYPE_IA32_4KB
+        || a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
         return ERROR_INVALID_PARAMETER;
     }
 
-    size_t error = ERROR_SUCCESS;
+    uint32 error = ERROR_SUCCESS;
 
-    struct IA32_4KB_Paging_FreeParam  *request;
+    struct IA32_4KB_Paging_FreeParam *request;
     request = (struct IA32_4KB_Paging_FreeParam*)  a_request->param;
 
-    do
-    {
+    do {
     } while (false);
 
     return error;
 }
 
 uint32 IA32_4KB_switchDirectory(
-    struct Paging *a_paging,
-    struct IA32_PageDirectory_4KB *a_pageDirectory)
+    struct Paging *a_paging)
 {
-    if (a_paging == NULL || a_pageDirectory == NULL)
-    {
+    if (a_paging == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    size_t addr = (size_t) a_pageDirectory;
+    uint32 addr = (uint32) a_paging->pagingStruct;
     writeCR3(addr);
 
     return ERROR_SUCCESS;
@@ -519,13 +424,12 @@ uint32 IA32_4KB_switchDirectory(
 uint32 IA32_4KB_enablePaging(
     struct Paging *a_paging)
 {
-    if (a_paging == NULL)
-    {
+    if (a_paging == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    IA32_4KB_switchDirectory(a_paging, (struct IA32_PageDirectory_4KB*) a_paging->pagingStruct);
-    size_t cr0 = readCR0();
+    IA32_4KB_switchDirectory(a_paging);
+    uint32 cr0 = readCR0();
     cr0 |= 0x80000001;
     writeCR0(cr0);
 
