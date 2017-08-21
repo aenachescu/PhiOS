@@ -238,8 +238,7 @@ uint32 init_init32(
 
     KERNEL_CHECK(IA32_4KB_initKernelPaging(&g_kernelPaging));
 
-    KERNEL_CHECK(IA32_4KB_switchDirectory(&g_kernelPaging,
-        (struct IA32_PageDirectory_4KB*) g_kernelPaging.pagingStruct));
+    KERNEL_CHECK(IA32_4KB_switchDirectory(&g_kernelPaging));
 
     adjustPointers();
 
