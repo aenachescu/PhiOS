@@ -408,6 +408,18 @@ uint32 IA32_4KB_free(
     return error;
 }
 
+uint32 IA32_4KB_virtualQuery(
+    struct Paging *a_paging,
+    struct VirtualAddressInfo *a_vaInfo,
+    uint32 a_address)
+{
+    if (a_paging == NULL || a_vaInfo == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    return ERROR_SUCCESS;
+}
+
 uint32 IA32_4KB_switchDirectory(
     struct Paging *a_paging)
 {

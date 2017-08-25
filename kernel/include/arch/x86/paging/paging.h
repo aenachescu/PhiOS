@@ -82,4 +82,12 @@ struct KernelArea
     size_t endPlacementAddr;
 };
 
+struct VirtualAddressInfo
+{
+    void *baseAddress;
+    size_t regionSize;
+    uint32 flags;
+    uint32 state;
+};
+
 #endif
