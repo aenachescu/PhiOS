@@ -95,6 +95,12 @@ uint32 IA32_4KB_free(
     struct FreeFuncParam *a_request
 );
 
+uint32 IA32_4KB_virtualQuery(
+    struct Paging *a_paging,
+    struct VirtualAddressInfo *a_vaInfo,
+    uint32 a_address
+);
+
 uint32 IA32_4KB_switchDirectory(
     struct Paging *a_paging
 );
