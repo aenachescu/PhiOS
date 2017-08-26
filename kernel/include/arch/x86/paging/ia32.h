@@ -151,7 +151,7 @@ struct IA32_PageDirectory_4MB_Entry
             uint32 ignored       :  3;
             uint32 pat           :  1;
             uint32 unkown        :  9; // Unkown bits, must read Intel Docs
-            uint32 highAddrBits  : 10; // Bits 31:22 of physical address
+            uint32 address       : 10; // Bits 31:22 of physical address
         };
         uint32 data;
     };
