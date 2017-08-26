@@ -413,9 +413,117 @@ uint32 IA32_4KB_virtualQuery(
     struct VirtualAddressInfo *a_vaInfo,
     uint32 a_address)
 {
+    /*
+     * TODO:
+     * 1. add support for STATE_RESERVED, STATE_PRIVATE & STATE_SHARED
+     * 2. add support for FLAG_EXECUTE
+     */
+
+    /*
+     * Notes:
+     * 1. present == 0 && physicalAddr != 0 ==> memory in swap
+     * 2. present == 0 && physicalAddr == 0 ==> memory reserved
+     * 3. present == 1                      ==> memory used
+     */
+
     if (a_paging == NULL || a_vaInfo == NULL) {
         return ERROR_NULL_POINTER;
     }
+
+    // init a_vaInfo (default values)
+    a_vaInfo->baseAddress   = NULL;
+    a_vaInfo->pageSize      = 0;
+    a_vaInfo->flags         = VIRTUAL_ADDRESS_FLAG_UNKNOWN;
+    a_vaInfo->state         = VIRTUAL_ADDRESS_STATE_UNKNOWN;
+
+    uint32 pageTableId = 0;
+    uint32 pageId = 0;
+    helper_IA32_4KB_getPositionForVirtualAddress(a_address, &pageId, &pageTableId);
+
+    struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
+
+#define SET_FLAG(x) (a_vaInfo->flags |= x)
+
+    if (pd->entries[pageTableId].data != 0) {
+        // page table is mapped
+        if (pd->entries[pageTableId].pageSize == 0) {
+            // it's a page of 4KiBs
+            struct IA32_PageTable_4KB *pt = IA32_4KB_PT_VIRTUAL_ADDRESS;
+            pt += pageTableId;
+
+            if (pt->entries[pageId].data != 0) {
+                // page is mapped
+                a_vaInfo->baseAddress   = (void*)(a_address & 0xFFFFF000); // aligned at 4KiBs
+                a_vaInfo->pageSize      = 4; // 4KiBs, because we are in IA32 4KiBs mode
+
+                // cast to IA32 4KiBs page
+                struct IA32_PageTable_4KB_Entry page;
+                page.data = pt->entries[pageId].data;
+
+                // set state
+                if (page.present == 1) {
+                    a_vaInfo->state = VIRTUAL_ADDRESS_STATE_USED;
+                } else {
+                    if (page.address != 0) {
+                        a_vaInfo->state = VIRTUAL_ADDRESS_STATE_IN_SWAP;
+                    } else {
+                        a_vaInfo->state = VIRTUAL_ADDRESS_STATE_RESERVED;
+                    }
+                }
+
+                // set flags
+                page.write          != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_READ_WRITE)    :
+                                           SET_FLAG(VIRTUAL_ADDRESS_FLAG_READ_ONLY);
+                page.user           != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_USER_MODE)     : 0;
+                page.global         != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_GLOBAL)        : 0;
+                page.cacheDisabled  != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_NO_CACHE)      : 0;
+                page.writeThrough   != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_WRITE_THROUGH) : 0;
+                page.accessed       != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_ACCESSED)      : 0;
+                page.dirty          != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_DIRTY)         : 0;
+            } else {
+                // page isn't mapped
+                a_vaInfo->baseAddress   = (void*)(a_address & 0xFFFFF000); // aligned at 4KiBs
+                a_vaInfo->pageSize      = 4; // 4KiBs, because we are in IA32 4KiBs mode
+                a_vaInfo->state         = VIRTUAL_ADDRESS_STATE_FREE;
+            }
+        } else {
+            // it's a large page (4MiBs in that case)
+            a_vaInfo->baseAddress   = (void*)(a_address & 0xFFC00000); // aligned at 4MiBs
+            a_vaInfo->pageSize      = 4096; // 4MiBs
+
+            // cast to IA32 4MiBs page
+            struct IA32_PageDirectory_4MB_Entry page;
+            page.data = pd->entries[pageTableId].data;
+
+            // set state
+            if (page.present == 1) {
+                a_vaInfo->state = VIRTUAL_ADDRESS_STATE_USED;
+            } else {
+                if (page.address != 0) {
+                    a_vaInfo->state = VIRTUAL_ADDRESS_STATE_IN_SWAP;
+                } else {
+                    a_vaInfo->state = VIRTUAL_ADDRESS_STATE_RESERVED;
+                }
+            }
+
+            // set flags
+            page.write          != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_READ_WRITE)    :
+                                       SET_FLAG(VIRTUAL_ADDRESS_FLAG_READ_ONLY);
+            page.user           != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_USER_MODE)     : 0;
+            page.global         != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_GLOBAL)        : 0;
+            page.cacheDisabled  != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_NO_CACHE)      : 0;
+            page.writeThrough   != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_WRITE_THROUGH) : 0;
+            page.accessed       != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_ACCESSED)      : 0;
+            page.dirty          != 0 ? SET_FLAG(VIRTUAL_ADDRESS_FLAG_DIRTY)         : 0;
+        }
+    } else {
+        // page table isn't mapped
+        a_vaInfo->baseAddress   = (void*)(a_address & 0xFFFFF000); // aligned at 4KiBs
+        a_vaInfo->pageSize      = 4; // 4KibS, because we are in IA32 4KiBs mode
+        a_vaInfo->state         = VIRTUAL_ADDRESS_STATE_FREE;
+    }
+
+#undef SET_FLAG
 
     return ERROR_SUCCESS;
 }
