@@ -40,7 +40,8 @@ struct Paging g_kernelPaging;
 
 extern struct PMA *g_allocators;
 
-static __attribute__ ((unused)) void printKernelArea()
+__attribute__ ((unused))
+static void printKernelArea()
 {
     kprintf("TextStart: %x TextEnd: %x\n",
         g_kernelArea.textStartAddr, g_kernelArea.textEndAddr);
