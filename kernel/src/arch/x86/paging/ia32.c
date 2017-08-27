@@ -1,5 +1,6 @@
 #include "kernel/include/arch/x86/paging/ia32.h"
 #include "kernel/include/memory/pmm.h"
+#include "kernel/include/arch/x86/registers.h"
 #include "include/cpu.h"
 
 extern struct KernelArea g_kernelArea;
@@ -77,7 +78,7 @@ static uint32 helper_IA32_4KB_deletePaging(
     struct Paging *a_paging)
 {
     uint32 error = ERROR_SUCCESS;
-    uint64 pdAddr = (uint64) a_paging->pagingStruct;
+    uint64 pdAddr = (uint32) a_paging->pagingStruct;
 
     do {
         if (pdAddr != 0) {
@@ -105,6 +106,7 @@ static uint32 helper_IA32_4KB_deletePaging(
     return error;
 }
 
+__attribute__ ((unused))
 static void helper_IA32_4KB_allocArea(
     struct Paging *a_paging,
     struct IA32_4KB_Paging_AllocParam *a_request)
@@ -112,11 +114,14 @@ static void helper_IA32_4KB_allocArea(
     struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
     struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
 
+    // TODO: remove that after you use them, for now it resolves warnings
+    a_paging = a_paging;
+    pd = pd;
+
     size_t virtualAddress = a_request->virtualAddress & (~4095);
     size_t firstPageId = virtualAddress / 4096;
     size_t lastVirtualAddress = a_request->virtualAddress + a_request->length;
-    if (lastVirtualAddress % 4096 != 0)
-    {
+    if (lastVirtualAddress % 4096 != 0) {
         lastVirtualAddress &= (~4095);
         lastVirtualAddress += 4096;
     }
@@ -136,16 +141,14 @@ static void helper_IA32_4KB_allocArea(
 
     pageTable += pageTableId;
 
-    while (pagesNumber != 0)
-    {
+    while (pagesNumber != 0) {
         pagesNumber--;
 
         pageTable->entries[pageId].data = (data | physicalAddress);
         physicalAddress += 4096;
 
         pageId++;
-        if (pageId == PAGING_IA32_PTE_NUMBER)
-        {
+        if (pageId == PAGING_IA32_PTE_NUMBER) {
             pageId = 0;
             pageTable++;
         }
@@ -154,60 +157,59 @@ static void helper_IA32_4KB_allocArea(
 }
 
 static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
-    uint32 virtualAddress,
-    uint32 *pageId,
-    uint32 *tableId)
+    uint32 a_virtualAddress,
+    uint32 *a_pageId,
+    uint32 *a_tableId)
 {
-    uint32 tmp = virtualAddress / 4096;
+    uint32 tmp = a_virtualAddress / 4096;
 
-    if (pageId != NULL) {
-        *pageId = tmp % PAGING_IA32_PTE_NUMBER;
+    if (a_pageId != NULL) {
+        *a_pageId = tmp % PAGING_IA32_PTE_NUMBER;
     }
 
-    if (tableId != NULL) {
-        *tableId = tmp / PAGING_IA32_PTE_NUMBER;
+    if (a_tableId != NULL) {
+        *a_tableId = tmp / PAGING_IA32_PTE_NUMBER;
     }
 
     return ERROR_SUCCESS;
 }
 
 static void helper_IA32_4KB_initPageTable(
-    struct IA32_PageTable_4KB *pt)
+    struct IA32_PageTable_4KB *a_pt)
 {
     // TODO: optimizes this for using kmemset()
-    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++)
-    {
-        pt->entries[i].data = 0;
+    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++) {
+        a_pt->entries[i].data = 0;
     }
 }
 
 static uint32 helper_IA32_4KB_getPagesAndPTNum(
-    uint32 start,
-    uint32 end,
-    uint32 *pagesNum,
-    uint32 *ptNum)
+    uint32 a_start,
+    uint32 a_end,
+    uint32 *a_pagesNum,
+    uint32 *a_ptNum)
 {
-    if (end <= start) {
+    if (a_end <= a_start) {
         return ERROR_INVALID_PARAMETER;
     }
 
-    start &= 0xFFFFF000;
+    a_start &= 0xFFFFF000;
 
-    if ((end & 0x00000FFF) != 0) {
-        end &= 0xFFFFF000;
-        end += 4096;
+    if ((a_end & 0x00000FFF) != 0) {
+        a_end &= 0xFFFFF000;
+        a_end += 4096;
     }
 
-    uint32 pagesNumber = (end - start) / 4096;
+    uint32 pagesNumber = (a_end - a_start) / 4096;
 
-    if (pagesNum != NULL) {
-        *pagesNum = pagesNumber;
+    if (a_pagesNum != NULL) {
+        *a_pagesNum = pagesNumber;
     }
 
-    if (ptNum != NULL) {
-        *ptNum = pagesNumber / PAGING_IA32_PTE_NUMBER;
+    if (a_ptNum != NULL) {
+        *a_ptNum = pagesNumber / PAGING_IA32_PTE_NUMBER;
         if (pagesNumber % PAGING_IA32_PTE_NUMBER != 0) {
-            (*ptNum)++;
+            (*a_ptNum)++;
         }
     }
 
@@ -370,8 +372,8 @@ uint32 IA32_4KB_alloc(
 
     *a_address = NULL;
 
-    struct IA32_4KB_Paging_AllocParam *request;
-    request = (struct IA32_4KB_Paging_AllocParam*) a_request->param;
+    //struct IA32_4KB_Paging_AllocParam *request;
+    //request = (struct IA32_4KB_Paging_AllocParam*) a_request->param;
 
     do {
         // get physical address and set to request
@@ -399,8 +401,8 @@ uint32 IA32_4KB_free(
 
     uint32 error = ERROR_SUCCESS;
 
-    struct IA32_4KB_Paging_FreeParam *request;
-    request = (struct IA32_4KB_Paging_FreeParam*)  a_request->param;
+    //struct IA32_4KB_Paging_FreeParam *request;
+    //request = (struct IA32_4KB_Paging_FreeParam*) a_request->param;
 
     do {
     } while (false);
