@@ -82,18 +82,22 @@ CUT_DEFINE_TEST(test_bitmapCreate)
 
 CUT_DEFINE_TEST(test_bitmapAlloc)
 {
-    // first column is the size and the second column is the expected address
-    static uint64 testCases[][2] = {
-        0x00005000, 0x00000000,
-        0x00000123, 0x00005000,
-        0x00002012, 0x00006000,
-        0x000F7000, 0x00009000,
-        0x000FFFFF, 0x00100000,
-        0x00200000, 0x00200000,
-        0x003FE001, 0x00400000,
-        0x00001000, 0x007FF000,
-        0x05BFE123, 0x00800000,
-        0x00001000, 0x063FF000
+    /*
+     * first column: area size
+     * second column: expected address
+     * third column: expected free frames number after alloc()
+     */
+    static uint64 testCases[][3] = {
+        0x00005000, 0x00000000, 25595,
+        0x00000123, 0x00005000, 25594,
+        0x00002012, 0x00006000, 25591,
+        0x000F7000, 0x00009000, 25344,
+        0x000FFFFF, 0x00100000, 25088,
+        0x00200000, 0x00200000, 24576,
+        0x003FE001, 0x00400000, 23553,
+        0x00001000, 0x007FF000, 23552,
+        0x05BFE123, 0x00800000,     1,
+        0x00001000, 0x063FF000,     0
     };
     static uint32 testCasesLength = 10;
 
@@ -120,6 +124,7 @@ CUT_DEFINE_TEST(test_bitmapAlloc)
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
         CUT_CHECK(addr == testCases[i][1]);
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][2]);
     }
 
     CUT_CHECK(BitmapPMA_alloc(&bpma, 0x1, &addr) == ERROR_NO_FREE_MEMORY);
@@ -142,6 +147,7 @@ CUT_DEFINE_TEST(test_bitmapAlloc)
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
         CUT_CHECK(addr == (testCases[i][1] + bpma.startAddress));
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][2]);
     }
 
     CUT_CHECK(BitmapPMA_alloc(&bpma, 0x1, &addr) == ERROR_NO_FREE_MEMORY);
@@ -151,18 +157,23 @@ CUT_DEFINE_TEST(test_bitmapAlloc)
 
 CUT_DEFINE_TEST(test_bitmapFree)
 {
-    // first column is the size and the second column is the expected address
-    static uint64 testCases[][2] = {
-        0x00005000, 0x00000000,
-        0x00000123, 0x00005000,
-        0x00002012, 0x00006000,
-        0x000F7000, 0x00009000,
-        0x000FFFFF, 0x00100000,
-        0x00200000, 0x00200000,
-        0x003FE001, 0x00400000,
-        0x00001000, 0x007FF000,
-        0x05BFE123, 0x00800000,
-        0x00001000, 0x063FF000
+    /*
+     * first column: area size
+     * second column: expected address
+     * third column: expected free frames number after alloc()
+     * fourth column: expected free frames number after free()
+     */
+    static uint64 testCases[][4] = {
+        0x00005000, 0x00000000, 25595, 5,
+        0x00000123, 0x00005000, 25594, 6,
+        0x00002012, 0x00006000, 25591, 9,
+        0x000F7000, 0x00009000, 25344, 256,
+        0x000FFFFF, 0x00100000, 25088, 512,
+        0x00200000, 0x00200000, 24576, 1024,
+        0x003FE001, 0x00400000, 23553, 2047,
+        0x00001000, 0x007FF000, 23552, 2048,
+        0x05BFE123, 0x00800000,     1, 25599,
+        0x00001000, 0x063FF000,     0, 25600
     };
     static uint32 testCasesLength = 10;
 
@@ -193,10 +204,12 @@ CUT_DEFINE_TEST(test_bitmapFree)
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
         CUT_CHECK(addr == testCases[i][1]);
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][2]);
     }
 
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_free(&bpma, testCases[i][0], testCases[i][1]) == ERROR_SUCCESS);
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][3]);
     }
 
     bpma.positionLastAllocatedFrame = 0;
@@ -204,6 +217,7 @@ CUT_DEFINE_TEST(test_bitmapFree)
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
         CUT_CHECK(addr == testCases[i][1]);
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][2]);
     }
 
     free(bpma.bitmap);
@@ -230,10 +244,12 @@ CUT_DEFINE_TEST(test_bitmapFree)
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
         CUT_CHECK(addr == (testCases[i][1] + bpma.startAddress));
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][2]);
     }
 
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_free(&bpma, testCases[i][0], testCases[i][1]  + bpma.startAddress) == ERROR_SUCCESS);
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][3]);
     }
 
     bpma.positionLastAllocatedFrame = 0;
@@ -241,6 +257,7 @@ CUT_DEFINE_TEST(test_bitmapFree)
     for (uint32 i = 0; i < testCasesLength; i++) {
         CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
         CUT_CHECK(addr == (testCases[i][1] + bpma.startAddress));
+        CUT_CHECK(bpma.freeFramesNumber == testCases[i][2]);
     }
 
     free(bpma.bitmap);
