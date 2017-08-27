@@ -90,16 +90,43 @@ CUT_DEFINE_TEST(test_bitmapCheck)
 
 CUT_DEFINE_TEST(test_bitmapAll)
 {
-    err = BitmapPMA_reserve();
-    err = BitmapPMA_check();
-    err = BitmapPMA_alloc();
-    err = BitmapPMA_free();
-    err = BitmapPMA_alloc();
-    err = BitmapPMA_check();
-    err = BitmapPMA_alloc();
-    err = BitmapPMA_free();
-    err = BitmapPMA_check();
-    err = BitmapPMA_free();
+    uint32 err;
+    uint8 state;
+
+    //err = BitmapPMA_reserve(&bpma, 0x5000, start);
+    //CUT_CHECK(err == ERROR_SUCCESS);
+
+    //state = 1;
+    //err = BitmapPMA_check(&bpma, start, start + 0x5000, &state);
+    //CUT_CHECK(err == ERROR_SUCCESS && state);
+
+    err = BitmapPMA_alloc(&bpma, 0x5000, &addr1);
+    CUT_CHECK((err == ERROR_SUCCESS) && (addr1 == start));
+    printf("%x\n", addr1);
+    printf("%x\n", start);
+    int tmp = ((unsigned int)addr1 == (unsigned int)start);
+    printf("%d\n", tmp);
+
+    err = BitmapPMA_alloc(&bpma, 0x2000, &addr2);
+    printf("%x\n", addr2);
+    CUT_CHECK(err == ERROR_SUCCESS && addr2 == addr1 + 0x5000);
+    
+    err = BitmapPMA_free(&bpma, 0x5000, addr1);
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    state = 1;
+    err = BitmapPMA_check(&bpma, addr2, addr2 + 0x2000, &state);
+    CUT_CHECK(err == ERROR_SUCCESS && state);
+
+    err = BitmapPMA_alloc(&bpma, 0x2000, &addr3);
+    CUT_CHECK(err == ERROR_SUCCESS && addr3 == start + 0x5000);
+
+    err = BitmapPMA_free(&bpma, 0x2000, addr2);
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    state = 0;
+    err = BitmapPMA_check(&bpma, addr2, addr2 + 0x2000, &state);
+    CUT_CHECK(err == ERROR_SUCCESS && state);
     
 
     free(bpma.bitmap);
@@ -112,4 +139,5 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_bitmapFree);
     //CUT_CALL_TEST(test_bitmapReserve);
     CUT_CALL_TEST(test_bitmapCheck);
+    CUT_CALL_TEST(test_bitmapAll);
 CUT_END_MAIN
