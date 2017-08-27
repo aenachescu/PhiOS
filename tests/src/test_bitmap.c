@@ -148,8 +148,10 @@ CUT_DEFINE_TEST(test_bitmapAlloc)
 
 CUT_DEFINE_TEST(test_bitmapFree)
 {
-    struct BitmapPMA bpma;
+    struct BitmapPMA bpma = { 0 };
     uint32 err;
+
+    CUT_CHECK(BitmapPMA_free(&bpma, 0x1000, 0x0) == ERROR_UNINITIALIZED);
 
     err = BitmapPMA_createAllocator(
         &bpma, 
@@ -157,6 +159,42 @@ CUT_DEFINE_TEST(test_bitmapFree)
         0x0, 
         0x6400000); // 100 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
+
+    CUT_CHECK(BitmapPMA_free(&bpma, 0x1000, bpma.startAddress) == ERROR_INVALID_STATE);
+    CUT_CHECK(BitmapPMA_free(NULL, 0x1000, 0x0) == ERROR_NULL_POINTER);
+    CUT_CHECK(BitmapPMA_free(&bpma, 0x1000,  0x10000000) == ERROR_INVALID_PARAMETER);
+
+    // first column is the size and the second column is the expected address
+    static uint64 testCases[][2] = {
+        0x00005000, 0x00000000,
+        0x00000123, 0x00005000,
+        0x00002012, 0x00006000,
+        0x000F7000, 0x00009000,
+        0x000FFFFF, 0x00100000,
+        0x00200000, 0x00200000,
+        0x003FE001, 0x00400000,
+        0x00001000, 0x007FF000,
+        0x05BFE123, 0x00800000,
+        0x00001000, 0x063FF000
+    };
+    static uint32 testCasesLength = 10;
+
+    uint64 addr = 0;
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
+        CUT_CHECK(addr == testCases[i][1]);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK(BitmapPMA_free(&bpma, testCases[i][0], testCases[i][1]) == ERROR_SUCCESS);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
+        CUT_CHECK(addr == testCases[i][1]);
+    }
+
 
     free(bpma.bitmap);
 
@@ -166,6 +204,10 @@ CUT_DEFINE_TEST(test_bitmapFree)
         0x400000, // 4 mibs
         0x6800000); // 104 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
+
+    CUT_CHECK(BitmapPMA_free(&bpma, bpma.bitmapSize, bpma.startAddress) == ERROR_INVALID_STATE);
+    CUT_CHECK(BitmapPMA_free(NULL, 0x1000, 0x0) == ERROR_NULL_POINTER);
+    CUT_CHECK(BitmapPMA_free(&bpma, 0x1000,  0x10000000) == ERROR_INVALID_PARAMETER);
 
     free(bpma.bitmap);
 }
