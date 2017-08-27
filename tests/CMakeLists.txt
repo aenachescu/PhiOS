@@ -17,7 +17,7 @@ add_definitions(-DPhiOS_ARCH_x86_64 -DUNIT_TEST)
 link_directories("${PRJ_PATH}/../CUT/bin")
 
 # set C flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wno-format")
 
 # PAA test
 list(APPEND PAA_SOURCES "${PRJ_PATH}/../kernel/src/memory/paa.c")
