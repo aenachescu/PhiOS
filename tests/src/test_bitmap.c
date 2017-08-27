@@ -23,8 +23,18 @@ CUT_DEFINE_TEST(test_bitmapCreate)
 
     err = BitmapPMA_createAllocator(&bpma, 
                                     0x1000, 
+                                    0x1234, 
+                                    0x6400123); // ~100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
+    CUT_CHECK(!CHECK_ALIGN(bpma.startAddress, 0x1000) &&
+              !CHECK_ALIGN(bpma.endAddress, 0x1000));
+
+    free(bpma.bitmap);
+
+    err = BitmapPMA_createAllocator(&bpma, 
                                     0x1000, 
-                                    0x0); // 100 mibs
+                                    0x1000, 
+                                    0x0);
     CUT_CHECK(err == ERROR_INVALID_PARAMETER);
 
     err = BitmapPMA_createAllocator(NULL, 
@@ -63,8 +73,10 @@ CUT_DEFINE_TEST(test_bitmapAlloc)
     CUT_CHECK(err == ERROR_SUCCESS && addr == 0x0);
     err = BitmapPMA_alloc(&bpma, 0x4000, &addr);
     CUT_CHECK(err == ERROR_SUCCESS && addr == 0x5000);
+    err = BitmapPMA_alloc(&bpma, 0x123, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS && !CHECK_ALIGN(addr, 0x1000));
     err = BitmapPMA_alloc(&bpma, 0x6400000 - 0x10000, &addr);
-    CUT_CHECK(err == ERROR_SUCCESS);
+    CUT_CHECK(err == ERROR_SUCCESS && !CHECK_ALIGN(addr, 0x1000));
     err = BitmapPMA_alloc(&bpma, 0x10000, &addr);
     CUT_CHECK(err == ERROR_NO_FREE_MEMORY);
 
@@ -87,8 +99,10 @@ CUT_DEFINE_TEST(test_bitmapAlloc)
     CUT_CHECK(err == ERROR_SUCCESS && addr == 0x400000);
     err = BitmapPMA_alloc(&bpma, 0x4000, &addr);
     CUT_CHECK(err == ERROR_SUCCESS && addr == 0x405000);
+    err = BitmapPMA_alloc(&bpma, 0x123, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS && !CHECK_ALIGN(addr, 0x1000));
     err = BitmapPMA_alloc(&bpma, 0x6400000 - 0x400000 - 0x10000, &addr);
-    CUT_CHECK(err == ERROR_SUCCESS);
+    CUT_CHECK(err == ERROR_SUCCESS && !CHECK_ALIGN(addr, 0x1000));
     err = BitmapPMA_alloc(&bpma, 0x10000, &addr);
     CUT_CHECK(err == ERROR_NO_FREE_MEMORY);
 
