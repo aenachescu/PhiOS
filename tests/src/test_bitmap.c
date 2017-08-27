@@ -19,14 +19,14 @@ CUT_DEFINE_TEST(test_bitmapCreate)
         0x0,
         0x6400000 // 100 mibs
     );
-    CUT_CHECK(err == ERROR_SUCCESS);
-    CUT_CHECK(bpma.startAddress == 0x0);
-    CUT_CHECK(bpma.endAddress == 0x6400000);
-    CUT_CHECK(bpma.frameSize == 0x1000);
-    CUT_CHECK(bpma.freeFramesNumber == 25600);
-    CUT_CHECK(bpma.positionLastAllocatedFrame == 0);
-    CUT_CHECK(bpma.bitmapSize == 400);
-    CUT_CHECK(bpma.bitmap != NULL);
+    CUT_CHECK_OPERATOR_UINT32 (err,                             ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT64 (bpma.startAddress,               ==, 0x0);
+    CUT_CHECK_OPERATOR_UINT64 (bpma.endAddress,                 ==, 0x6400000);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.frameSize,                  ==, 0x1000);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.freeFramesNumber,           ==, 25600);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.positionLastAllocatedFrame, ==, 0);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.bitmapSize,                 ==, 400);
+    CUT_CHECK_OPERATOR_ADDRESS(bpma.bitmap,                     !=, NULL);
 
     free(bpma.bitmap);
 
@@ -36,14 +36,14 @@ CUT_DEFINE_TEST(test_bitmapCreate)
         0x200123, // ~2 mibs
         0x6400123 // ~100 mibs
     );
-    CUT_CHECK(err == ERROR_SUCCESS);
-    CUT_CHECK(bpma.startAddress == 0x201000);
-    CUT_CHECK(bpma.endAddress == 0x6400000);
-    CUT_CHECK(bpma.frameSize == 0x1000);
-    CUT_CHECK(bpma.freeFramesNumber == 25087);
-    CUT_CHECK(bpma.positionLastAllocatedFrame == 0);
-    CUT_CHECK(bpma.bitmapSize == 392);
-    CUT_CHECK(bpma.bitmap != NULL);
+    CUT_CHECK_OPERATOR_UINT32 (err,                             ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT64 (bpma.startAddress,               ==, 0x201000);
+    CUT_CHECK_OPERATOR_UINT64 (bpma.endAddress,                 ==, 0x6400000);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.frameSize,                  ==, 0x1000);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.freeFramesNumber,           ==, 25087);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.positionLastAllocatedFrame, ==, 0);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.bitmapSize,                 ==, 392);
+    CUT_CHECK_OPERATOR_ADDRESS(bpma.bitmap,                     !=, NULL);
 
     free(bpma.bitmap);
 
@@ -53,7 +53,7 @@ CUT_DEFINE_TEST(test_bitmapCreate)
         0x1000,
         0x0
     );
-    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(err, ==, ERROR_INVALID_PARAMETER);
 
     err = BitmapPMA_createAllocator(
         &bpma,
@@ -61,7 +61,7 @@ CUT_DEFINE_TEST(test_bitmapCreate)
         0x1000,
         0x1000
     );
-    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(err, ==, ERROR_INVALID_PARAMETER);
 
     err = BitmapPMA_createAllocator(
         NULL,
@@ -69,7 +69,7 @@ CUT_DEFINE_TEST(test_bitmapCreate)
         0x0,
         0x6400000 // 100 mibs
     );
-    CUT_CHECK(err == ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(err, ==, ERROR_NULL_POINTER);
 
     err = BitmapPMA_createAllocator(
         &bpma,
@@ -77,7 +77,7 @@ CUT_DEFINE_TEST(test_bitmapCreate)
         0x0,
         0x6400000 // 100 mibs
     );
-    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(err, ==, ERROR_INVALID_PARAMETER);
 }
 
 CUT_DEFINE_TEST(test_bitmapAlloc)
@@ -164,14 +164,14 @@ CUT_DEFINE_TEST(test_bitmapFree)
      * fourth column: expected free frames number after free()
      */
     static uint64 testCases[][4] = {
-        0x00005000, 0x00000000, 25595, 5,
-        0x00000123, 0x00005000, 25594, 6,
-        0x00002012, 0x00006000, 25591, 9,
-        0x000F7000, 0x00009000, 25344, 256,
-        0x000FFFFF, 0x00100000, 25088, 512,
-        0x00200000, 0x00200000, 24576, 1024,
-        0x003FE001, 0x00400000, 23553, 2047,
-        0x00001000, 0x007FF000, 23552, 2048,
+        0x00005000, 0x00000000, 25595,     5,
+        0x00000123, 0x00005000, 25594,     6,
+        0x00002012, 0x00006000, 25591,     9,
+        0x000F7000, 0x00009000, 25344,   256,
+        0x000FFFFF, 0x00100000, 25088,   512,
+        0x00200000, 0x00200000, 24576,  1024,
+        0x003FE001, 0x00400000, 23553,  2047,
+        0x00001000, 0x007FF000, 23552,  2048,
         0x05BFE123, 0x00800000,     1, 25599,
         0x00001000, 0x063FF000,     0, 25600
     };
