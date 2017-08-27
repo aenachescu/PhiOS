@@ -8,136 +8,186 @@
 #define ALIGN(addr, align) addr = addr & (~(align - 1))
 #define CHECK_ALIGN(addr, align) ((addr & (align - 1)) != 0)
 
-void *bpma_memory;
-struct BitmapPMA bpma;
-uint64 addr1, addr2, addr3;
-uint64 start, end;
-
 CUT_DEFINE_TEST(test_bitmapCreate)
 {
+    struct BitmapPMA bpma;
     uint32 err;
-    bpma_memory = malloc(0x1000 * 50);
 
     err = BitmapPMA_createAllocator(&bpma, 
                                     0x1000, 
-                                    (uint64) bpma_memory, 
-                                    (uint64) ((uint64) bpma_memory + 0x1000 * 50));
+                                    0x0, 
+                                    0x6400000); // 100 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
 
-    start = (uint64) bpma_memory;
-    if (CHECK_ALIGN(start, 0x1000)) {
-        ALIGN(start, 0x1000);
-        start += 0x1000;
-    }
-    end = (uint64) bpma_memory + 0x1000 * 50;
-    if (CHECK_ALIGN(end, 0x1000)) {
-        ALIGN(end, 0x1000);
-    }
-    CUT_CHECK(bpma.freeFramesNumber == (end - start) / 0x1000);
-    CUT_CHECK(bpma.bitmap != NULL);
+    free(bpma.bitmap);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x1000, 
+                                    0x0); // 100 mibs
+    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+
+    err = BitmapPMA_createAllocator(NULL, 
+                                    0x1000, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_NULL_POINTER);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1001, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
 }
 
 CUT_DEFINE_TEST(test_bitmapAlloc)
 {
+    struct BitmapPMA bpma;
     uint32 err;
-    addr3 = 0x0;
 
-    err = BitmapPMA_alloc(&bpma, 0, &addr1);
-    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
-    err = BitmapPMA_alloc(NULL, 0x3000, &addr2);
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    uint64 addr;
+    err = BitmapPMA_alloc(NULL, 0x1000, &addr);
     CUT_CHECK(err == ERROR_NULL_POINTER);
-    err = BitmapPMA_alloc(&bpma, 0x5000, &addr3);
-    CUT_CHECK(err == ERROR_SUCCESS && addr3 != 0x0);
+    err = BitmapPMA_alloc(&bpma, 0, &addr);
+    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+    err = BitmapPMA_alloc(&bpma, 0x1000, NULL);
+    CUT_CHECK(err == ERROR_NULL_POINTER);
+
+    err = BitmapPMA_alloc(&bpma, 0x5000, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS && addr == 0x0);
+    err = BitmapPMA_alloc(&bpma, 0x4000, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS && addr == 0x5000);
+    err = BitmapPMA_alloc(&bpma, 0x6400000 - 0x10000, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS);
+    err = BitmapPMA_alloc(&bpma, 0x10000, &addr);
+    CUT_CHECK(err == ERROR_NO_FREE_MEMORY);
+
+    free(bpma.bitmap);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x400000, // 4 mibs
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    err = BitmapPMA_alloc(NULL, 0x1000, &addr);
+    CUT_CHECK(err == ERROR_NULL_POINTER);
+    err = BitmapPMA_alloc(&bpma, 0, &addr);
+    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+    err = BitmapPMA_alloc(&bpma, 0x1000, NULL);
+    CUT_CHECK(err == ERROR_NULL_POINTER);
+
+    err = BitmapPMA_alloc(&bpma, 0x5000, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS && addr == 0x400000);
+    err = BitmapPMA_alloc(&bpma, 0x4000, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS && addr == 0x405000);
+    err = BitmapPMA_alloc(&bpma, 0x6400000 - 0x400000 - 0x10000, &addr);
+    CUT_CHECK(err == ERROR_SUCCESS);
+    err = BitmapPMA_alloc(&bpma, 0x10000, &addr);
+    CUT_CHECK(err == ERROR_NO_FREE_MEMORY);
+
+    free(bpma.bitmap);
 }
 
 CUT_DEFINE_TEST(test_bitmapFree)
 {
+    struct BitmapPMA bpma;
     uint32 err;
-    err = BitmapPMA_free(&bpma, 0x5000, addr3);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
 
-    err = BitmapPMA_free(&bpma, 0x5000, addr3);
-    CUT_CHECK(err == ERROR_INVALID_STATE);
+    free(bpma.bitmap);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x400000, // 4 mibs
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    free(bpma.bitmap);
 }
 
 CUT_DEFINE_TEST(test_bitmapReserve)
 {
+    struct BitmapPMA bpma;
     uint32 err;
-    err = BitmapPMA_reserve(&bpma, 0x5000, start);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
 
-    err = BitmapPMA_free(&bpma, 0x5000, start);
+    free(bpma.bitmap);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x400000, // 4 mibs
+                                    0x6400000); // 100 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
+
+    free(bpma.bitmap);
 }
 
 CUT_DEFINE_TEST(test_bitmapCheck)
 {
+    struct BitmapPMA bpma;
     uint32 err;
-    uint8 state = 0;
-    err = BitmapPMA_check(&bpma, start, end, &state);
-    CUT_CHECK(err == ERROR_SUCCESS && state);
 
-    BitmapPMA_alloc(&bpma, 0x5000, &addr3);
-    state = 1;
-    err = BitmapPMA_check(&bpma, addr3, addr3 + 0x5000, &state);
-    CUT_CHECK(err == ERROR_SUCCESS && state);
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
 
-    BitmapPMA_free(&bpma, 0x5000, addr3);
-    state = 0;
-    err = BitmapPMA_check(&bpma, addr3, addr3 + 0x5000, &state);
-    CUT_CHECK(err == ERROR_SUCCESS && state);
+    free(bpma.bitmap);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x400000, // 4 mibs
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    free(bpma.bitmap);
 }
 
 CUT_DEFINE_TEST(test_bitmapAll)
 {
+    struct BitmapPMA bpma;
     uint32 err;
-    uint8 state;
 
-    //err = BitmapPMA_reserve(&bpma, 0x5000, start);
-    //CUT_CHECK(err == ERROR_SUCCESS);
-
-    //state = 1;
-    //err = BitmapPMA_check(&bpma, start, start + 0x5000, &state);
-    //CUT_CHECK(err == ERROR_SUCCESS && state);
-
-    err = BitmapPMA_alloc(&bpma, 0x5000, &addr1);
-    CUT_CHECK((err == ERROR_SUCCESS) && (addr1 == start));
-    printf("%x\n", addr1);
-    printf("%x\n", start);
-    int tmp = ((unsigned int)addr1 == (unsigned int)start);
-    printf("%d\n", tmp);
-
-    err = BitmapPMA_alloc(&bpma, 0x2000, &addr2);
-    printf("%x\n", addr2);
-    CUT_CHECK(err == ERROR_SUCCESS && addr2 == addr1 + 0x5000);
-    
-    err = BitmapPMA_free(&bpma, 0x5000, addr1);
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x0, 
+                                    0x6400000); // 100 mibs
     CUT_CHECK(err == ERROR_SUCCESS);
-
-    state = 1;
-    err = BitmapPMA_check(&bpma, addr2, addr2 + 0x2000, &state);
-    CUT_CHECK(err == ERROR_SUCCESS && state);
-
-    err = BitmapPMA_alloc(&bpma, 0x2000, &addr3);
-    CUT_CHECK(err == ERROR_SUCCESS && addr3 == start + 0x5000);
-
-    err = BitmapPMA_free(&bpma, 0x2000, addr2);
-    CUT_CHECK(err == ERROR_SUCCESS);
-
-    state = 0;
-    err = BitmapPMA_check(&bpma, addr2, addr2 + 0x2000, &state);
-    CUT_CHECK(err == ERROR_SUCCESS && state);
-    
 
     free(bpma.bitmap);
-    free(bpma_memory);
+
+    err = BitmapPMA_createAllocator(&bpma, 
+                                    0x1000, 
+                                    0x400000, // 4 mibs
+                                    0x6400000); // 100 mibs
+    CUT_CHECK(err == ERROR_SUCCESS);
+
+    free(bpma.bitmap);
 }
 
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_bitmapCreate);
     CUT_CALL_TEST(test_bitmapAlloc);
     CUT_CALL_TEST(test_bitmapFree);
-    //CUT_CALL_TEST(test_bitmapReserve);
+    CUT_CALL_TEST(test_bitmapReserve);
     CUT_CALL_TEST(test_bitmapCheck);
     CUT_CALL_TEST(test_bitmapAll);
 CUT_END_MAIN
