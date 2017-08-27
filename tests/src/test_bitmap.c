@@ -209,6 +209,21 @@ CUT_DEFINE_TEST(test_bitmapFree)
     CUT_CHECK(BitmapPMA_free(NULL, 0x1000, 0x0) == ERROR_NULL_POINTER);
     CUT_CHECK(BitmapPMA_free(&bpma, 0x1000,  0x10000000) == ERROR_INVALID_PARAMETER);
 
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
+        CUT_CHECK(addr == (testCases[i][1] + bpma.startAddress));
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK(BitmapPMA_free(&bpma, testCases[i][0], testCases[i][1]  + bpma.startAddress) == ERROR_SUCCESS);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK(BitmapPMA_alloc(&bpma, testCases[i][0], &addr) == ERROR_SUCCESS);
+        CUT_CHECK(addr == (testCases[i][1] + bpma.startAddress));
+    }
+
+
     free(bpma.bitmap);
 }
 
