@@ -265,8 +265,33 @@ CUT_DEFINE_TEST(test_bitmapFree)
 
 CUT_DEFINE_TEST(test_bitmapReserve)
 {
-    struct BitmapPMA bpma;
+    /*
+     * first column: area size
+     * second column: start address for reserve()
+     * third column: start address for free()
+     * fourth column: expected free frames number after reserve()
+     * fifth column: expected free frames number after free()
+     */
+    static uint64 testCases[][5] = {
+        0x00004ffb, 0x00000005, 0x00000000, 25595,     5,
+        0x00000120, 0x00005003, 0x00005000, 25594,     6,
+        0x00002005, 0x00006007, 0x00006000, 25591,     9,
+        0x000F6ff7, 0x00009009, 0x00009000, 25344,   256,
+        0x000FFFF4, 0x0010000b, 0x00100000, 25088,   512,
+        0x001ffff3, 0x0020000d, 0x00200000, 24576,  1024,
+        0x003FE001, 0x00400000, 0x00400000, 23553,  2047,
+        0x00001000, 0x007FF000, 0x007FF000, 23552,  2048,
+        0x05BFE123, 0x00800000, 0x00800000,     1, 25599,
+        0x00001000, 0x063FF000, 0x063FF000,     0, 25600
+    };
+    static uint32 testCasesLength = 10;
+
+    struct BitmapPMA bpma = { 0 };
     uint32 err;
+
+    CUT_CHECK(BitmapPMA_reserve(&bpma, 0x1000, 0x0) == ERROR_UNINITIALIZED);
+
+    /*----- when startAddress is at 0x0 -----*/
 
     err = BitmapPMA_createAllocator(
         &bpma,
@@ -276,7 +301,28 @@ CUT_DEFINE_TEST(test_bitmapReserve)
     );
     CUT_CHECK(err == ERROR_SUCCESS);
 
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(NULL, 0x1000, 0x0),                  ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, 0x0, 0x0),                    ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, 0x1000, bpma.endAddress + 1), ==, ERROR_INVALID_PARAMETER);
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, testCases[i][0], testCases[i][1]), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(bpma.freeFramesNumber,                                      ==, testCases[i][3]);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_free(&bpma, testCases[i][0], testCases[i][2]), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(bpma.freeFramesNumber,                                   ==, testCases[i][4]);
+    }
+    
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, testCases[i][0], testCases[i][1]), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(bpma.freeFramesNumber,                                      ==, testCases[i][3]);
+    }
+
     free(bpma.bitmap);
+
+    /*----- when startAddress is greater than 0x0 -----*/
 
     err = BitmapPMA_createAllocator(
         &bpma,
@@ -285,6 +331,26 @@ CUT_DEFINE_TEST(test_bitmapReserve)
         0x6800000 // 104 mibs
     );
     CUT_CHECK(err == ERROR_SUCCESS);
+
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(NULL, 0x1000, 0x0),                    ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, 0x0, 0x0),                      ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, 0x1000, bpma.startAddress - 1), ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, 0x1000, bpma.endAddress + 1),   ==, ERROR_INVALID_PARAMETER);
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, testCases[i][0], testCases[i][1] + bpma.startAddress), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(bpma.freeFramesNumber,                                                          ==, testCases[i][3]);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_free(&bpma, testCases[i][0], testCases[i][2] + bpma.startAddress), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(bpma.freeFramesNumber,                                                       ==, testCases[i][4]);
+    }
+    
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, testCases[i][0], testCases[i][1] + bpma.startAddress), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(bpma.freeFramesNumber,                                                          ==, testCases[i][3]);
+    }
 
     free(bpma.bitmap);
 }
