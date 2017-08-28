@@ -357,8 +357,43 @@ CUT_DEFINE_TEST(test_bitmapReserve)
 
 CUT_DEFINE_TEST(test_bitmapCheck)
 {
-    struct BitmapPMA bpma;
+    /*
+     * first column: area size
+     * second column: address where to reserve
+     */
+    static uint64 areas[][2] = {
+        0x00005000, 0x00000000,
+        0x000F7000, 0x00009000,
+        0x00200000, 0x00200000,
+        0x00001000, 0x007FF000,
+        0x00001000, 0x063FF000
+    };
+    static uint32 areasLength = 5;
+
+    /*
+     * first column: zone for checking end
+     * second column: zone for checking start
+     * third column: status
+     */
+    static uint64 testCases[][3] = {
+        0x00005000, 0x00000003, 1,
+        0x00100000, 0x00009004, 1,
+        0x00400000, 0x00200001, 1,
+        0x00400000, 0x00000001, 1,
+        0x06300000, 0x00000001, 1,
+        0x00007000, 0x00005001, 0,
+        0x00500000, 0x00400002, 0,
+        0x00900000, 0x00800003, 0,
+        0x00550000, 0x00500000, 0,
+        0x00650000, 0x00600000, 0,
+    };
+    static uint32 testCasesLength = 10;
+    static uint8 state = 0;
+
+    struct BitmapPMA bpma = { 0 };
     uint32 err;
+
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x0, 0x1000, &state), ==, ERROR_UNINITIALIZED);
 
     err = BitmapPMA_createAllocator(
         &bpma,
@@ -367,6 +402,74 @@ CUT_DEFINE_TEST(test_bitmapCheck)
         0x6400000 // 100 mibs
     );
     CUT_CHECK(err == ERROR_SUCCESS);
+
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(NULL, 0x0, 0x1000, &state), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x1000, 0x0, &state), ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x0, 0xFFFFFFFF, &state), ==, ERROR_INVALID_PARAMETER);
+    state = 2;
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x400000, 0x500000, &state), ==, ERROR_INVALID_PARAMETER);
+
+    for (uint32 i = 0; i < areasLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, areas[i][0], areas[i][1]), ==, ERROR_SUCCESS);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+    }
 
     free(bpma.bitmap);
 
@@ -378,31 +481,83 @@ CUT_DEFINE_TEST(test_bitmapCheck)
     );
     CUT_CHECK(err == ERROR_SUCCESS);
 
-    free(bpma.bitmap);
-}
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(NULL, 0x0, 0x1000, &state), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x1000, 0x0, &state), ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x0, 0xFFFFFFFF, &state), ==, ERROR_INVALID_PARAMETER);
+    state = 2;
+    CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, 0x400000, 0x500000, &state), ==, ERROR_INVALID_PARAMETER);
 
-CUT_DEFINE_TEST(test_bitmapAll)
-{
-    struct BitmapPMA bpma;
-    uint32 err;
 
-    err = BitmapPMA_createAllocator(
-        &bpma,
-        0x1000,
-        0x0,
-        0x6400000 // 100 mibs
-    );
-    CUT_CHECK(err == ERROR_SUCCESS);
+    for (uint32 i = 0; i < areasLength; i++) {
+        areas[i][1] += bpma.startAddress;
+    }
 
-    free(bpma.bitmap);
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        testCases[i][0] += bpma.startAddress;
+        testCases[i][1] += bpma.startAddress;
+    }
 
-    err = BitmapPMA_createAllocator(
-        &bpma,
-        0x1000,
-        0x400000, // 4 mibs
-        0x6800000 // 104 mibs
-    );
-    CUT_CHECK(err == ERROR_SUCCESS);
+    for (uint32 i = 0; i < areasLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_reserve(&bpma, areas[i][0], areas[i][1]), ==, ERROR_SUCCESS);
+    }
+
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 1);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0], &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1], testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] - 1, testCases[i][0] + 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+
+        state = !testCases[i][2];
+        CUT_CHECK_OPERATOR_UINT32(BitmapPMA_check(&bpma, testCases[i][1] + 1, testCases[i][0] - 1, &state), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT8(state, ==, 0);
+    }
 
     free(bpma.bitmap);
 }
@@ -413,5 +568,4 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_bitmapFree);
     CUT_CALL_TEST(test_bitmapReserve);
     CUT_CALL_TEST(test_bitmapCheck);
-    CUT_CALL_TEST(test_bitmapAll);
 CUT_END_MAIN
