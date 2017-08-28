@@ -394,7 +394,11 @@ uint32 BitmapPMA_check(
     }
 
     ALIGN(a_startAddr, bpma->frameSize);
-    ALIGN(a_endAddr, bpma->frameSize);
+
+    if (CHECK_ALIGN(a_endAddr, bpma->frameSize)) {
+        ALIGN(a_endAddr, bpma->frameSize);
+        a_endAddr += bpma->frameSize;
+    }
 
     if (a_startAddr >= a_endAddr ||
         a_startAddr < bpma->startAddress ||
@@ -408,10 +412,8 @@ uint32 BitmapPMA_check(
 
     a_startAddr -= bpma->startAddress;
     a_endAddr -= bpma->startAddress;
-    uint32 frameNumber = a_startAddr / bpma->frameSize +
-                         (a_startAddr % bpma->frameSize ? 1 : 0);
-    uint32 framesToCheck = a_endAddr / bpma->frameSize +
-                           (a_endAddr % bpma->frameSize ? 1 : 0) - frameNumber;
+    uint32 frameNumber = a_startAddr / bpma->frameSize;
+    uint32 framesToCheck = a_endAddr / bpma->frameSize - frameNumber;
     
     uint32 bitmapIndex = frameNumber / WORDSIZE;
     uint32 indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
