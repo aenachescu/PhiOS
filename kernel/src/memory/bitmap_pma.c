@@ -347,8 +347,10 @@ uint32 BitmapPMA_reserve(
     ALIGN(startAddress, bpma->frameSize);
 
     uint64 endAddress = a_physicalAddress + a_size;
-    ALIGN(endAddress, bpma->frameSize);
-    endAddress += bpma->frameSize;
+    if (CHECK_ALIGN(endAddress, bpma->frameSize)) {
+        ALIGN(endAddress, bpma->frameSize);
+        endAddress += bpma->frameSize;
+    }
 
     if (startAddress < bpma->startAddress ||
         endAddress   > bpma->endAddress) {
@@ -357,11 +359,15 @@ uint32 BitmapPMA_reserve(
 
     startAddress -= bpma->startAddress;
     endAddress -= bpma->startAddress;
-    uint32 frameNumber = startAddress / bpma->frameSize +
-                        (startAddress % bpma->frameSize ? 1 : 0);
-    uint32 framesToReserve = endAddress / bpma->frameSize +
-                             (endAddress % bpma->frameSize ? 1 : 0) -
-                             frameNumber;
+
+    uint32 frameNumber = startAddress / (uint64) bpma->frameSize;
+    uint32 framesToReserve = endAddress / (uint64) bpma->frameSize - frameNumber;
+
+    if (framesToReserve > bpma->freeFramesNumber) {
+        return ERROR_NO_FREE_MEMORY;
+    }
+
+    bpma->freeFramesNumber -= framesToReserve;
 
     uint32 bitmapIndex = frameNumber / WORDSIZE;
     uint32 indexBits = WORDSIZE - 1 - frameNumber % WORDSIZE;
