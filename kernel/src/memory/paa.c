@@ -1,8 +1,9 @@
 #include "kernel/include/memory/paa.h"
 
-static size_t g_placementAddress = 0;
+static uint64 g_placementAddress = 0;
 
-size_t PAA_init(size_t a_startAddress)
+uint32 PAA_init(
+    uint64 a_startAddress)
 {
     if (g_placementAddress != 0) {
         return ERROR_ALREADY_INITIALIZED;
@@ -17,13 +18,16 @@ size_t PAA_init(size_t a_startAddress)
     return ERROR_SUCCESS;
 }
 
-size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
+uint32 PAA_alloc(
+    uint64 a_size,
+    uint64 *a_address,
+    uint64 a_alignment)
 {
     if (g_placementAddress == 0) {
         return ERROR_UNINITIALIZED;
     }
 
-    if (a_size == 0) {
+    if (a_size == 0 || a_alignment == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -43,7 +47,7 @@ size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
     return ERROR_SUCCESS;
 }
 
-size_t PAA_getCurrentAddress()
+uint64 PAA_getCurrentAddress()
 {
     return g_placementAddress;
 }
