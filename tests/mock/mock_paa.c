@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
+uint32 PAA_alloc(uint64 a_size, uint64 *a_address, uint64 a_alignment)
 {
     if (a_size == 0) {
         return ERROR_INVALID_PARAMETER;
@@ -14,7 +14,7 @@ size_t PAA_alloc(size_t a_size, size_t *a_address, size_t a_alignment)
     }
     *a_address = 0;
 
-    size_t g_placementAddress = (size_t) malloc(a_size + a_alignment - 1);
+    uint64 g_placementAddress = (uint64) malloc(a_size + a_alignment - 1);
     if ((g_placementAddress & (a_alignment - 1)) != 0) {
         g_placementAddress &= (~(a_alignment - 1));
         g_placementAddress += a_alignment;

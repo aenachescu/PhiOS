@@ -5,50 +5,44 @@
 
 #include "kernel/include/memory/paa.h"
 
-void *paa_memory;
-
-CUT_DEFINE_TEST(test_PAA_init)
+CUT_DEFINE_TEST(test_PAA)
 {
-    uint32 err;
-    paa_memory = malloc(0x1000 * 25);
+    uint32 err = ERROR_SUCCESS;
+    uint64 addr = 0;
 
-    err = PAA_init((size_t) paa_memory);
-    CUT_CHECK(err == ERROR_SUCCESS);
-}
+    CUT_CHECK_OPERATOR_UINT32(PAA_init(0), ==, ERROR_INVALID_PARAMETER);
 
-CUT_DEFINE_TEST(test_PAA_alloc)
-{
-    uint32 err;
+    CUT_CHECK_OPERATOR_UINT32(PAA_alloc(0x1000, &addr, 0x1000), ==, ERROR_UNINITIALIZED);
 
-    size_t addr;
-    size_t addr1;
-    size_t addr2;
-    int *x;
-    char *s;
+    CUT_CHECK_OPERATOR_UINT32(PAA_init(0x1000), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT64(PAA_getCurrentAddress(), ==, 0x1000);
 
-    err = PAA_alloc(0, &addr, 0);
-    CUT_CHECK(err == ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(PAA_init(0x1000), ==, ERROR_ALREADY_INITIALIZED);
 
-    err = PAA_alloc(10, NULL, 0);
-    CUT_CHECK(err == ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(PAA_alloc(0, &addr, 0x1000), ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(PAA_alloc(0x1000, &addr, 0), ==, ERROR_INVALID_PARAMETER);
+    CUT_CHECK_OPERATOR_UINT32(PAA_alloc(0x1000, NULL, 0x1000), ==, ERROR_NULL_POINTER);
 
-    CUT_CHECK(PAA_alloc(sizeof(int), &addr, 0x1000) == ERROR_SUCCESS);
-    CUT_CHECK((addr & (0x1000 - 1)) == 0);
+    /*
+     * first column: area size
+     * second column: align
+     * third column: expected address
+     */
+    static uint64 testCases[][3] = {
+        0x00000010, 0x00000002, 0x00001000,
+        0x00000123, 0x00001000, 0x00002000,
+        0x00000123, 0x00000010, 0x00002130,
+        0x00001234, 0x00000001, 0x00002253,
+        0x00001000, 0x00100000, 0x00100000
+    };
+    static uint32 testCasesLength = 5;
 
-    CUT_CHECK(PAA_alloc(sizeof(int), &addr1, 1) == ERROR_SUCCESS);
-    CUT_CHECK(PAA_alloc(sizeof(char) * 20, &addr2, 1) == ERROR_SUCCESS);
-
-    x = (int*) addr1;
-    s = (char*) addr2;
-
-    *x = 5;
-    strcpy(s, "This is so nice!\n");
-    CUT_CHECK(*x == 5);
-    CUT_CHECK(!strcmp(s, "This is so nice!\n"));
-    free(paa_memory);
+    for (uint32 i = 0; i < testCasesLength; i++) {
+        CUT_CHECK_OPERATOR_UINT32(PAA_alloc(testCases[i][0], &addr, testCases[i][1]), ==, ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT64(addr, ==, testCases[i][2]);
+    }
 }
 
 CUT_DEFINE_MAIN
-    CUT_CALL_TEST(test_PAA_init);
-    CUT_CALL_TEST(test_PAA_alloc);
+    CUT_CALL_TEST(test_PAA);
 CUT_END_MAIN
