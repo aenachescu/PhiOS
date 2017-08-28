@@ -14,8 +14,8 @@
  *  ERROR_ALREADY_INITIALIZED - if the placement address allocator is already
  *      initialized
  */
-size_t PAA_init(
-    size_t a_startAddress
+uint32 PAA_init(
+    uint64 a_startAddress
 );
 
 /*
@@ -33,10 +33,10 @@ size_t PAA_init(
  *  ERROR_INVALID_PARAMETER - If a_size is 0.
  *  ERROR_NULL_POINTER - If a_address is null.
  */
-size_t PAA_alloc(
-    size_t a_size, 
-    size_t *a_address, 
-    size_t a_alignment
+uint32 PAA_alloc(
+    uint64 a_size,
+    uint64 *a_address,
+    uint64 a_alignment
 );
 
 /*
@@ -45,6 +45,6 @@ size_t PAA_alloc(
  * @return
  *  Returns the current placement address or 0 if the PAA is not initialized
  */
-size_t PAA_getCurrentAddress();
+uint64 PAA_getCurrentAddress();
 
 #endif
