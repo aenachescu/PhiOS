@@ -8,7 +8,7 @@ uint8       g_allocatorsNumber  = 0;
 uint32 PMM_init(
     uint8 a_allocatorsNumber)
 {
-    size_t address = 0;
+    uint64 address = 0;
     uint32 error = ERROR_SUCCESS;
 
     do {
@@ -31,7 +31,7 @@ uint32 PMM_init(
             break;
         }
 
-        g_allocators        = (struct PMA*) address;
+        g_allocators        = (struct PMA*) (size_t) address;
         g_index             = 0;
         g_allocatorsNumber  = a_allocatorsNumber;
     } while (false);

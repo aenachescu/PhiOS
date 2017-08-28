@@ -111,11 +111,13 @@ uint32 BitmapPMA_createAllocator(
         bitmapSize++;
     }
 
+    uint64 addr = 0;
     uint32 error = PAA_alloc(
         sizeof(size_t) * bitmapSize,
-        (size_t*) &a_bpma->bitmap,
+        &addr,
         WORDSIZE_BYTES
     );
+    a_bpma->bitmap = (size_t*) (size_t) addr;
 
     if (error != ERROR_SUCCESS) {
         a_bpma->bitmap       = NULL;
