@@ -233,7 +233,7 @@ uint32 PMM_check(
     return error;
 }
 
-uint32 PMM_adjustPfn(
+uint32 PMM_adjustPointers(
     uint32 a_offset)
 {
     uint32 error = ERROR_SUCCESS;
@@ -249,7 +249,11 @@ uint32 PMM_adjustPfn(
             g_allocators[i].freeFn += a_offset;
             g_allocators[i].reserveFn += a_offset;
             g_allocators[i].checkFn += a_offset;
+
+            g_allocators[i].PMAStruct += a_offset;
         }
+
+        g_allocators = (struct PMA*)(((size_t)g_allocators) + a_offset);
     } while (false);
 
     return error;
