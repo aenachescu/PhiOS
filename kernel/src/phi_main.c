@@ -12,26 +12,6 @@
 
 #include "util/kstdlib/include/kstdio.h"
 
-static_assert(sizeof(uint64) == 8, "Type size is not as expected.");
-static_assert(sizeof(uint32) == 4, "Type size is not as expected.");
-static_assert(sizeof(uint16) == 2, "Type size is not as expected.");
-static_assert(sizeof(uint8) == 1, "Type size is not as expected.");
-
-static_assert(sizeof(sint64) == 8, "Type size is not as expected.");
-static_assert(sizeof(sint32) == 4, "Type size is not as expected.");
-static_assert(sizeof(sint16) == 2, "Type size is not as expected.");
-static_assert(sizeof(sint8) == 1, "Type size is not as expected.");
-
-static_assert(sizeof(cuint64) == 8, "Type size is not as expected.");
-static_assert(sizeof(cuint32) == 4, "Type size is not as expected.");
-static_assert(sizeof(cuint16) == 2, "Type size is not as expected.");
-static_assert(sizeof(cuint8) == 1, "Type size is not as expected.");
-
-static_assert(sizeof(csint64) == 8, "Type size is not as expected.");
-static_assert(sizeof(csint32) == 4, "Type size is not as expected.");
-static_assert(sizeof(csint16) == 2, "Type size is not as expected.");
-static_assert(sizeof(csint8) == 1, "Type size is not as expected.");
-
 extern size_t g_kernelStack[2048];
 
 // TODO: remove this when tasks are available
