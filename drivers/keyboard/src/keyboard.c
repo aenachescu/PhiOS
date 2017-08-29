@@ -125,7 +125,7 @@ uint32 keyboard_setLayout(
     return ERROR_SUCCESS;
 }
 
-char keyboard_readKey()
+uint8 keyboard_readKey()
 {
     while (true) {
         turnOffInts();
@@ -138,7 +138,7 @@ char keyboard_readKey()
         pauseCpu();
     }
 
-    char ret = g_keyboardBuffer[0];
+    uint8 ret = g_keyboardBuffer[0];
 
     for (uint32 i = 1; i < g_keyboardBufferPos; i++) {
         g_keyboardBuffer[i - 1] = g_keyboardBuffer[i];
