@@ -5,6 +5,7 @@
 #include "kernel/include/arch/x86/pic.h"
 #include "kernel/include/arch/x86/cpuid.h"
 #include "kernel/include/memory/pmm.h"
+#include "kernel/include/qemu/power.h"
 
 #include "drivers/keyboard/include/keyboard.h"
 #include "drivers/rtc/include/rtc.h"
@@ -41,15 +42,21 @@ void user_main()
     kprintf("Hello, world!\n");
     kprintf("> ");
     while (1) {
-        char c = keyboard_readKey();
+        uint8 c = keyboard_readKey();
         if (c == '\n') {
             kprintf("\n> ");
         }
 
-        if (c == 'q') {
+        if (c == ESC) {
+            kprintf("\nCommand line exited!\n");
             break;
-        }
-        else {
+        } else if (c == KF1) {
+            kprintf("\nReboot will work only on QEMU for now...\n");
+            qemu_reboot();
+        } else if (c == KF2) {
+            qemu_shutdown();
+            kprintf("\nShutdown will work only on QEMU for now...\n");
+        } else {
             kprintf("%c", c);
         }
     }
