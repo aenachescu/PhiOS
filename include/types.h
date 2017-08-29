@@ -52,6 +52,30 @@ typedef uint64 size_t;
 #include <stddef.h>
 #endif
 
+#define static_assert _Static_assert
+#define ASSERT_MESSAGE "Type size is not as expected."
+static_assert(sizeof(uint64) == 8, ASSERT_MESSAGE);
+static_assert(sizeof(uint32) == 4, ASSERT_MESSAGE);
+static_assert(sizeof(uint16) == 2, ASSERT_MESSAGE);
+static_assert(sizeof(uint8) == 1, ASSERT_MESSAGE);
+
+static_assert(sizeof(sint64) == 8, ASSERT_MESSAGE);
+static_assert(sizeof(sint32) == 4, ASSERT_MESSAGE);
+static_assert(sizeof(sint16) == 2, ASSERT_MESSAGE);
+static_assert(sizeof(sint8) == 1, ASSERT_MESSAGE);
+
+static_assert(sizeof(cuint64) == 8, ASSERT_MESSAGE);
+static_assert(sizeof(cuint32) == 4, ASSERT_MESSAGE);
+static_assert(sizeof(cuint16) == 2, ASSERT_MESSAGE);
+static_assert(sizeof(cuint8) == 1, ASSERT_MESSAGE);
+
+static_assert(sizeof(csint64) == 8, ASSERT_MESSAGE);
+static_assert(sizeof(csint32) == 4, ASSERT_MESSAGE);
+static_assert(sizeof(csint16) == 2, ASSERT_MESSAGE);
+static_assert(sizeof(csint8) == 1, ASSERT_MESSAGE);
+#undef ASSERT_MESSAGE
+#undef static_assert
+
 #endif
 
 
