@@ -159,6 +159,39 @@ void handlers32_pageFault(IntCpuState32 *a_state)
     VGA_WriteString("] ");
     VGA_WriteString("Page fault...\n");
     cpu_printState32(a_state);
+    
+    // Specific information about the memory
+    VGA_WriteString("[");
+    VGA_WriteColoredString("ADDRESS", VGA_ColorBlack, VGA_ColorRed);
+    VGA_WriteString("] ");
+    kprintf("%x\n", a_state->cr2);
+#define CHECK_BIT(var, pos) ((var) & (1 << pos))
+    VGA_WriteString("[");
+    VGA_WriteColoredString("BITS", VGA_ColorBlack, VGA_ColorRed);
+    VGA_WriteString("] ");
+
+    /*
+     * first colum: value to print if the bit is set
+     * second column: value to print if the bit is not set
+     */
+    const char *status[][2] = {
+        "P ",   "NP ",
+        "W ",   "R ",
+        "U ",   "S ",
+        "RSVD ", "\0",
+        "I ",   "D " 
+    };
+    const uint32 cases = 5;
+
+    for (uint32 i = 0; i < cases; i++) {
+        if (CHECK_BIT(a_state->errCode, i)) {
+            VGA_WriteString(status[i][0]);
+        } else {
+            VGA_WriteString(status[i][1]);
+        }
+    }
+#undef CHECK_BIT
+
     stopCpu();
 }
 
