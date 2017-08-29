@@ -26,5 +26,6 @@
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)
 #define KERNEL_CHECK(err) _kernel_check(err, __FILE__, __LINE__)
+#define static_assert _Static_assert
 
 #endif
