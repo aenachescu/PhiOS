@@ -9,6 +9,7 @@
 
 #include "drivers/keyboard/include/keyboard.h"
 #include "drivers/rtc/include/rtc.h"
+#include "drivers/serial/include/serial.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -76,6 +77,9 @@ void kernel_main()
     // Inits keyboard
     KERNEL_CHECK(keyboard_init());
     kprintf("[SYSTEM] Initialized keyboard.\n");
+
+    serial_init();
+    serial_writeString("oh, serial is working :o\n", SERIAL_PORT_A);
 
     return;
 }
