@@ -101,13 +101,11 @@ void adjustPointers()
 {
     uint32 offset = 0xBFF00000;
 
-    PMM_adjustPfn(offset);
+    PMM_adjustPointers(offset);
 
     for (size_t i = 0; i < g_PMAVM_num; i++) {
-        g_PMAVM[i].bitmap = (size_t*) ((size_t)g_PMAVM[i].bitmap + offset);
+        g_PMAVM[i].bitmap = (size_t*) (((size_t)g_PMAVM[i].bitmap) + offset);
     }
-
-    g_allocators = (struct PMA*) ((size_t)g_allocators + offset);
 
     adjust_got(offset);
 }
