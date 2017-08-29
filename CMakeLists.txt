@@ -63,6 +63,7 @@ endif()
 # Set flags
 set(CMAKE_ASM_FLAGS "")
 set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -std=gnu11 -ffreestanding -Wall -Wextra -fpie -O2")
+set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
 set(CMAKE_LINKER_FLAGS "-T ${LINKER_FILE} -O2 -nostdlib -z max-page-size=0x1000")
 
 # Set linker rule
