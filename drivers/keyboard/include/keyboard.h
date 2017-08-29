@@ -76,7 +76,7 @@ uint32 keyboard_setLayout(
     char *a_capsOnLayout
 );
 
-char keyboard_readKey();
+uint8 keyboard_readKey();
 
 void keyboard_intHandler(
     __attribute__((unused)) CpuState *a_state
