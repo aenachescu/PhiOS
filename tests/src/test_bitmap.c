@@ -10,6 +10,18 @@
 
 CUT_DEFINE_TEST(test_bitmapCreate)
 {
+    /*
+     * first column: on x86_32
+     * second column: on x86_64
+     */
+    static uint32_t expectedBitmapSize[][2] = {
+        800, 400,
+        784, 392
+    };
+
+#define GET_EXPECTED_BITMAP_SIZE(testCase) \
+    sizeof(size_t) == 4 ? expectedBitmapSize[testCase][0] : expectedBitmapSize[testCase][1]
+
     struct BitmapPMA bpma = { 0 };
     uint32 err;
 
@@ -25,7 +37,7 @@ CUT_DEFINE_TEST(test_bitmapCreate)
     CUT_CHECK_OPERATOR_UINT32 (bpma.frameSize,                  ==, 0x1000);
     CUT_CHECK_OPERATOR_UINT32 (bpma.freeFramesNumber,           ==, 25600);
     CUT_CHECK_OPERATOR_UINT32 (bpma.positionLastAllocatedFrame, ==, 0);
-    CUT_CHECK_OPERATOR_UINT32 (bpma.bitmapSize,                 ==, 400);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.bitmapSize,                 ==, GET_EXPECTED_BITMAP_SIZE(0));
     CUT_CHECK_OPERATOR_ADDRESS(bpma.bitmap,                     !=, NULL);
 
     free(bpma.bitmap);
@@ -42,10 +54,12 @@ CUT_DEFINE_TEST(test_bitmapCreate)
     CUT_CHECK_OPERATOR_UINT32 (bpma.frameSize,                  ==, 0x1000);
     CUT_CHECK_OPERATOR_UINT32 (bpma.freeFramesNumber,           ==, 25087);
     CUT_CHECK_OPERATOR_UINT32 (bpma.positionLastAllocatedFrame, ==, 0);
-    CUT_CHECK_OPERATOR_UINT32 (bpma.bitmapSize,                 ==, 392);
+    CUT_CHECK_OPERATOR_UINT32 (bpma.bitmapSize,                 ==, GET_EXPECTED_BITMAP_SIZE(1));
     CUT_CHECK_OPERATOR_ADDRESS(bpma.bitmap,                     !=, NULL);
 
     free(bpma.bitmap);
+
+#undef GET_EXPECTED_BITMAP_SIZE
 
     err = BitmapPMA_createAllocator(
         &bpma,
