@@ -23,6 +23,7 @@
 #define ERROR_NOT_IMPLEMENTED       17
 #define ERROR_DRNG_NOT_READY        18
 #define ERROR_INVALID_PORT          19
+#define ERROR_VIRTUAL_ADDRESS_IN_USE 20
 
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)
