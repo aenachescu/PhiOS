@@ -9,6 +9,11 @@ notifications:
 language: c
 compiler: gcc
 
+addons:
+    apt:
+        packages:
+        - libc6-dev-i386
+
 install:
     - ./linux_x86_64_getDependencies.sh
 
