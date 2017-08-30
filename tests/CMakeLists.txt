@@ -11,7 +11,21 @@ include_directories("${PRJ_PATH}/../include")
 include_directories("${PRJ_PATH}/../CUT/include")
 
 # set definitions
-add_definitions(-DPhiOS_ARCH_x86_64 -DUNIT_TEST)
+add_definitions(-DUNIT_TEST)
+
+if (DEFINED ARCH)
+    if (ARCH STREQUAL "x86_32")
+        add_definitions(-DPhiOS_ARCH_x86_32)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+    elseif (ARCH STREQUAL "x86_64")
+        add_definitions(-DPhiOS_ARCH_x86_64)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+    else()
+        message(FATAL_ERROR "Architecture not supported")
+    endif()
+else()
+    message(FATAL_ERROR "Architecture is not defined")
+endif()
 
 # set path to CUT library
 link_directories("${PRJ_PATH}/../CUT/bin")
