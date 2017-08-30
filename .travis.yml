@@ -16,3 +16,4 @@ script:
     - ./linux_x86_64_compile.sh clean x86_32
     - ./linux_x86_64_compile.sh build x86_32 notGenerateIso
     - ./test.sh run x86_32
+    - ./test.sh run x86_64
