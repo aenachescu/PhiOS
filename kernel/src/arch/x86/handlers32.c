@@ -1,6 +1,7 @@
 #include "kernel/include/arch/x86/handlers32.h"
 #include "include/cpu.h"
 #include "drivers/video/include/vga/text_mode.h"
+#include "util/kstdlib/include/kstdio.h"
 
 void handlers32_default(IntCpuState32 *a_state)
 {
@@ -161,25 +162,21 @@ void handlers32_pageFault(IntCpuState32 *a_state)
     cpu_printState32(a_state);
     
     // Specific information about the memory
-    VGA_WriteString("[");
-    VGA_WriteColoredString("ADDRESS", VGA_ColorBlack, VGA_ColorRed);
-    VGA_WriteString("] ");
+    VGA_WriteColoredString("Faulting address is: ", VGA_ColorBlack, VGA_ColorRed);
     kprintf("%x\n", a_state->cr2);
 #define CHECK_BIT(var, pos) ((var) & (1 << pos))
-    VGA_WriteString("[");
-    VGA_WriteColoredString("BITS", VGA_ColorBlack, VGA_ColorRed);
-    VGA_WriteString("] ");
+    VGA_WriteColoredString("The fault was caused by:\n", VGA_ColorBlack, VGA_ColorRed);
 
     /*
      * first colum: value to print if the bit is set
      * second column: value to print if the bit is not set
      */
     const char *status[][2] = {
-        "P ",   "NP ",
-        "W ",   "R ",
-        "U ",   "S ",
-        "RSVD ", "\0",
-        "I ",   "D " 
+        "- breaking protection rules\n",                        "- a not present page\n",
+        "- a writing action\n",                                 "- a reading action\n",
+        "- an user space instruction\n",                        "- a kernel space instruction\n",
+        "- reserved bits in page\n",                            "\0",
+        "- an instruction fetch (no-execute bit is enabled)",   "\0" 
     };
     const uint32 cases = 5;
 
