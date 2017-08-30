@@ -60,9 +60,8 @@ struct Paging
     void           *pagingStruct; // physical address
     VMA_ALLOC_PFN   allocFn;
     VMA_FREE_PFN    freeFn;
-    size_t          freeMappedVirtualMemory;
-    size_t          freeVirtualMemory;
-    size_t          lastAllocatedPage;
+    size_t          freeVirtualMemory;    // amount of free memory in bytes
+    size_t          lastAllocatedAddress; // virtual address of last allocated page
 };
 
 struct KernelArea
