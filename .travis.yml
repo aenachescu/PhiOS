@@ -13,6 +13,8 @@ addons:
     apt:
         packages:
         - libc6-dev-i386
+        - gcc-multilib
+        - g++-multilib
 
 install:
     - ./linux_x86_64_getDependencies.sh
