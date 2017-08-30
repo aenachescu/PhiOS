@@ -80,7 +80,7 @@ function configEnvironment {
     echo -e "${green}*****${reset} Building CUT"
     cd CUT/src
     make clean
-    make
+    make $1
     cd ../..
 
     # set path to cmake
@@ -97,7 +97,7 @@ fi
 
 if [ "$1" == "run" ];then
     if [ "$2" == "x86_64" ]; then
-        configEnvironment
+        configEnvironment platform=-m64
 
         echo -e "\n${green}*****${reset} Building tests for x86_64"
         build_tests_x86_64
@@ -107,7 +107,7 @@ if [ "$1" == "run" ];then
     fi
 
     if [ "$2" == "x86_32" ]; then
-        configEnvironment
+        configEnvironment platform=-m32
 
         echo -e "\n${green}*****${reset} Building tests for x86_32"
         build_tests_x86_32
