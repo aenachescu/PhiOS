@@ -76,8 +76,6 @@ list(APPEND ASM_SOURCES "")
 list(APPEND STATIC_LIBS "")
 
 # Set include paths
-list(APPEND INCLUDE_PATH "${PRJ_PATH}/include")
-list(APPEND INCLUDE_PATH "${PRJ_PATH}/kernel/include")
 list(APPEND INCLUDE_PATH "${PRJ_PATH}")
 
 # Add subdirectories
