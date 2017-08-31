@@ -12,7 +12,7 @@
 
 #include "kernel/include/multiboot2.h"
 
-#include "cpu.h"
+#include "include/cpu.h"
 
 struct KernelArea g_kernelArea;
 
