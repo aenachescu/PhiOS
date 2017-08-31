@@ -1,47 +1,153 @@
-#include "util/kstdlib/include/kstdio.h"
+#include "include/logging.h"
 
-void KLOG_FATAL(const char *format, ...)
+uint32 __klog(const char *a_format, ...)
 {
-    va_list args;
-    va_start(args, format);
-    __KLOG("FATAL", format, args);
-    va_end(args);
-}
+    if (a_format == NULL) {
+        return ERROR_NULL_POINTER;
+    }
 
-void KLOG_ERROR(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    __KLOG("ERROR", format, args);
-    va_end(args);
-}
+    char c;
+    const char *str = NULL;
+    size_t address;
+    sint32 svalue;
+    uint32 uvalue;
 
-void KLOG_WARNING(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    __KLOG("WARNING", format, args);
-    va_end(args);
-}
+    char buffer[32] = { 0 };
+    size_t bufferSize = 32;
 
-void KLOG_INFO(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    __KLOG("INFO", format, args);
-    va_end(args);
-}
+    bool extend = false;
+    char ebuffer[64] = { 0 };
+    uint64 eaddress;
+    sint64 esvalue;
+    uint64 euvalue;
 
-void KLOG_TRACE(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    __KLOG("TRACE", format, args);
-    va_end(args);
-}
+    char tmp[3] = { 0 };
+    tmp[0] = '%';
 
-void __KLOG(const char *logging_level, const char *format, va_list args) 
-{
-    kprintf("[%s][%s][%s] ", __FILE__, __LINE__, logging_level);
-    kprintf(format, args);
+
+    va_list arg;
+    va_start(arg, a_format);
+
+    while ((c = *a_format) != '\0') {
+        ++a_format;
+
+        if (c == '%' || extend) {
+            switch (*a_format) {
+                case 'd':
+                    if (extend) {
+                        esvalue = va_arg(arg, sint64);
+
+                        bufferSize = 64;
+                        ki64toa(esvalue, ebuffer, &bufferSize, 10);
+
+                        VGA_WriteString(ebuffer);
+                    } else {
+                        svalue = va_arg(arg, sint32);
+
+                        bufferSize = 32;
+                        kitoa(svalue, buffer, &bufferSize, 10);
+
+                        VGA_WriteString(buffer);
+                    }
+                    extend = false;
+                    break;
+
+                case 'u':
+                    if (extend) {
+                        euvalue = va_arg(arg, uint64);
+
+                        bufferSize = 64;
+                        ku64toa(euvalue, ebuffer, &bufferSize, 10);
+
+                        VGA_WriteString(ebuffer);
+                    } else {
+                        uvalue = va_arg(arg, uint32);
+
+                        bufferSize = 32;
+                        kutoa(uvalue, buffer, &bufferSize, 10);
+
+                        VGA_WriteString(buffer);
+                    }
+                    extend = false;
+                    break;
+
+                case 's':
+                    str = va_arg(arg, const char*);
+
+                    if (str == NULL) {
+                        VGA_WriteString("(null)");
+                    } else {
+                        VGA_WriteString(str);
+                    }
+                    extend = false;
+                    break;
+
+                case 'c':
+                    c = va_arg(arg, int);
+
+                    VGA_WriteChar(c);
+                    extend = false;
+                    break;
+
+                case 'p':
+                    address = va_arg(arg, uint32);
+
+                    bufferSize = 32;
+                    kutoa(address, buffer, &bufferSize, 16);
+
+                    VGA_WriteChar('0');
+                    VGA_WriteChar('x');
+                    VGA_WriteString(buffer);
+                    extend = false;
+                    break;
+
+                case 'x':
+                    if (extend) {
+                        eaddress = va_arg(arg, uint64);
+
+                        bufferSize = 64;
+                        ku64toa(eaddress, ebuffer, &bufferSize, 16);
+
+                        VGA_WriteChar('0');
+                        VGA_WriteChar('x');
+
+                        for (uint32 i = 64 / 4 - bufferSize; i > 0; i--)
+                        VGA_WriteChar('0');
+                        VGA_WriteString(ebuffer);
+                    } else {
+                        address = va_arg(arg, uint32);
+
+                        bufferSize = 32;
+                        kutoa(address, buffer, &bufferSize, 16);
+
+                        VGA_WriteChar('0');
+                        VGA_WriteChar('x');
+
+                        for (uint32 i = WORDSIZE / 4 - bufferSize; i > 0; i--) {
+                            VGA_WriteChar('0');
+                        }
+                        VGA_WriteString(buffer);
+                    }
+                    extend = false;
+                    break;
+
+                case 'l':
+                    if (*(a_format + 1) == 'l')  {
+                        extend = true;
+                    }
+                    break;
+
+                default:
+                    tmp[1] = *a_format;
+                    VGA_WriteString(tmp);
+            }
+            ++a_format;
+        } else {
+            VGA_WriteChar(c);
+        }
+    }
+
+    va_end(arg);
+
+    return ERROR_SUCCESS;
 }
