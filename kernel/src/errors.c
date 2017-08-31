@@ -1,7 +1,7 @@
-#include "errors.h"
+#include "include/errors.h"
 #include "util/kstdlib/include/kstdio.h"
-#include "cpu.h"
-#include "types.h"
+#include "include/cpu.h"
+#include "include/types.h"
 
 #define ERROR_KPRINTF(message) kprintf("\n[%s] In file %s at line %d.", message, file, line); stopCpu();
 
