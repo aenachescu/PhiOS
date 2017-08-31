@@ -1,7 +1,7 @@
 #include "kernel/include/arch/x86/asm_io.h"
 #include "kernel/include/qemu/power.h"
-#include "cpu.h"
-#include "types.h"
+#include "include/cpu.h"
+#include "include/types.h"
 
 void qemu_reboot()
 {
