@@ -1,3 +1,5 @@
+#include "tests/asserts.h"
+
 #include <cut.h>
 
 #include <string.h>
