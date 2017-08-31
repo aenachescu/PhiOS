@@ -7,7 +7,6 @@ set(PRJ_PATH ${CMAKE_SOURCE_DIR})
 
 # set include directories
 include_directories("${PRJ_PATH}/../")
-include_directories("${PRJ_PATH}/../include")
 include_directories("${PRJ_PATH}/../CUT/include")
 
 # set definitions

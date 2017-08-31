@@ -1,7 +1,7 @@
 #include "kernel/include/memory/bitmap_pma.h"
 #include "kernel/include/memory/paa.h"
-#include "types.h"
-#include "errors.h"
+#include "include/types.h"
+#include "include/errors.h"
 
 #define CHECK_ALIGN(addr, align) ((addr & (align - 1)) != 0)
 #define ALIGN(addr, align) addr = addr & (~(align - 1))
