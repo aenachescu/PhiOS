@@ -1,4 +1,4 @@
-# PhiOS ![Build Passing Icon](https://travis-ci.org/EnachescuAlin/PhiOS.svg)
+# PhiOS ![Build Passing Icon](https://travis-ci.org/EnachescuAlin/PhiOS.svg?branch=devel)
 
 ## How to build?
 * First of all, you must have installed a Linux based operating system.
