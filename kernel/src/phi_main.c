@@ -83,7 +83,7 @@ void kernel_main()
 
     serial_init();
     serial_writeString("oh, serial is working :o\n", SERIAL_PORT_A);
-
+/*
     struct AllocFuncParam request;
     struct IA32_4KB_Paging_AllocParam ia32_request;
 
@@ -103,6 +103,6 @@ void kernel_main()
     KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
 
     freezeCpu();
-
+*/
     return;
 }

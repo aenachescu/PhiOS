@@ -86,13 +86,13 @@ uint32 IA32_4KB_init(
 
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
-    struct AllocFuncParam *a_request,
-    uint32 *a_address
+    struct VirtualAllocRequest *a_request,
+    uint64 *a_address
 );
 
 uint32 IA32_4KB_free(
     struct Paging *a_paging,
-    struct FreeFuncParam *a_request
+    struct VirtualFreeRequest *a_request
 );
 
 uint32 IA32_4KB_virtualQuery(
@@ -108,25 +108,6 @@ uint32 IA32_4KB_switchDirectory(
 uint32 IA32_4KB_enablePaging(
     struct Paging *a_paging
 );
-
-struct IA32_4KB_Paging_AllocParam
-{
-    uint32          flag;
-    bool            user;
-    bool            write;
-    bool            cacheDisabled;
-    bool            writeThrough;
-    uint32          virtualAddress;
-    uint32          length; // in bytes
-    uint32          physicalAddress;
-};
-
-struct IA32_4KB_Paging_FreeParam
-{
-    uint32 flag;
-    uint32 startAddress;
-    uint32 length; // in bytes
-};
 
 /*
  * struct for page directory with page size 4MB
