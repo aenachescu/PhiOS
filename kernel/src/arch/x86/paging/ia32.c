@@ -115,7 +115,7 @@ static uint32 helper_IA32_4KB_deletePaging(
 __attribute__ ((unused))
 static void helper_IA32_4KB_allocArea(
     struct Paging *a_paging,
-    struct IA32_4KB_Paging_AllocParam *a_request)
+    struct VirtualAllocRequest *a_request)
 {
     struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
     struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
@@ -146,11 +146,12 @@ static void helper_IA32_4KB_allocArea(
 
     uint32 data = 0;
     data |= (1 << 0); // set present
+    /*
     a_request->write ? data |= (1 << 1) : 0; // set write
     a_request->user? data |= (1 << 2) : 0; // set user
     a_request->writeThrough ? data |= (1 << 3) : 0; // set writeThrough
     a_request->cacheDisabled ? data |= (1 << 4) : 0; // set cacheDisabled
-
+    */
     pageTable += pageTableId;
 
     while (pagesNumber != 0) {
@@ -364,19 +365,17 @@ uint32 IA32_4KB_initKernelPaging(
 
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
-    struct AllocFuncParam *a_request,
-    uint32 *a_address)
+    struct VirtualAllocRequest *a_request,
+    uint64 *a_address)
 {
-    if (a_paging == NULL
-        || a_request == NULL
-        || a_address == NULL
-        || a_paging->pagingStruct == NULL
-        || a_request->param == NULL) {
+    if (a_paging == NULL ||
+        a_request == NULL ||
+        a_address == NULL ||
+        a_paging->pagingStruct == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_request->pagingType != PAGING_TYPE_IA32_4KB
-        || a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
+    if (a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
         return ERROR_INVALID_PARAMETER;
     }
 
@@ -384,14 +383,11 @@ uint32 IA32_4KB_alloc(
 
     *a_address = NULL;
 
-    struct IA32_4KB_Paging_AllocParam *request;
-    request = (struct IA32_4KB_Paging_AllocParam*) a_request->param;
-
-    if (request->length == 0) {
+    if (a_request->length == 0) {
         return ERROR_INVALID_PARAMETER;
     }
 
-    do {
+    do {/*
         bool allocAtAddr = request->flag & PAGING_FLAG_ALLOC_AT_ADDRESS ? 1 : 0;
         bool allocCloser = request->flag & PAGING_FLAG_ALLOC_CLOSER_OF_ADDRESS ? 1 : 0;
         bool sharedMemory = request->flag & PAGING_FLAG_ALLOC_SHARED_MEMORY ? 1 : 0;
@@ -466,7 +462,7 @@ uint32 IA32_4KB_alloc(
                 return ERROR_NO_FREE_MEMORY;
             }
 
-            struct VirtualAddressInfo info;
+            struct VirtualAddressInfo info;*/
 
             /*
             TODO: this should be finished
@@ -529,6 +525,7 @@ uint32 IA32_4KB_alloc(
             }
 
             kprintf("%x\n", request->virtualAddress);*/
+            /*
         } else {
             // TODO: search from last allocated page to end of address space for
             // an empty page, if there aren't, then search from 0x0 to last allocated page
@@ -562,7 +559,7 @@ uint32 IA32_4KB_alloc(
             }
 
             request->physicalAddress = physicalAddress;
-        }
+        }*/
 
         // call allocArea
         // TODO: here should come the actual mapping
@@ -573,24 +570,19 @@ uint32 IA32_4KB_alloc(
 
 uint32 IA32_4KB_free(
     struct Paging *a_paging,
-    struct FreeFuncParam *a_request)
+    struct VirtualFreeRequest *a_request)
 {
-    if (a_paging == NULL
-        || a_request == NULL
-        || a_paging->pagingStruct == NULL
-        || a_request->param == NULL) {
+    if (a_paging == NULL ||
+        a_request == NULL ||
+        a_paging->pagingStruct == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_request->pagingType != PAGING_TYPE_IA32_4KB
-        || a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
+    if (a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
         return ERROR_INVALID_PARAMETER;
     }
 
     uint32 error = ERROR_SUCCESS;
-
-    //struct IA32_4KB_Paging_FreeParam *request;
-    //request = (struct IA32_4KB_Paging_FreeParam*) a_request->param;
 
     do {
     } while (false);
