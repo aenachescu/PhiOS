@@ -22,6 +22,7 @@ addons:
     coverity_scan:
         project:
             name: "EnachescuAlin/PhiOS"
+        notification_email: alinenachescu033@gmail.com
         build_command_prepend: "cov-configure --comptype gcc --compiler gcc-4.8"
         build_command:   "make VERBOSE=1"
         branch_pattern: devel
