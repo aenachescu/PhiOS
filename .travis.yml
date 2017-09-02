@@ -5,10 +5,6 @@ notifications:
 
 notifications:
     irc: "chat.freenode.net#cruce-devel"
-    
-env:
-    global:
-    - secure: "IeCb360nngOFcHA38xxUULb7dC04DisAkHnXEMgaAt58a+gDoPjipA3NVH2+6ea3DL9KrTiWziheS97kdmCctBciJxbG2zH7FI9zPiQUTUFfXutvQ3NismG/NdnpqIZyr2+RvNb33WBxGOvGTYSQ/+VoVgfBGBh1mmEhDBl1uEHHiLTzoX5EGmUW++WZAuItVfUvE2t5XFYj3r/UO2JTOy+05uAdisQfCRPoAFIjMCLdDYAf7MzNYmttH7pdMT7LLnDIWX3GIFBU+jWtUahf+S4OC+MosJzt8qhi2w69s7VB/1yvs8cSC0LlgxqZxjw9IUqC7SYQIHTe9FK4QC75JVDFa32hXZl8mBedQKcKs82Q1EZngX8fR1/RrVOMl0pTtq/0LMxwmZy0zOofX385hqsQfUo36DKhN8X33yoO1OYB3l/2XoAvUd7zuX/cS/DIGlVnQwGi8wyeSH5x2QUV7hkvPgjnxLaYF4aRXxSCWurEPrbUY30ghvOTdCVh+dcznyTKKkp4kftXt60fv7pthq1RjGcvENA2R4qigiVHAcEio0OnFss+p6Rzfg/KqgjXBmS4/wrp6x6o6Q3jFaJxhJ4cIQEmWfNIffbThjU3ITgjF5InuaUyEWo1dCYq1bs31OyVRyl33SjLerUCSyFZ38ib3aTldT7gAQgYV1Ffs/Q="
 
 language: c
 compiler: gcc
@@ -19,11 +15,6 @@ addons:
         - libc6-dev-i386
         - gcc-multilib
         - g++-multilib
-    coverity_scan:
-        project:
-            name: "EnachescuAlin/PhiOS"
-        notification_email: alinenachescu033@gmail.com
-        branch_pattern: devel
 
 install:
     - ./linux_x86_64_getDependencies.sh
