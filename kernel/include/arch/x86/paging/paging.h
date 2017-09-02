@@ -16,41 +16,55 @@
 #define PAGING_TYPE_IA32E_2MB   6
 #define PAGING_TYPE_IA32E_1GB   7
 
-#define PAGING_FLAG_USER                        0x10000000
-#define PAGING_FLAG_KERNEL                      0x20000000
+#define PAGING_ALLOC_PAGE_FLAG_USER             0x00000001
+#define PAGING_ALLOC_PAGE_FLAG_WRITE            0x00000002
+#define PAGING_ALLOC_PAGE_FLAG_CACHE_DISABLED   0x00000004
+#define PAGING_ALLOC_PAGE_FLAG_WRITE_THROUGH    0x00000008
+#define PAGING_ALLOC_PAGE_FLAG_EXECUTE          0x00000010
+#define PAGING_ALLOC_PAGE_FLAG_GLOBAL           0x00000020
+#define PAGING_ALLOC_PAGE_FLAG_DEBUG            0x40000000
+#define PAGING_ALLOC_PAGE_FLAG_UNIT_TESTING     0x80000000
 
-#define PAGING_FLAG_ALLOC_AT_ADDRESS            0x00000001
-#define PAGING_FLAG_ALLOC_SHARED_MEMORY         0x00000002
-#define PAGING_FLAG_ALLOC_CLOSER_OF_ADDRESS     0x00000004
-#define PAGING_FLAG_ALLOC_MAPS_KERNEL           0x00000008
+#define PAGING_ALLOC_FLAG_AT_ADDRESS            0x00000001
+#define PAGING_ALLOC_FLAG_SHARED_MEMORY         0x00000002
+#define PAGING_ALLOC_FLAG_CLOSER_OF_ADDRESS     0x00000004
+#define PAGING_ALLOC_FLAG_MAPS_KERNEL           0x00000008
+#define PAGING_ALLOC_FLAG_DEBUG                 0x40000000
+#define PAGING_ALLOC_FLAG_UNIT_TESTING          0x80000000
 
-#define PAGING_FLAG_FREE_DESTROY                0x00000010
-#define PAGING_FLAG_FREE_SHARED_MEMORY          0x00000020
-#define PAGING_FLAG_FREE_EXIT_PROCESS           0x00000040
+#define PAGING_FREE_FLAG_DESTROY                0x00000001
+#define PAGING_FREE_FLAG_SHARED_MEMORY          0x00000002
+#define PAGING_FREE_FLAG_EXIT_PROCESS           0x00000004
+#define PAGING_FREE_FLAG_DEBUG                  0x40000000
+#define PAGING_FREE_FLAG_UNIT_TESTING           0x80000000
 
-struct AllocFuncParam
+struct VirtualAllocRequest
 {
-    uint8       pagingType;
-    void       *param;
+    uint32 flags;
+    uint32 pageFlags;
+    uint64 virtualAddress;
+    uint64 length; // in bytes
+    uint64 physicalAddress;
 };
 
-struct FreeFuncParam
+struct VirtualFreeRequest
 {
-    uint8       pagingType;
-    void       *param;
+    uint32 flags;
+    uint64 startAddress;
+    uint64 length; // in bytes
 };
 
 struct Paging;
 
 typedef size_t (*VMA_ALLOC_PFN)(
     struct Paging *a_paging,
-    struct AllocFuncParam *a_request,
-    size_t *a_address
+    struct VirtualAllocRequest *a_request,
+    uint64 *a_address
 );
 
 typedef size_t (*VMA_FREE_PFN)(
     struct Paging *a_paging,
-    struct FreeFuncParam *a_request
+    struct VirtualFreeRequest *a_request
 );
 
 struct Paging
