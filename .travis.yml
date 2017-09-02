@@ -8,7 +8,7 @@ notifications:
     
 env:
     global:
-    - secure: "12-1Okee5fI2QoLiV3gnmg"
+    - secure: "vjNTx4thv2UASyiizOfykw"
 
 language: c
 compiler: gcc
@@ -20,6 +20,10 @@ addons:
         - gcc-multilib
         - g++-multilib
     coverity_scan:
+        project:
+            name: "EnachescuAlin/PhiOS"
+        build_command_prepend: "cov-configure --comptype gcc --compiler gcc-4.8"
+        build_command:   "make VERBOSE=1"
         branch_pattern: devel
 
 install:
