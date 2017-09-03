@@ -25,6 +25,12 @@
 #define ERROR_INVALID_PORT          19
 #define ERROR_PERMISSION_DENIED     20
 #define ERROR_NO_FREE_VIRTUAL_MEMORY 21
+#define ERROR_INVALID_PHYSICAL_ADDRESS          22
+#define ERROR_INVALID_VIRTUAL_ADDRESS           23
+#define ERROR_INVALID_SIZE                      24
+#define ERROR_INVALID_ALIGNMENT                 25
+#define ERROR_ALREADY_USED_AREA                 26
+#define ERROR_NO_FREE_PHYSICAL_MEMORY           27
 
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)
