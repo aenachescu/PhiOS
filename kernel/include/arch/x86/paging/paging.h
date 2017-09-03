@@ -58,13 +58,13 @@ struct Paging;
 
 typedef size_t (*VMA_ALLOC_PFN)(
     struct Paging *a_paging,
-    struct VirtualAllocRequest *a_request,
+    const struct VirtualAllocRequest *a_request,
     uint64 *a_address
 );
 
 typedef size_t (*VMA_FREE_PFN)(
     struct Paging *a_paging,
-    struct VirtualFreeRequest *a_request
+    const struct VirtualFreeRequest *a_request
 );
 
 struct Paging
