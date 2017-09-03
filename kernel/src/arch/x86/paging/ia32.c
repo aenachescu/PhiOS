@@ -391,6 +391,9 @@ uint32 IA32_4KB_alloc(
         bool allocCloser = a_request->flags & PAGING_ALLOC_FLAG_CLOSER_TO_ADDRESS ? true : false;
         bool sharedMemory = a_request->flags & PAGING_ALLOC_FLAG_SHARED_MEMORY ? true : false;
 
+        uint32 start = 0;
+        uint32 end   = 0;
+
         // you can't alloc at some address or closer to it in the same time
         if (allocCloser && allocAtAddr) {
             error = ERROR_INVALID_PARAMETER;
@@ -415,9 +418,8 @@ uint32 IA32_4KB_alloc(
                 break;
             }
 
-            uint32 start = (uint32) a_request->virtualAddress;
-            uint32 end   = (uint32) a_request->length;
-            end += start;
+            start = (uint32) a_request->virtualAddress;
+            end   = (uint32) a_request->length + start;
 
             if (start >= end) {
                 error = ERROR_INVALID_VIRTUAL_ADDRESS;
@@ -480,7 +482,7 @@ uint32 IA32_4KB_alloc(
                 return ERROR_NO_FREE_MEMORY;
             }
 
-            struct VirtualAddressInfo info;
+            //struct VirtualAddressInfo info;
 
             /*
             TODO: this should be finished
