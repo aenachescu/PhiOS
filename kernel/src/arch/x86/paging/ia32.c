@@ -369,7 +369,7 @@ uint32 IA32_4KB_initKernelPaging(
 
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
-    struct VirtualAllocRequest *a_request,
+    const struct VirtualAllocRequest *a_request,
     uint64 *a_address)
 {
     if (a_paging == NULL ||
@@ -601,7 +601,7 @@ uint32 IA32_4KB_alloc(
 
 uint32 IA32_4KB_free(
     struct Paging *a_paging,
-    struct VirtualFreeRequest *a_request)
+    const struct VirtualFreeRequest *a_request)
 {
     if (a_paging == NULL ||
         a_request == NULL ||
