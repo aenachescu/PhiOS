@@ -115,7 +115,11 @@ static uint32 helper_IA32_4KB_deletePaging(
 __attribute__ ((unused))
 static void helper_IA32_4KB_allocArea(
     struct Paging *a_paging,
-    struct VirtualAllocRequest *a_request)
+    uint64 a_virtualAddress,
+    uint64 a_physicalAddress,
+    uint64 a_length,
+    uint32 a_pageFlags,
+    uint32 a_pageTableFlags)
 {
     struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
     struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
@@ -123,9 +127,9 @@ static void helper_IA32_4KB_allocArea(
     // TODO: remove that after you use them, for now it resolves warnings
     pd = pd;
 
-    size_t virtualAddress = a_request->virtualAddress & (~4095);
+    size_t virtualAddress = a_virtualAddress & (~4095);
     size_t firstPageId = virtualAddress / 4096;
-    size_t lastVirtualAddress = a_request->virtualAddress + a_request->length;
+    size_t lastVirtualAddress = a_virtualAddress + a_length;
     if (lastVirtualAddress % 4096 != 0) {
         lastVirtualAddress &= (~4095);
         lastVirtualAddress += 4096;
@@ -140,9 +144,9 @@ static void helper_IA32_4KB_allocArea(
     size_t pagesNumber = (lastVirtualAddress - virtualAddress) / 4096;
 
     // ADDED: update the free memory count
-    a_paging->freeVirtualMemory -= pagesNumber;
+    a_paging->freeVirtualMemory -= a_length;
 
-    size_t physicalAddress = a_request->physicalAddress;
+    size_t physicalAddress = a_physicalAddress;
 
     uint32 data = 0;
     data |= (1 << 0); // set present
@@ -393,6 +397,8 @@ uint32 IA32_4KB_alloc(
 
         uint32 start = 0;
         uint32 end   = 0;
+        
+        uint32 virtualAddress, physicalAddress, pageTableFlags;
 
         // you can't alloc at some address or closer to it in the same time
         if (allocCloser && allocAtAddr) {
@@ -466,8 +472,10 @@ uint32 IA32_4KB_alloc(
             if (error != ERROR_SUCCESS) {
                 break;
             }
+            
+            virtualAddress = a_request->virtualAddress;
         } else if (allocCloser) {
-            // align the virtual address to 4 KiB
+            /*// align the virtual address to 4 KiB
             ALIGN(a_request->virtualAddress, 0x1000);
 
             // align size too
@@ -480,7 +488,7 @@ uint32 IA32_4KB_alloc(
             size_t pagesToAlloc = a_request->length / 0x1000;
             if (pagesToAlloc > a_paging->freeVirtualMemory) {
                 return ERROR_NO_FREE_MEMORY;
-            }
+            }*/
 
             //struct VirtualAddressInfo info;
 
@@ -568,9 +576,9 @@ uint32 IA32_4KB_alloc(
         if (!sharedMemory) {
             // if the memory is not shared, we should alloc some physical memory
 
-            uint64 physicalAddress;
+            uint64 tempAddr;
             error = PMM_alloc(
-                &physicalAddress, 
+                &tempAddr, 
                 (uint64) (end - start),
                 PMM_FOR_VIRTUAL_MEMORY
             );
@@ -579,12 +587,13 @@ uint32 IA32_4KB_alloc(
                 error = ERROR_NO_FREE_PHYSICAL_MEMORY;
                 break;
             }
-
-            a_request->physicalAddress = physicalAddress;
+            
+            physicalAddress = (uint32) tempAddr;
         }
 
         // call allocArea
         // TODO: here should come the actual mapping
+        kprintf("VIRT %x PHYS %x\n", virtualAddress, physicalAddress);
     } while (false);
 
     return error;
