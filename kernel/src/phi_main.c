@@ -83,26 +83,21 @@ void kernel_main()
 
     serial_init();
     serial_writeString("oh, serial is working :o\n", SERIAL_PORT_A);
-/*
-    struct AllocFuncParam request;
-    struct IA32_4KB_Paging_AllocParam ia32_request;
 
-    request.pagingType = PAGING_TYPE_IA32_4KB;
-    request.param = &ia32_request;
+    struct VirtualAllocRequest ia32_request;
 
-    ia32_request.flag = PAGING_FLAG_ALLOC_AT_ADDRESS;
-    ia32_request.user = false;
-    ia32_request.write = true;
-    ia32_request.cacheDisabled = false;
-    ia32_request.writeThrough = false;
-    ia32_request.virtualAddress = 0xBFFFFFFF;
+    ia32_request.flags = PAGING_ALLOC_FLAG_AT_ADDRESS;
+    ia32_request.pageFlags = 0;
+    ia32_request.virtualAddress = 0x50000;
     ia32_request.length = 0x1000;
     ia32_request.physicalAddress = 0;
 
-    uint32 addr;
-    KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
+    uint64 addr;
+    KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &ia32_request, &addr));
+    
+    // if alloc doesn't work, this should fault
+    uint32 *tmp = 0x50000;
+    *tmp = 1;
 
-    freezeCpu();
-*/
     return;
 }
