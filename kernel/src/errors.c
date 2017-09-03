@@ -93,7 +93,7 @@ void __kernel_check(size_t err, const char *file, size_t line)
             ERROR_KPRINTF("ERROR_NO_FREE_VIRTUAL_MEMORY");
 
         default:
-            ERROR_KPRINTF("UNKNOWN_ERROR_CODE");
+            kprintf("\n[UNKNOWN_CODE %d] In file %s at line %d.", err, file, line); stopCpu();
             break;
     }
 }
