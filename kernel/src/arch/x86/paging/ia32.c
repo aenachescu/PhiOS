@@ -388,7 +388,7 @@ uint32 IA32_4KB_alloc(
 
     do {
         bool allocAtAddr = a_request->flags & PAGING_ALLOC_FLAG_AT_ADDRESS ? true : false;
-        bool allocCloser = a_request->flags & PAGING_ALLOC_FLAG_CLOSER_OF_ADDRESS ? true : false;
+        bool allocCloser = a_request->flags & PAGING_ALLOC_FLAG_CLOSER_TO_ADDRESS ? true : false;
         bool sharedMemory = a_request->flags & PAGING_ALLOC_FLAG_SHARED_MEMORY ? true : false;
 
         // you can't alloc at some address or closer to it in the same time
