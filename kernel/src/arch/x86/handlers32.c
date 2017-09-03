@@ -172,11 +172,11 @@ void handlers32_pageFault(IntCpuState32 *a_state)
      * second column: value to print if the bit is not set
      */
     const char *status[][2] = {
-        "- breaking protection rules\n",                        "- a not present page\n",
-        "- a writing action\n",                                 "- a reading action\n",
-        "- an user space instruction\n",                        "- a kernel space instruction\n",
-        "- reserved bits in page\n",                            "\0",
-        "- an instruction fetch (no-execute bit is enabled)",   "\0" 
+        {"- breaking protection rules\n",                        "- a not present page\n"},
+        {"- a writing action\n",                                 "- a reading action\n"},
+        {"- an user space instruction\n",                        "- a kernel space instruction\n"},
+        {"- reserved bits in page\n",                            "\0"},
+        {"- an instruction fetch (no-execute bit is enabled)",   "\0"} 
     };
     const uint32 cases = 5;
 
