@@ -127,6 +127,10 @@ static void helper_IA32_4KB_allocArea(
     // TODO: remove that after you use them, for now it resolves warnings
     pd = pd;
 
+    // set present flag by default
+    a_pageFlags |= IA32_4KB_PAGE_PRESENT;
+    a_pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
+
     size_t virtualAddress = a_virtualAddress & (~4095);
     size_t firstPageId = virtualAddress / 4096;
     size_t lastVirtualAddress = a_virtualAddress + a_length;
@@ -135,7 +139,7 @@ static void helper_IA32_4KB_allocArea(
         lastVirtualAddress += 4096;
     }
 
-    // ADDED: save the last allocated address
+    // save the last allocated address
     a_paging->lastAllocatedAddress = lastVirtualAddress;
 
     size_t pageTableId = firstPageId / PAGING_IA32_PDE_NUMBER;
@@ -143,31 +147,30 @@ static void helper_IA32_4KB_allocArea(
 
     size_t pagesNumber = (lastVirtualAddress - virtualAddress) / 4096;
 
-    // ADDED: update the free memory count
+    // update the free memory count
     a_paging->freeVirtualMemory -= a_length;
 
     size_t physicalAddress = a_physicalAddress;
 
-    uint32 data = 0;
-    data |= (1 << 0); // set present
-    /*
-    a_request->write ? data |= (1 << 1) : 0; // set write
-    a_request->user? data |= (1 << 2) : 0; // set user
-    a_request->writeThrough ? data |= (1 << 3) : 0; // set writeThrough
-    a_request->cacheDisabled ? data |= (1 << 4) : 0; // set cacheDisabled
-    */
     pageTable += pageTableId;
 
     while (pagesNumber != 0) {
         pagesNumber--;
 
-        pageTable->entries[pageId].data = (data | physicalAddress);
+        pageTable->entries[pageId].data = (a_pageFlags | physicalAddress);
         physicalAddress += 4096;
 
         pageId++;
         if (pageId == PAGING_IA32_PTE_NUMBER) {
             pageId = 0;
             pageTable++;
+            pageTableId++;
+        }
+        
+        if (!(pd->entries[pageTableId].data & IA32_4KB_PAGE_TABLE_PRESENT)) {
+            // TODO: create new page table
+            kprintf("PAGE TABLE NOT ALLOCATED");
+            freezeCpu();
         }
     }
 
@@ -399,6 +402,17 @@ uint32 IA32_4KB_alloc(
         uint32 end   = 0;
         
         uint32 virtualAddress, physicalAddress, pageTableFlags;
+        
+        // craft page table falgs
+        pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT;
+        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_WRITE 
+                          ? IA32_4KB_PAGE_WRITE : 0;
+        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_USER 
+                          ? IA32_4KB_PAGE_USER : 0;
+        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_WRITE_THROUGH 
+                          ? IA32_4KB_PAGE_WRITE_THROUGH : 0;
+        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_CACHE_DISABLED 
+                          ? IA32_4KB_PAGE_CACHE_DISABLED : 0;
 
         // you can't alloc at some address or closer to it in the same time
         if (allocCloser && allocAtAddr) {
@@ -591,9 +605,12 @@ uint32 IA32_4KB_alloc(
             physicalAddress = (uint32) tempAddr;
         }
 
-        // call allocArea
-        // TODO: here should come the actual mapping
-        kprintf("VIRT %x PHYS %x\n", virtualAddress, physicalAddress);
+        helper_IA32_4KB_allocArea(a_paging, 
+                                  virtualAddress, 
+                                  physicalAddress,
+                                  a_request->length,
+                                  a_request->pageFlags,
+                                  pageTableFlags); 
     } while (false);
 
     return error;
