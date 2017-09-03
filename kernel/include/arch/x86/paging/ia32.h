@@ -86,13 +86,13 @@ uint32 IA32_4KB_init(
 
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
-    struct VirtualAllocRequest *a_request,
+    const struct VirtualAllocRequest *a_request,
     uint64 *a_address
 );
 
 uint32 IA32_4KB_free(
     struct Paging *a_paging,
-    struct VirtualFreeRequest *a_request
+    const struct VirtualFreeRequest *a_request
 );
 
 uint32 IA32_4KB_virtualQuery(
