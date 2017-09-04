@@ -87,7 +87,7 @@ void kernel_main()
     struct VirtualAllocRequest ia32_request;
 
     ia32_request.flags = PAGING_ALLOC_FLAG_AT_ADDRESS;
-    ia32_request.pageFlags = 0;
+    ia32_request.pageFlags = PAGING_ALLOC_PAGE_FLAG_WRITE;
     ia32_request.virtualAddress = 0x50000;
     ia32_request.length = 0x1000;
     ia32_request.physicalAddress = 0;
@@ -98,6 +98,7 @@ void kernel_main()
     // if alloc doesn't work, this should fault
     uint32 *tmp = 0x50000;
     *tmp = 1;
+    kprintf("%u\n", *tmp);
 
     return;
 }
