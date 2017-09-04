@@ -41,6 +41,34 @@ extern struct KernelArea g_kernelArea;
 #define ALIGN(addr, align) addr = addr & (~(align - 1))
 #define IS_POWER_OF_2(x) (!(x & (x - 1)))
 
+static uint32 helper_IA32_4KB_allocPageFlagsToIntelFlags(
+    uint32 a_allocPageFlags)
+{
+    uint32 ret = 0;
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_WRITE) {
+        ret |= IA32_4KB_PAGE_WRITE;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_USER) {
+        ret |= IA32_4KB_PAGE_USER;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_WRITE_THROUGH) {
+        ret |= IA32_4KB_PAGE_WRITE_THROUGH;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_CACHE_DISABLED) {
+        ret |= IA32_4KB_PAGE_CACHE_DISABLED;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_GLOBAL) {
+        ret |= IA32_4KB_PAGE_GLOBAL;
+    }
+
+    return ret;
+}
+
 static uint32 helper_IA32_4KB_createPaging(
     struct Paging *a_paging)
 {
@@ -112,70 +140,6 @@ static uint32 helper_IA32_4KB_deletePaging(
     return error;
 }
 
-__attribute__ ((unused))
-static void helper_IA32_4KB_allocArea(
-    struct Paging *a_paging,
-    uint64 a_virtualAddress,
-    uint64 a_physicalAddress,
-    uint64 a_length,
-    uint32 a_pageFlags,
-    uint32 a_pageTableFlags)
-{
-    struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
-    struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
-
-    // TODO: remove that after you use them, for now it resolves warnings
-    pd = pd;
-
-    // set present flag by default
-    a_pageFlags |= IA32_4KB_PAGE_PRESENT;
-    a_pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
-
-    size_t virtualAddress = a_virtualAddress & (~4095);
-    size_t firstPageId = virtualAddress / 4096;
-    size_t lastVirtualAddress = a_virtualAddress + a_length;
-    if (lastVirtualAddress % 4096 != 0) {
-        lastVirtualAddress &= (~4095);
-        lastVirtualAddress += 4096;
-    }
-
-    // save the last allocated address
-    a_paging->lastAllocatedAddress = lastVirtualAddress;
-
-    size_t pageTableId = firstPageId / PAGING_IA32_PDE_NUMBER;
-    size_t pageId = firstPageId % PAGING_IA32_PTE_NUMBER;
-
-    size_t pagesNumber = (lastVirtualAddress - virtualAddress) / 4096;
-
-    // update the free memory count
-    a_paging->freeVirtualMemory -= a_length;
-
-    size_t physicalAddress = a_physicalAddress;
-
-    pageTable += pageTableId;
-
-    while (pagesNumber != 0) {
-        pagesNumber--;
-
-        pageTable->entries[pageId].data = (a_pageFlags | physicalAddress);
-        physicalAddress += 4096;
-
-        pageId++;
-        if (pageId == PAGING_IA32_PTE_NUMBER) {
-            pageId = 0;
-            pageTable++;
-            pageTableId++;
-        }
-        
-        if (!(pd->entries[pageTableId].data & IA32_4KB_PAGE_TABLE_PRESENT)) {
-            // TODO: create new page table
-            kprintf("PAGE TABLE NOT ALLOCATED");
-            freezeCpu();
-        }
-    }
-
-}
-
 static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     uint32 a_virtualAddress,
     uint32 *a_pageId,
@@ -192,6 +156,45 @@ static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     }
 
     return ERROR_SUCCESS;
+}
+
+__attribute__ ((unused))
+static void helper_IA32_4KB_allocArea(
+    uint32 a_start,
+    uint32 a_end,
+    uint32 a_physicalAddress,
+    uint32 a_pageFlags,
+    uint32 a_pageTableFlags)
+{
+    struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
+    struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
+
+    // set present flag by default
+    a_pageFlags |= IA32_4KB_PAGE_PRESENT;
+    a_pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
+
+    uint32 pageId = 0, pageTableId = 0;
+    helper_IA32_4KB_getPositionForVirtualAddress(a_start, &pageId, &pageTableId);
+    pageTable += pageTableId;
+
+    while (a_start < a_end) {
+        if (pd->entries[pageTableId].data == 0) {
+            kprintf("page table not allocated\n");
+            // alloc it!!!
+        }
+
+        pageTable->entries[pageId].data = (a_pageFlags | a_physicalAddress);
+        a_physicalAddress += 4096;
+
+        pageId++;
+        if (pageId == PAGING_IA32_PTE_NUMBER) {
+            pageId = 0;
+            pageTable++;
+            pageTableId++;
+        }
+
+        a_start += 4096;
+    }
 }
 
 static void helper_IA32_4KB_initPageTable(
@@ -401,7 +404,7 @@ uint32 IA32_4KB_alloc(
         uint32 start = 0;
         uint32 end   = 0;
         
-        uint32 virtualAddress, physicalAddress, pageTableFlags;
+        uint32 physicalAddress = 0, pageTableFlags = 0;
         
         // craft page table falgs
         pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT;
@@ -486,8 +489,6 @@ uint32 IA32_4KB_alloc(
             if (error != ERROR_SUCCESS) {
                 break;
             }
-            
-            virtualAddress = a_request->virtualAddress;
         } else if (allocCloser) {
             /*// align the virtual address to 4 KiB
             ALIGN(a_request->virtualAddress, 0x1000);
@@ -605,12 +606,13 @@ uint32 IA32_4KB_alloc(
             physicalAddress = (uint32) tempAddr;
         }
 
-        helper_IA32_4KB_allocArea(a_paging, 
-                                  virtualAddress, 
-                                  physicalAddress,
-                                  a_request->length,
-                                  a_request->pageFlags,
-                                  pageTableFlags); 
+        helper_IA32_4KB_allocArea(
+            start,
+            end,
+            physicalAddress,
+            helper_IA32_4KB_allocPageFlagsToIntelFlags(a_request->pageFlags),
+            pageTableFlags
+        );
     } while (false);
 
     return error;
