@@ -8,6 +8,7 @@
 #include "kernel/include/qemu/power.h"
 #include "kernel/include/arch/x86/paging/ia32.h"
 #include "kernel/include/arch/x86/paging/paging.h"
+#include "kernel/include/logging.h"
 extern struct Paging g_kernelPaging;
 
 #include "drivers/keyboard/include/keyboard.h"
@@ -101,6 +102,8 @@ void kernel_main()
 
     uint32 addr;
     KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
+
+    KLOG_ERROR("FORTZA FORTZA FORTZA");
 
     freezeCpu();
 
