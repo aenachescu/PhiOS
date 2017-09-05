@@ -423,19 +423,25 @@ uint32 IA32_4KB_alloc(
             break;
         }
 
+        // check if physical memory can be used.
         if (sharedMemory) {
+            // physical address must be in the first 4GiB
             if (a_request->physicalAddress > 0xFFFFFFFF) {
                 error = ERROR_INVALID_PHYSICAL_ADDRESS;
                 break;
             }
 
+            // physical address must be multiple of 4KiB
             if (a_request->physicalAddress % 0x1000) {
                 error = ERROR_INVALID_ALIGNMENT;
                 break;
             }
+
+            physicalAddress = a_request->physicalAddress;
         }
 
         if (allocAtAddr) {
+            // in ia32 paging mode we have 4GiB of virtual memory
             if (a_request->virtualAddress > 0xFFFFFFFF) {
                 error = ERROR_INVALID_VIRTUAL_ADDRESS;
                 break;
@@ -457,7 +463,11 @@ uint32 IA32_4KB_alloc(
                 end += 0x1000;
             }
 
-            // check if there is enough memory
+            // check if there is enough memory, but that does not guarantee that
+            // we will find a continuous memory area of the required size
+            // but when a large area is required, we can quickly say that we
+            // don't have such a large area available without looking for
+            // a continuous area.
             if (((uint64)(end - start)) > a_paging->freeVirtualMemory) {
                 return ERROR_NO_FREE_VIRTUAL_MEMORY;
             }
@@ -588,9 +598,8 @@ uint32 IA32_4KB_alloc(
 
         }
 
+        // if the memory is not shared, we should alloc some physical memory
         if (!sharedMemory) {
-            // if the memory is not shared, we should alloc some physical memory
-
             uint64 tempAddr;
             error = PMM_alloc(
                 &tempAddr, 
@@ -602,8 +611,37 @@ uint32 IA32_4KB_alloc(
                 error = ERROR_NO_FREE_PHYSICAL_MEMORY;
                 break;
             }
+
+            if (tempAddr > 0xFFFFFFFF) {
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
+            }
             
             physicalAddress = (uint32) tempAddr;
+
+            // the entire physical memory area must be in the first 4GiB.
+            tempAddr += (end - start);
+            if (tempAddr > 0x100000000L) {
+                error = PMM_free(
+                    physicalAddress,
+                    (uint64) (end - start),
+                    PMM_FOR_VIRTUAL_MEMORY
+                );
+
+                if (error != ERROR_SUCCESS) {
+                    // TODO: something like BSOD
+                }
+
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
+            }
+        } else {
+            uint64 physicalAddressEnd = physicalAddress;
+            physicalAddressEnd += (end - start);
+            if (physicalAddressEnd > 0x100000000L) {
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
+            }
         }
 
         helper_IA32_4KB_allocArea(
