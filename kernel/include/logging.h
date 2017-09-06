@@ -1,25 +1,20 @@
-#ifndef Logging
-#define Logging
+#ifndef PhiOS_logging
+#define PhiOS_logging
 
-#include "util/kstdlib/include/kstdio.h"
-#include "util/kstdlib/include/kstdlib.h"
+void __klog(
+    const char *a_file,
+    int a_line,
+    const char *a_logType,
+    const char *a_format,
+    ...
+);
 
-#include "drivers/video/include/vga/text_mode.h"
+#define __KLOG(logType, format, ...) __klog(__FILENAME__, __LINE__, logType, format, ##__VA_ARGS__)
 
-#include <stdarg.h>
-
-uint32 __klog(const char *a_format, ...);
-
-#define __KLOG(errot_type, ...) { \ 
-    __klog(__FILENAME__);         \
-    __klog(__LINE__)              \
-    __klog(error_type);           \
-    __klog(__VA_ARGS__);          \ 
-};                                \
-
-#define KLOG_ERROR(...) { __KLOG("ERROR", __VA_ARGS__) };
-#define KLOG_WARNING(...) { __KLOG("WARNING", __VA_ARGS__) };
-#define KLOG_INFO(...) { __KLOG("INFO", __VA_ARGS__) };
-#define KLOG_FATAL(...) { __KLOG("FATAL", __VA_ARGS__) };
+#define KLOG_FATAL(format, ...)     __KLOG("FATAL", format, ##__VA_ARGS__)
+#define KLOG_ERROR(format, ...)     __KLOG("ERROR", format, ##__VA_ARGS__)
+#define KLOG_WARNING(format, ...)   __KLOG("WARNING", format, ##__VA_ARGS__)
+#define KLOG_INFO(format, ...)      __KLOG("INFO", format, ##__VA_ARGS__)
+#define KLOG_TRACE(format, ...)     __KLOG("TRACE", format, ##__VA_ARGS__)
 
 #endif
