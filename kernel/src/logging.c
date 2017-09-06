@@ -287,6 +287,7 @@ reinit:
 
                 case '*':
                     widthAsterix = true;
+                    ++a_format;
                     exit = true;
                     break;
 
@@ -324,6 +325,7 @@ reinit:
 
                 case '*':
                     precisionAsterix = true;
+                    ++a_format;
                     exit = true;
                     break;
 
@@ -343,6 +345,7 @@ skipPrecision:
         switch (*a_format) {
             case 'h':
                 if (a_format[1] == 'h') {
+                    ++a_format;
                     length = LENGTH_hh;
                 } else {
                     length = LENGTH_h;
@@ -351,6 +354,7 @@ skipPrecision:
 
             case 'l':
                 if (a_format[1] == 'l') {
+                    ++a_format;
                     length = LENGTH_ll;
                 } else {
                     length = LENGTH_l;
@@ -470,18 +474,22 @@ skipPrecision:
 
             case 'f':
             case 'F':
+                // TODO: add support for these specifiers
                 REINIT;
 
             case 'e':
             case 'E':
+                // TODO: add support for these specifiers
                 REINIT;
 
             case 'g':
             case 'G':
+                // TODO: add support for these specifiers
                 REINIT;
 
             case 'a':
             case 'A':
+                // TODO: add support for these specifiers
                 REINIT;
 
             case 'p':
@@ -504,11 +512,11 @@ skipPrecision:
         goto reinit;
     }
 
+end:
+
     va_end(arg);
 
-end:
     if (processingFormat == true && backupFormat != NULL) {
-        addString(result, "ana are mere", &currentPos);
         while (backupFormat <= a_format) {
             addChar(result, *backupFormat, &currentPos);
             backupFormat++;
