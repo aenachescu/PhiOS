@@ -151,8 +151,20 @@ static inline void int64ToStr(
     }
 
     --(*length);
-    kitoa(val, str + 1, length, base);
+    ki64toa(val, str + 1, length, base);
     ++(*length);
+}
+
+static inline void hexToLower(
+    char *str)
+{
+    register char *p = str;
+    while (*p != 0) {
+        if (*p >= 'A' && *p <= 'Z') {
+            (*p) += 32;
+        }
+        p++;
+    }
 }
 
 void __klog(
@@ -173,8 +185,8 @@ void __klog(
     char tmpBuff[TMP_BUFF_LENGTH] = { 0 };
     size_t tmpBuffLength = TMP_BUFF_LENGTH;
     uint32 currentPos = 0;
-    char c;
     const char *backupFormat = NULL;
+    char ch;
     bool exit;
 
     bool flag_minus, flag_plus, flag_space, flag_zero, flag_hash;
@@ -214,19 +226,21 @@ reinit:
         a_format++;
     }
 
-    while ((c = *a_format) != '\0') {
+    while (*a_format != '\0') {
         // backup for pointer if the format does not meet the standard
         backupFormat = a_format;
-        ++a_format;
 
-        if (c != '%') {
-            addChar(result, c, &currentPos);
+        if (*a_format != '%') {
+            addChar(result, *a_format, &currentPos);
+            ++a_format;
             continue;
         }
 
+        ++a_format;
+
         // for %% case
         if (*a_format == '%') {
-            addChar(result, c, &currentPos);
+            addChar(result, *a_format, &currentPos);
             ++a_format;
             continue;
         }
@@ -413,13 +427,13 @@ skipPrecision:
 
                     case LENGTH_h:
                         // int16
-                        val32 = (sint32) va_arg(arg, sint32);
+                        val32 = (sint16) va_arg(arg, sint32);
                         intToStr(val32, tmpBuff, &tmpBuffLength, 10, flag_space, flag_plus);
                         break;
 
                     case LENGTH_hh:
                         // int8
-                        val32 = (sint32) va_arg(arg, sint32);
+                        val32 = (sint8) va_arg(arg, sint32);
                         intToStr(val32, tmpBuff, &tmpBuffLength, 10, flag_space, flag_plus);
                         break;
 
@@ -466,6 +480,7 @@ skipPrecision:
                 REINIT;
 
             case 'o':
+                // TODO: add support for this specifier
                 REINIT;
 
             case 'x':
@@ -494,9 +509,31 @@ skipPrecision:
 
             case 'p':
             case 'P':
+#if defined WORDSIZE && WORDSIZE == 64
+                uval64 = va_arg(arg, uint64);
+                ku64toa(uval64, tmpBuff, &tmpBuffLength, 16);
+#else
+                uval32 = va_arg(arg, uint32);
+                kutoa(uval32, tmpBuff, &tmpBuffLength, 16);
+#endif
+
+                if (*a_format == 'p') {
+                    hexToLower(tmpBuff);
+                    addString(result, "0x", &currentPos);
+                } else {
+                    addString(result, "0X", &currentPos);
+                }
+
+                if (flag_hash == false) {
+                    addChars(result, '0', WORDSIZE_BYTES * 2 - tmpBuffLength, &currentPos);
+                }
+                addString(result, tmpBuff, &currentPos);
+
                 REINIT;
 
             case 'c':
+                ch = (char) va_arg(arg, int);
+                addChar(result, ch, &currentPos);
                 REINIT;
 
             case 's':
