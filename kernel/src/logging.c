@@ -41,6 +41,10 @@
     ++a_format;             \
     goto reinit
 
+static LOGGING_WRITE_PFN g_pfn[LOGGING_MAX_PFN];
+static uint32 g_numOfPfn;
+static bool g_isInitialized = false;
+
 static inline void write(
     const char *str)
 {
@@ -401,6 +405,7 @@ skipPrecision:
         // processing specifiers
         exit = false;
         switch (*a_format) {
+            // d and i specifiers
             case 'd':
             case 'i':
                 if (widthAsterix == true) {
@@ -442,11 +447,11 @@ skipPrecision:
                     case LENGTH_z:
                         // size_t
 #if defined WORDSIZE && WORDSIZE == 64
-                        val64 = va_arg(arg, sint64);
-                        int64ToStr(val64, tmpBuff, &tmpBuffLength, 10, flag_space, flag_plus);
+                        uval64 = va_arg(arg, uint64);
+                        ku64toa(uval64, tmpBuff, &tmpBuffLength, 10);
 #else
-                        val32 = va_arg(arg, sint32);
-                        intToStr(val32, tmpBuff, &tmpBuffLength, 10, flag_space, flag_plus);
+                        uval32 = va_arg(arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 10);
 #endif
                         break;
                 }
@@ -476,13 +481,80 @@ skipPrecision:
 
                 REINIT;
 
+            // u specifier
             case 'u':
+                if (widthAsterix == true) {
+                    width = va_arg(arg, uint32);
+                }
+
+                switch (length) {
+                    case LENGTH_L:
+                        // interpreted as int32
+                    case LENGTH_l:
+                    case LENGTH_none:
+                        // int32
+                        uval32 = va_arg(arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 10);
+                        break;
+
+                    case LENGTH_j:
+                        // intmax_t - interpreted as int64
+                    case LENGTH_ll:
+                        // int64
+                        uval64 = va_arg(arg, sint64);
+                        ku64toa(uval64, tmpBuff, &tmpBuffLength, 10);
+                        break;
+
+                    case LENGTH_h:
+                        // int16
+                        uval32 = (uint16) va_arg(arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 10);
+                        break;
+
+                    case LENGTH_hh:
+                        // int8
+                        uval32 = (uint8) va_arg(arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 10);
+                        break;
+
+                    case LENGTH_t:
+                        // ptrdiff_t - interpreted as int32 on 32bits and int64 on 64bits
+                    case LENGTH_z:
+                        // size_t
+#if defined WORDSIZE && WORDSIZE == 64
+                        uval64 = va_arg(arg, uint64);
+                        ku64toa(uval64, tmpBuff, &tmpBuffLength, 10);
+#else
+                        uval32 = va_arg(arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 10);
+#endif
+                        break;
+                }
+
+                if (tmpBuffLength < width) {
+                    if (flag_minus == true) {
+                        addString(result, tmpBuff, &currentPos);
+                        addChars(result, ' ', width - tmpBuffLength, &currentPos);
+                    } else {
+                        if (flag_zero == true) {
+                            addChars(result, '0', width - tmpBuffLength, &currentPos);
+                            addString(result, tmpBuff, &currentPos);
+                        } else {
+                            addChars(result, ' ', width - tmpBuffLength, &currentPos);
+                            addString(result, tmpBuff, &currentPos);
+                        }
+                    }
+                } else {
+                    addString(result, tmpBuff, &currentPos);
+                }
+
                 REINIT;
 
             case 'o':
                 // TODO: add support for this specifier
                 REINIT;
 
+            // x specifier
             case 'x':
             case 'X':
                 REINIT;
@@ -507,6 +579,7 @@ skipPrecision:
                 // TODO: add support for these specifiers
                 REINIT;
 
+            // p specifier
             case 'p':
             case 'P':
 #if defined WORDSIZE && WORDSIZE == 64
@@ -531,11 +604,13 @@ skipPrecision:
 
                 REINIT;
 
+            // c specifier
             case 'c':
                 ch = (char) va_arg(arg, int);
                 addChar(result, ch, &currentPos);
                 REINIT;
 
+            // s specifier
             case 's':
                 REINIT;
 
@@ -562,4 +637,57 @@ end:
 
     result[currentPos] = 0;
     write(result);
+}
+
+uint32 logging_init()
+{
+    if (g_isInitialized == true) {
+        return ERROR_ALREADY_INITIALIZED;
+    }
+
+    g_numOfPfn = 0;
+    for (uint32 i = 0; i < LOGGING_MAX_PFN; i++) {
+        g_pfn[i] = NULL;
+    }
+
+    g_isInitialized = true;
+
+    return ERROR_SUCCESS;
+}
+
+uint32 logging_uinit()
+{
+    if (g_isInitialized == false) {
+        return ERROR_UNINITIALIZED;
+    }
+
+    g_isInitialized = false;
+
+    return ERROR_SUCCESS;
+}
+
+bool logging_isInitialized()
+{
+    return g_isInitialized;
+}
+
+uint32 logging_addPfn(
+    LOGGING_WRITE_PFN a_pfn)
+{
+    if (g_isInitialized == false) {
+        return ERROR_UNINITIALIZED;
+    }
+
+    if (g_numOfPfn == LOGGING_MAX_PFN) {
+        return ERROR_LIMIT_REACHED;
+    }
+
+    if (a_pfn == NULL) {
+        return ERROR_INVALID_FUNCTION;
+    }
+
+    g_pfn[g_numOfPfn] = a_pfn;
+    g_numOfPfn++;
+
+    return ERROR_SUCCESS;
 }
