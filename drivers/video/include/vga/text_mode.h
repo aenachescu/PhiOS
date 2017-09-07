@@ -2,6 +2,7 @@
 #define _PhiOS_drivers_text_mode
 
 #include "include/types.h"
+#include "include/errors.h"
 
 #define VGA_WIDTH    80
 #define VGA_HEIGHT   25
@@ -51,7 +52,7 @@ void VGA_WriteChar(
     char a_c
 );
 
-void VGA_WriteString(
+uint32 VGA_WriteString(
     const char *a_str
 );
 

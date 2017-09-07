@@ -5,20 +5,57 @@
 #include "include/errors.h"
 
 void __klog(
-    const char *a_file,
-    int a_line,
-    const char *a_logType,
     const char *a_format,
     ...
 );
 
-#define __KLOG(logType, format, ...) __klog(__FILENAME__, __LINE__, logType, format, ##__VA_ARGS__)
+#define DEFAULT_FORMAT  "[%#10s][%5d][%7s]: "
+#define NEW_LINE        "\n"
 
-#define KLOG_FATAL(format, ...)     __KLOG("FATAL", format, ##__VA_ARGS__)
-#define KLOG_ERROR(format, ...)     __KLOG("ERROR", format, ##__VA_ARGS__)
-#define KLOG_WARNING(format, ...)   __KLOG("WARNING", format, ##__VA_ARGS__)
-#define KLOG_INFO(format, ...)      __KLOG("INFO", format, ##__VA_ARGS__)
-#define KLOG_TRACE(format, ...)     __KLOG("TRACE", format, ##__VA_ARGS__)
+#define KLOG_FATAL(format, ...)         \
+    __klog(                             \
+        DEFAULT_FORMAT format NEW_LINE, \
+        __FILENAME__,                   \
+        __LINE__,                       \
+        "FATAL",                        \
+        ##__VA_ARGS__                   \
+    )
+
+#define KLOG_ERROR(format, ...)         \
+    __klog(                             \
+        DEFAULT_FORMAT format NEW_LINE, \
+        __FILENAME__,                   \
+        __LINE__,                       \
+        "ERROR",                        \
+        ##__VA_ARGS__                   \
+    )
+
+#define KLOG_WARNING(format, ...)       \
+    __klog(                             \
+        DEFAULT_FORMAT format NEW_LINE, \
+        __FILENAME__,                   \
+        __LINE__,                       \
+        "WARNING",                      \
+        ##__VA_ARGS__                   \
+    )
+
+#define KLOG_INFO(format, ...)          \
+    __klog(                             \
+        DEFAULT_FORMAT format NEW_LINE, \
+        __FILENAME__,                   \
+        __LINE__,                       \
+        "INFO",                         \
+        ##__VA_ARGS__                   \
+    )
+
+#define KLOG_TRACE(format, ...)         \
+    __klog(                             \
+        DEFAULT_FORMAT format NEW_LINE, \
+        __FILENAME__,                   \
+        __LINE__,                       \
+        "TRACE",                        \
+        ##__VA_ARGS__                   \
+    )
 
 typedef uint32 (*LOGGING_WRITE_PFN)(const char *str);
 
