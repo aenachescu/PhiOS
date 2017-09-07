@@ -1,14 +1,9 @@
 #include "kernel/include/logging.h"
-#include "include/types.h"
 
 #include <stdarg.h>
 
-#include "drivers/video/include/vga/text_mode.h"
-
 #include "util/kstdlib/include/kstdlib.h"
-
-#include "include/cpu.h"
-#include "drivers/serial/include/serial.h"
+#include "util/kstdlib/include/kstring.h"
 
 #define BUFFER_SIZE 512
 #define TMP_BUFF_LENGTH 65
@@ -48,8 +43,9 @@ static bool g_isInitialized = false;
 static inline void write(
     const char *str)
 {
-    VGA_WriteString(str);
-    serial_writeString(str, SERIAL_PORT_A);
+    for (uint32 i = 0; i < g_numOfPfn; i++) {
+        g_pfn[i](str);
+    }
 }
 
 static inline void addChar(
@@ -103,6 +99,30 @@ static inline void addString(
 
         if (*str == '\0') {
             return;
+        }
+
+        res[*pos] = 0;
+        write(res);
+        *pos = 0;
+    }
+}
+
+static inline void addSubstring(
+    char *res,
+    const char *str,
+    uint32 length,
+    uint32 *pos)
+{
+    while (true) {
+        while (*pos < BUFFER_SIZE - 1 && length != 0) {
+            res[*pos] = *str;
+            str++;
+            (*pos)++;
+            length--;
+        }
+
+        if (length == 0) {
+            break;
         }
 
         res[*pos] = 0;
@@ -171,17 +191,19 @@ static inline void hexToLower(
     }
 }
 
+/*
+ * Things different from standard:
+ * 1. 'p' specifier
+ *      a. if the zero flag is present then the addres is padded with zeroes to left
+ *
+ * 2. 's' specifier
+ *      a. if the '#' flag is used then the string is truncated to width (if width is not equal to 0)
+ */
 void __klog(
-    const char *a_file,
-    int a_line,
-    const char *a_logType,
     const char *a_format,
     ...)
 {
-    if (a_format == NULL ||
-        a_file == NULL ||
-        a_logType == NULL ||
-        a_line < 0) {
+    if (a_format == NULL) {
         return;
     }
 
@@ -191,6 +213,7 @@ void __klog(
     uint32 currentPos = 0;
     const char *backupFormat = NULL;
     char ch;
+    const char* str;
     bool exit;
 
     bool flag_minus, flag_plus, flag_space, flag_zero, flag_hash;
@@ -561,6 +584,8 @@ skipPrecision:
 
             case 'f':
             case 'F':
+                // just fix warning -- remove that when 'precisionAsterix' will be used
+                precisionAsterix = precisionAsterix;
                 // TODO: add support for these specifiers
                 REINIT;
 
@@ -597,7 +622,7 @@ skipPrecision:
                     addString(result, "0X", &currentPos);
                 }
 
-                if (flag_hash == false) {
+                if (flag_zero == true) {
                     addChars(result, '0', WORDSIZE_BYTES * 2 - tmpBuffLength, &currentPos);
                 }
                 addString(result, tmpBuff, &currentPos);
@@ -612,6 +637,37 @@ skipPrecision:
 
             // s specifier
             case 's':
+                if (widthAsterix == true) {
+                    width = va_arg(arg, uint32);
+                }
+
+                str = va_arg(arg, const char*);
+
+                if (width == 0) {
+                    addString(result, str, &currentPos);
+                } else {
+                    kstrlen(str, &tmpBuffLength);
+                    if (tmpBuffLength < width) {
+                        if (flag_minus == true) {
+                            addString(result, str, &currentPos);
+                            addChars(result, ' ', width - tmpBuffLength, &currentPos);
+                        } else {
+                            addChars(result, ' ', width - tmpBuffLength, &currentPos);
+                            addString(result, str, &currentPos);
+                        }
+                    } else {
+                        if (flag_hash == true) {
+                            if (flag_minus == true) {
+                                addSubstring(result, str, width, &currentPos);
+                            } else {
+                                addString(result, str + (tmpBuffLength - width), &currentPos);
+                            }
+                        } else {
+                            addString(result, str, &currentPos);
+                        }
+                    }
+                }
+
                 REINIT;
 
             case 'n':

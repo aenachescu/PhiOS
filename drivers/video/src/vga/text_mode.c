@@ -60,10 +60,11 @@ void VGA_WriteChar(
     VGA_WriteColoredChar(a_c, g_VGA_backgroundColor, g_VGA_foregroundColor);
 }
 
-void VGA_WriteString(
+uint32 VGA_WriteString(
     const char *a_str)
 {
     VGA_WriteColoredString(a_str, g_VGA_backgroundColor, g_VGA_foregroundColor);
+    return ERROR_SUCCESS;
 }
 
 void VGA_WriteBuffer(

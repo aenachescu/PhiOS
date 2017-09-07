@@ -14,6 +14,7 @@ extern struct Paging g_kernelPaging;
 #include "drivers/keyboard/include/keyboard.h"
 #include "drivers/rtc/include/rtc.h"
 #include "drivers/serial/include/serial.h"
+#include "drivers/video/include/vga/text_mode.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -103,9 +104,9 @@ void kernel_main()
     uint32 addr;
     KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
 
-    KLOG_ERROR("FORTZA FORTZA FORTZA");
-
-    freezeCpu();
+    logging_init();
+    logging_addPfn(VGA_WriteString);
+    KLOG_INFO("message");
 
     return;
 }
