@@ -1,9 +1,4 @@
 notifications:
-    email:
-        recipients:
-            - alinenachescu033@gmail.com
-
-notifications:
     irc: "chat.freenode.net#cruce-devel"
 
 language: c
