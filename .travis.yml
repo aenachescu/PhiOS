@@ -29,4 +29,4 @@ script:
     - ./linux_runTests.sh run x86_64
 
 after_success:
-    - coveralls -r /home/travis/build/EnachescuAlin/PhiOS -b /home/travis/build/EnachescuAlin/PhiOS/tests/bin  bitmap_pma.c paa.c --gcov gcov --gcov-options '\-lp'
+    - coveralls -r /home/travis/build/EnachescuAlin/PhiOS -b /home/travis/build/EnachescuAlin/PhiOS/tests/bin -E .*bitmap_pma.* -E .*paa.* --gcov gcov --gcov-options '\-lp'
