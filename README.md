@@ -1,4 +1,5 @@
 # PhiOS ![Build Passing Icon](https://travis-ci.org/EnachescuAlin/PhiOS.svg?branch=devel)
+[![Coverage Status](https://coveralls.io/repos/github/EnachescuAlin/PhiOS/badge.svg?branch=devel)](https://coveralls.io/github/EnachescuAlin/PhiOS?branch=devel)
 
 ## How to build?
 * First of all, you must have installed a Linux based operating system.
