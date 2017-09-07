@@ -83,6 +83,15 @@ void __kernel_check(size_t err, const char *file, size_t line)
             ERROR_KPRINTF("ERROR_DRNG_NOT_READY");
             break;
 
+        case ERROR_INVALID_PORT:
+            ERROR_KPRINTF("ERROR_INVALID_PORT");
+
+        case ERROR_PERMISSION_DENIED:
+            ERROR_KPRINTF("ERROR_PERMISSION_DENIED");
+
+        case ERROR_NO_FREE_VIRTUAL_MEMORY:
+            ERROR_KPRINTF("ERROR_NO_FREE_VIRTUAL_MEMORY");
+
         default:
             ERROR_KPRINTF("UNKNOWN_ERROR_CODE");
             break;

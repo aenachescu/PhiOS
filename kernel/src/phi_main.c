@@ -6,10 +6,15 @@
 #include "kernel/include/arch/x86/cpuid.h"
 #include "kernel/include/memory/pmm.h"
 #include "kernel/include/qemu/power.h"
+#include "kernel/include/arch/x86/paging/ia32.h"
+#include "kernel/include/arch/x86/paging/paging.h"
+#include "kernel/include/logging.h"
+extern struct Paging g_kernelPaging;
 
 #include "drivers/keyboard/include/keyboard.h"
 #include "drivers/rtc/include/rtc.h"
 #include "drivers/serial/include/serial.h"
+#include "drivers/video/include/vga/text_mode.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -80,6 +85,28 @@ void kernel_main()
 
     serial_init();
     serial_writeString("oh, serial is working :o\n", SERIAL_PORT_A);
+
+    struct AllocFuncParam request;
+    struct IA32_4KB_Paging_AllocParam ia32_request;
+
+    request.pagingType = PAGING_TYPE_IA32_4KB;
+    request.param = &ia32_request;
+
+    ia32_request.flag = PAGING_FLAG_ALLOC_AT_ADDRESS;
+    ia32_request.user = false;
+    ia32_request.write = true;
+    ia32_request.cacheDisabled = false;
+    ia32_request.writeThrough = false;
+    ia32_request.virtualAddress = 0xBFFFFFFF;
+    ia32_request.length = 0x1000;
+    ia32_request.physicalAddress = 0;
+
+    uint32 addr;
+    KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
+
+    logging_init();
+    logging_addPfn(VGA_WriteString);
+    KLOG_INFO("message");
 
     return;
 }
