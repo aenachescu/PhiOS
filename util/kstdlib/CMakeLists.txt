@@ -7,6 +7,7 @@ list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/kstdio.c")
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/kstdlib.c")
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/ksnprintf_helper.c")
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/ksnprintf.c")
+list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/kvsnprintf.c")
 
 # Add include paths
 include_directories(${INCLUDE_PATH})
