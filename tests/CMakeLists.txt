@@ -30,7 +30,7 @@ endif()
 link_directories("${PRJ_PATH}/../CUT/bin")
 
 # set C flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wno-format")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wno-format -fprofile-arcs -ftest-coverage")
 
 # PAA test
 list(APPEND PAA_SOURCES "${PRJ_PATH}/../kernel/src/memory/paa.c")
