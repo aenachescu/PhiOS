@@ -88,7 +88,7 @@ void kernel_main()
 
     ia32_request.flags = PAGING_ALLOC_FLAG_AT_ADDRESS;
     ia32_request.pageFlags = PAGING_ALLOC_PAGE_FLAG_WRITE;
-    ia32_request.virtualAddress = 0x50000;
+    ia32_request.virtualAddress = 0x600000;
     ia32_request.length = 0x1000;
     ia32_request.physicalAddress = 0;
 
@@ -96,7 +96,7 @@ void kernel_main()
     KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &ia32_request, &addr));
     
     // if alloc doesn't work, this should fault
-    uint32 *tmp = 0x50000;
+    uint32 *tmp = 0x600000;
     *tmp = 1;
     kprintf("%u\n", *tmp);
 
