@@ -158,6 +158,42 @@ static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     return ERROR_SUCCESS;
 }
 
+static void helper_IA32_4KB_allocPageTable(
+    struct IA32_PageDirectory_4KB *a_pageDirectory,
+    uint32 a_pageTableId,
+    uint32 a_pageTableFlags
+)
+{
+    // set flags for the page table
+    a_pageDirectory->entries[a_pageTableId].data = a_pageTableFlags;
+
+    // alloc physical memory for the pages
+    uint64 ptPhysAddr;
+    PMM_alloc(
+        &ptPhysAddr, 
+        sizeof(struct IA32_PageTable_4KB_Entry) * PAGING_IA32_PTE_NUMBER,
+        PMM_FOR_VIRTUAL_MEMORY
+    );
+
+    struct IA32_PageTable_4KB *pt0 = IA32_4KB_PT_VIRTUAL_ADDRESS;
+    struct IA32_PageTable_4KB *pt1023 = pt0 + 1023;
+            
+    // map the page table physical address to the virtual address
+    pt1023->entries[a_pageTableId].data = IA32_4KB_PAGE_PRESENT       |
+                                          IA32_4KB_PAGE_WRITE         |
+                                          IA32_4KB_PAGE_WRITE_THROUGH | 
+                                          (uint32) ptPhysAddr;
+}
+
+static void helper_IA32_4KB_initPageTable(
+    struct IA32_PageTable_4KB *a_pt)
+{
+    // TODO: optimizes this for using kmemset()
+    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++) {
+        a_pt->entries[i].data = 0;
+    }
+}
+
 __attribute__ ((unused))
 static void helper_IA32_4KB_allocArea(
     uint32 a_start,
@@ -179,8 +215,8 @@ static void helper_IA32_4KB_allocArea(
 
     while (a_start < a_end) {
         if (pd->entries[pageTableId].data == 0) {
-            kprintf("page table not allocated\n");
-            // alloc it!!!
+            helper_IA32_4KB_allocPageTable(pd, pageTableId, a_pageTableFlags);
+            helper_IA32_4KB_initPageTable(pageTable);
         }
 
         pageTable->entries[pageId].data = (a_pageFlags | a_physicalAddress);
@@ -194,15 +230,6 @@ static void helper_IA32_4KB_allocArea(
         }
 
         a_start += 4096;
-    }
-}
-
-static void helper_IA32_4KB_initPageTable(
-    struct IA32_PageTable_4KB *a_pt)
-{
-    // TODO: optimizes this for using kmemset()
-    for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++) {
-        a_pt->entries[i].data = 0;
     }
 }
 
@@ -407,15 +434,8 @@ uint32 IA32_4KB_alloc(
         uint32 physicalAddress = 0, pageTableFlags = 0;
         
         // craft page table falgs
-        pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT;
-        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_WRITE 
-                          ? IA32_4KB_PAGE_WRITE : 0;
-        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_USER 
-                          ? IA32_4KB_PAGE_USER : 0;
-        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_WRITE_THROUGH 
-                          ? IA32_4KB_PAGE_WRITE_THROUGH : 0;
-        pageTableFlags |= a_request->pageFlags & IA32_4KB_PAGE_CACHE_DISABLED 
-                          ? IA32_4KB_PAGE_CACHE_DISABLED : 0;
+        pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT | IA32_4KB_PAGE_TABLE_WRITE;
+        pageTableFlags = a_request->pageFlags & IA32_4KB_PAGE_USER;
 
         // you can't alloc at some address or closer to it in the same time
         if (allocCloser && allocAtAddr) {
