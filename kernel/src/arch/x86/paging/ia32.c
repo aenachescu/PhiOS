@@ -179,6 +179,11 @@ static void helper_IA32_4KB_allocPageTable(
     struct IA32_PageTable_4KB *pt1023 = pt0 + 1023;
             
     // map the page table physical address to the virtual address
+    a_pageDirectory->entries[a_pageTableId].data = IA32_4KB_PAGE_TABLE_PRESENT       |
+                                                   IA32_4KB_PAGE_TABLE_WRITE         |
+                                                   IA32_4KB_PAGE_TABLE_WRITE_THROUGH | 
+                                                   (uint32) ptPhysAddr;
+
     pt1023->entries[a_pageTableId].data = IA32_4KB_PAGE_PRESENT       |
                                           IA32_4KB_PAGE_WRITE         |
                                           IA32_4KB_PAGE_WRITE_THROUGH | 
