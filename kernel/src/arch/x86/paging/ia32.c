@@ -14,6 +14,8 @@ extern struct KernelArea g_kernelArea;
 
 #define KERNEL_VIRTUAL_ADDRESS ((uint32) 0xC0000000) // 3GiB
 
+#define INVLPG(m) asm volatile ( "invlpg (%0)" : : "c"(m) : "memory" );
+
 #define IA32_4KB_PAGE_PRESENT           ((uint32) 0x00000001)
 #define IA32_4KB_PAGE_WRITE             ((uint32) 0x00000002)
 #define IA32_4KB_PAGE_USER              ((uint32) 0x00000004)
@@ -158,38 +160,6 @@ static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     return ERROR_SUCCESS;
 }
 
-static void helper_IA32_4KB_allocPageTable(
-    struct IA32_PageDirectory_4KB *a_pageDirectory,
-    uint32 a_pageTableId,
-    uint32 a_pageTableFlags
-)
-{
-    // set flags for the page table
-    a_pageDirectory->entries[a_pageTableId].data = a_pageTableFlags;
-
-    // alloc physical memory for the pages
-    uint64 ptPhysAddr;
-    PMM_alloc(
-        &ptPhysAddr, 
-        sizeof(struct IA32_PageTable_4KB_Entry) * PAGING_IA32_PTE_NUMBER,
-        PMM_FOR_VIRTUAL_MEMORY
-    );
-
-    struct IA32_PageTable_4KB *pt0 = IA32_4KB_PT_VIRTUAL_ADDRESS;
-    struct IA32_PageTable_4KB *pt1023 = pt0 + 1023;
-            
-    // map the page table physical address to the virtual address
-    a_pageDirectory->entries[a_pageTableId].data = IA32_4KB_PAGE_TABLE_PRESENT       |
-                                                   IA32_4KB_PAGE_TABLE_WRITE         |
-                                                   IA32_4KB_PAGE_TABLE_WRITE_THROUGH | 
-                                                   (uint32) ptPhysAddr;
-
-    pt1023->entries[a_pageTableId].data = IA32_4KB_PAGE_PRESENT       |
-                                          IA32_4KB_PAGE_WRITE         |
-                                          IA32_4KB_PAGE_WRITE_THROUGH | 
-                                          (uint32) ptPhysAddr;
-}
-
 static void helper_IA32_4KB_initPageTable(
     struct IA32_PageTable_4KB *a_pt)
 {
@@ -199,7 +169,63 @@ static void helper_IA32_4KB_initPageTable(
     }
 }
 
-__attribute__ ((unused))
+static void helper_IA32_4KB_allocPageTable(
+    struct IA32_PageDirectory_4KB *a_pageDirectory,
+    struct IA32_PageTable_4KB *a_pageTable0,
+    uint32 a_pageTableId,
+    uint32 a_pageTableFlags,
+    uint32 a_physicalAddress)
+{
+    // calculate where to map the new page table
+    struct IA32_PageTable_4KB *pt1023 = a_pageTable0 + 1023;
+    
+    // add page table to page directory
+    a_pageDirectory->entries[a_pageTableId].data = a_pageTableFlags | 
+                                                   (uint32) a_physicalAddress;
+
+    // map the memory for page table
+    pt1023->entries[a_pageTableId].data = IA32_4KB_PAGE_PRESENT       |
+                                          IA32_4KB_PAGE_WRITE         |
+                                          IA32_4KB_PAGE_WRITE_THROUGH | 
+                                          (uint32) a_physicalAddress;
+
+    INVLPG(a_pageTable0 + a_pageTableId);
+    helper_IA32_4KB_initPageTable(a_pageTable0 + a_pageTableId);
+}
+
+static void helper_IA32_4KB_allocPage(
+    struct IA32_PageDirectory_4KB *a_pageDirectory,
+    struct IA32_PageTable_4KB *a_pageTable0,
+    uint32 a_pageTableId,
+    uint32 a_pageId,
+    uint32 a_pageTableFlags, /* in case we need to crate the page table */
+    uint32 a_pageFlags,
+    uint32 a_physicalAddress)
+{
+    // if page table is not allocated
+    if (a_pageDirectory->entries[a_pageTableId].data == 0) {
+        uint64 ptPhysAddr;
+        PMM_alloc(
+            &ptPhysAddr, 
+            sizeof(struct IA32_PageTable_4KB_Entry) * PAGING_IA32_PTE_NUMBER,
+            PMM_FOR_VIRTUAL_MEMORY
+        );
+
+        helper_IA32_4KB_allocPageTable(
+            a_pageDirectory,
+            a_pageTable0,
+            a_pageTableId,
+            a_pageTableFlags,
+            (uint32) ptPhysAddr
+        );
+    }
+
+    // create the page
+    struct IA32_PageTable_4KB *pageTable = a_pageTable0 + a_pageTableId;
+    pageTable->entries[a_pageId].data = (a_pageFlags | a_physicalAddress);
+}
+
+/* this should be used ONLY after paging is initialized */
 static void helper_IA32_4KB_allocArea(
     uint32 a_start,
     uint32 a_end,
@@ -207,7 +233,7 @@ static void helper_IA32_4KB_allocArea(
     uint32 a_pageFlags,
     uint32 a_pageTableFlags)
 {
-    struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
+    struct IA32_PageDirectory_4KB *pageDirectory = IA32_4KB_PD_VIRTUAL_ADDRESS;
     struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
 
     // set present flag by default
@@ -216,21 +242,24 @@ static void helper_IA32_4KB_allocArea(
 
     uint32 pageId = 0, pageTableId = 0;
     helper_IA32_4KB_getPositionForVirtualAddress(a_start, &pageId, &pageTableId);
-    pageTable += pageTableId;
 
     while (a_start < a_end) {
-        if (pd->entries[pageTableId].data == 0) {
-            helper_IA32_4KB_allocPageTable(pd, pageTableId, a_pageTableFlags);
-            helper_IA32_4KB_initPageTable(pageTable);
-        }
+        helper_IA32_4KB_allocPage(
+            pageDirectory,
+            pageTable,
+            pageTableId,
+            pageId,
+            a_pageTableFlags,
+            a_pageFlags,
+            a_physicalAddress
+        );
+        INVLPG(a_start);
 
-        pageTable->entries[pageId].data = (a_pageFlags | a_physicalAddress);
         a_physicalAddress += 4096;
 
         pageId++;
         if (pageId == PAGING_IA32_PTE_NUMBER) {
             pageId = 0;
-            pageTable++;
             pageTableId++;
         }
 
@@ -315,7 +344,7 @@ uint32 IA32_4KB_initKernelPaging(
 
         pt0Addr    = (uint32) tmpAddr;
         pt1022Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
-        pt1023Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
+        pt1023Addr = pt0Addr + 2 * sizeof(struct IA32_PageTable_4KB);
 
         pdAddr = (uint32) a_paging->pagingStruct;
 
@@ -333,6 +362,30 @@ uint32 IA32_4KB_initKernelPaging(
         pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE;
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
+
+        /*helper_IA32_4KB_allocPageTable(
+            pd,
+            pt0,
+            0,
+            pageTableFlags,
+            pt0Addr           
+        );
+
+        helper_IA32_4KB_allocPageTable(
+            pd,
+            pt1022,
+            1022,
+            pageTableFlags,
+            pt1022Addr           
+        );
+
+        helper_IA32_4KB_allocPageTable(
+            pd,
+            pt1023,
+            1023,
+            pageTableFlags,
+            pt1023Addr           
+        );*/
 
         // init the page tables
         helper_IA32_4KB_initPageTable(pt0);
@@ -439,8 +492,12 @@ uint32 IA32_4KB_alloc(
         uint32 physicalAddress = 0, pageTableFlags = 0;
         
         // craft page table falgs
-        pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT | IA32_4KB_PAGE_TABLE_WRITE;
-        pageTableFlags = a_request->pageFlags & IA32_4KB_PAGE_USER;
+        pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT | 
+                         IA32_4KB_PAGE_TABLE_WRITE   |
+                         IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
+        if (a_request->pageFlags & PAGING_ALLOC_PAGE_FLAG_USER) {
+            pageTableFlags |= IA32_4KB_PAGE_TABLE_USER;
+        }
 
         // you can't alloc at some address or closer to it in the same time
         if (allocCloser && allocAtAddr) {
