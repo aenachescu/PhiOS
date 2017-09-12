@@ -6,7 +6,3 @@ CUT_DEFINE_TEST(test_kvsnprintf)
 {
 
 }
-
-CUT_DEFINE_MAIN
-    CUT_CALL_TEST(test_kvsnprintf);
-CUT_END_MAIN
