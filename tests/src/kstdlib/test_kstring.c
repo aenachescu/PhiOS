@@ -104,8 +104,8 @@ CUT_DEFINE_TEST(test_kmemcpy)
         {"asdfg", "poiuy", 5, ERROR_SUCCESS}
     };
 
-    char memArea1[] = "asdfg";
-    char memArea2[] = "qwert";
+    char memArea1[] = "asdfghjk";
+    char memArea2[] = "qwertyui";
 
     CUT_CHECK_OPERATOR_UINT32(kmemcpy(NULL, memArea2, 5), ==, ERROR_NULL_POINTER);
     CUT_CHECK_OPERATOR_UINT32(kmemcpy(memArea1, NULL, 5), ==, ERROR_NULL_POINTER);
@@ -113,6 +113,14 @@ CUT_DEFINE_TEST(test_kmemcpy)
     CUT_CHECK_OPERATOR_UINT32(kmemcpy(memArea1, memArea1, 5), ==, ERROR_SAME_POINTERS);
 
     sint32 result = 0;
+
+    CUT_CHECK_OPERATOR_UINT32(kmemcpy(memArea1, memArea1 + 3, 5), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea1, "fghjk", 5, &result), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+
+    CUT_CHECK_OPERATOR_UINT32(kmemcpy(memArea2 + 3, memArea2, 5), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea2, "qweqw", 5, &result), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_INT32(result, ==, 0);
 
     for (uint32 i = 0; i < _countof(testCases); i++) {
         CUT_CHECK_OPERATOR_UINT32(
