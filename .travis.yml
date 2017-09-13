@@ -24,4 +24,14 @@ script:
     - ./linux_runTests.sh run x86_64
 
 after_success:
-    - coveralls -r /home/travis/build/EnachescuAlin/PhiOS -b /home/travis/build/EnachescuAlin/PhiOS/tests/bin -i /home/travis/build/EnachescuAlin/PhiOS/kernel/src/memory/bitmap_pma.c -i kernel/src/memory/paa.c -i ksnprintf_helper.c -i ksnprintf.c -i kstdlib.c -i kstring.c -i kvsnprintf.c --gcov gcov --gcov-options '\-lp'
+    - coveralls
+        -r /home/travis/build/EnachescuAlin/PhiOS
+        -b /home/travis/build/EnachescuAlin/PhiOS/tests/bin
+        -i kernel/src/memory/bitmap_pma.c
+        -i kernel/src/memory/paa.c
+        -i util/kstdlib/src/ksnprintf_helper.c
+        -i util/kstdlib/src/ksnprintf.c
+        -i util/kstdlib/src/kstdlib.c
+        -i util/kstdlib/src/kstring.c
+        -i util/kstdlib/src/kvsnprintf.c
+        --gcov gcov --gcov-options '\-lp'
