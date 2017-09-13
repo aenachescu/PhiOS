@@ -58,5 +58,7 @@ list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kvsnprintf.c")
 list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstring.c")
 list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstdlib.c")
 
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstdlib_main.c")
+
 add_executable(test_kstdlib ${KSTDLIB_SOURCES})
 target_link_libraries(test_kstdlib cut)
