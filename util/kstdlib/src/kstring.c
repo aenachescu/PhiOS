@@ -60,11 +60,9 @@ uint32 kmemcmp(
 
         *a_result = 0;
         return ERROR_SUCCESS;
-    } else {
-        return ERROR_EMPTY_BUFFER;
     }
 
-    return ERROR_UNKNOWN;
+    return ERROR_EMPTY_BUFFER;
 }
 
 uint32 kmemcpy(
