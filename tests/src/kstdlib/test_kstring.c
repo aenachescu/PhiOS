@@ -49,6 +49,47 @@ CUT_DEFINE_TEST(test_kmemchr)
     }
 }
 
+CUT_DEFINE_TEST(test_kmemcmp)
+{
+    struct TestCase {
+        char str1[32];
+        char str2[32];
+        size_t length;
+        sint32 result;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {"asd", "asd", 3,  0, ERROR_SUCCESS},
+        {"asd", "ase", 3, -1, ERROR_SUCCESS},
+        {"asd", "asc", 3,  1, ERROR_SUCCESS}
+    };
+
+    sint32 result = 0;
+
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(NULL, "as", 2, &result), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp("as", NULL, 2, &result), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp("as", "as", 2, NULL),    ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp("as", "as", 2, &result), ==, ERROR_SAME_POINTERS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp("as", "ad", 0, &result), ==, ERROR_EMPTY_BUFFER);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK_OPERATOR_UINT32(
+            kmemcmp(
+                testCases[i].str1,
+                testCases[i].str2,
+                testCases[i].length,
+                &result
+            ),
+            ==,
+            testCases[i].retValue
+        );
+
+        CUT_CHECK_OPERATOR_INT32(result, ==, testCases[i].result);
+    }
+}
+
 CUT_DEFINE_MODULE(module_kstring)
     CUT_CALL_TEST(test_kmemchr);
+    CUT_CALL_TEST(test_kmemcmp);
 CUT_END_MODULE
