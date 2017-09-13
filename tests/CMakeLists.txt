@@ -44,3 +44,21 @@ list(APPEND BITMAP_SOURCES "src/test_bitmap.c")
 list(APPEND BITMAP_SOURCES "mock/mock_paa.c")
 add_executable(test_bitmap ${BITMAP_SOURCES})
 target_link_libraries(test_bitmap cut)
+
+# kstdlib test
+list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/ksnprintf_helper.c")
+list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/ksnprintf.c")
+list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kvsnprintf.c")
+list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kstdlib.c")
+list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kstring.c")
+
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_ksnprintf_helper.c")
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_ksnprintf.c")
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kvsnprintf.c")
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstring.c")
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstdlib.c")
+
+list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstdlib_main.c")
+
+add_executable(test_kstdlib ${KSTDLIB_SOURCES})
+target_link_libraries(test_kstdlib cut)
