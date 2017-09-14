@@ -260,7 +260,7 @@ uint32 kstrrev(
 
     size_t length = a_length;
     if (a_length == 0) {
-        size_t error  = kstrlen(a_str, &length);
+        uint32 error  = kstrlen(a_str, &length);
 
         if (error != ERROR_SUCCESS) {
             return error;
