@@ -1,5 +1,5 @@
 #include "util/kstdlib/include/kvsnprintf.h"
-#include "util/kstdlib/include/ksnprintf.h"
+#include "util/kstdlib/include/ksnprintf_helper.h"
 
 uint32 kvsnprintf(
     char *a_buffer,
