@@ -52,9 +52,7 @@ list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kvsnprintf.c")
 list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kstdlib.c")
 list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kstring.c")
 
-list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_ksnprintf_helper.c")
 list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_ksnprintf.c")
-list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kvsnprintf.c")
 list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstring.c")
 list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstdlib.c")
 
