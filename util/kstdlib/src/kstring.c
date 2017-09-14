@@ -119,8 +119,8 @@ uint32 kmemmove(
 
     // TODO: remove naive implementation for p1 < p2
     if (((pSrc) < (pDest))) {
-        pSrc  += a_length;
-        pDest += a_length;
+        pSrc  += a_length - 1;
+        pDest += a_length - 1;
 
         while (a_length != 0) {
             *pDest = *pSrc;
