@@ -255,10 +255,59 @@ CUT_DEFINE_TEST(test_kmemset)
     }
 }
 
+CUT_DEFINE_TEST(test_kstrcmp)
+{
+    struct TestCase {
+        char str1[32];
+        char str2[32];
+        sint32 result;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {"asdasd", "asdasd",  0, ERROR_SUCCESS},
+        {"asd"   , "asd"   ,  0, ERROR_SUCCESS},
+        {"asdasd", "asdasf", -2, ERROR_SUCCESS},
+        {"asd"   , "asf"   , -2, ERROR_SUCCESS},
+        {"asdasf", "asdasd",  2, ERROR_SUCCESS},
+        {"asf"   , "asd"   ,  2, ERROR_SUCCESS},
+        {"asdasd", "asf"   , -2, ERROR_SUCCESS},
+        {"asdasd", "asfasf", -2, ERROR_SUCCESS},
+        {"asf"   , "asdasd",  2, ERROR_SUCCESS},
+        {"asfasf", "asdasd",  2, ERROR_SUCCESS},
+        {"asdf"  , "asd"   ,  1, ERROR_SUCCESS},
+        {"asd"   , "asdf"  , -1, ERROR_SUCCESS},
+    };
+
+    char str1[] = "asdfg";
+    char str2[] = "zxcvb";
+    sint32 result;
+
+    CUT_CHECK_OPERATOR_UINT32(kstrcmp(NULL, str2, &result), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kstrcmp(str1, NULL, &result), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kstrcmp(str1, str1, &result), ==, ERROR_SAME_POINTERS);
+    CUT_CHECK_OPERATOR_UINT32(kstrcmp(str1, str2, NULL)   , ==, ERROR_NULL_POINTER);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK_OPERATOR_UINT32(
+            kstrcmp(
+                testCases[i].str1,
+                testCases[i].str2,
+                &result
+            ),
+            ==,
+            testCases[i].retValue
+        );
+
+        CUT_CHECK_OPERATOR_INT32(result, ==, testCases[i].result);
+    }
+}
+
 CUT_DEFINE_MODULE(module_kstring)
     CUT_CALL_TEST(test_kmemchr);
     CUT_CALL_TEST(test_kmemcmp);
     CUT_CALL_TEST(test_kmemcpy);
     CUT_CALL_TEST(test_kmemmove);
     CUT_CALL_TEST(test_kmemset);
+    CUT_CALL_TEST(test_kstrcmp);
 CUT_END_MODULE
