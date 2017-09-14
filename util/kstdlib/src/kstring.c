@@ -224,7 +224,7 @@ uint32 kstrcpy(
 
     if (length < *a_destLength) {
         *a_dest = '\0';
-        *a_destLength = length;
+        *a_destLength = length + 1;
     } else {
         *a_destLength = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
