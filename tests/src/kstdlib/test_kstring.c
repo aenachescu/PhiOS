@@ -148,8 +148,68 @@ CUT_DEFINE_TEST(test_kmemcpy)
     }
 }
 
+CUT_DEFINE_TEST(test_kmemmove)
+{
+    struct TestCase {
+        char memArea1[32];
+        char memArea2[32];
+        size_t length;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {"asdfg", "qwert", 5, ERROR_SUCCESS},
+        {"asdfg", "zxcvb", 5, ERROR_SUCCESS},
+        {"asdfg", "poiuy", 5, ERROR_SUCCESS}
+    };
+
+    char memArea1[] = "asdfghjk";
+    char memArea2[] = "qwertyui";
+
+    CUT_CHECK_OPERATOR_UINT32(kmemmove(NULL, memArea2, 5), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kmemmove(memArea1, NULL, 5), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kmemmove(memArea1, memArea2, 0), ==, ERROR_EMPTY_BUFFER);
+    CUT_CHECK_OPERATOR_UINT32(kmemmove(memArea1, memArea1, 5), ==, ERROR_SAME_POINTERS);
+
+    sint32 result = 0;
+
+    CUT_CHECK_OPERATOR_UINT32(kmemmove(memArea1, memArea1 + 3, 5), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea1, "fghjkhjk", 8, &result), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+
+    CUT_CHECK_OPERATOR_UINT32(kmemmove(memArea2 + 3, memArea2, 5), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea2, "qweqwert", 8, &result), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK_OPERATOR_UINT32(
+            kmemmove(
+                testCases[i].memArea1,
+                testCases[i].memArea2,
+                testCases[i].length
+            ),
+            ==,
+            testCases[i].retValue
+        );
+
+        CUT_CHECK_OPERATOR_UINT32(
+            kmemcmp(
+                testCases[i].memArea1,
+                testCases[i].memArea2,
+                testCases[i].length,
+                &result
+            ),
+            ==,
+            ERROR_SUCCESS
+        );
+
+        CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+    }
+}
+
 CUT_DEFINE_MODULE(module_kstring)
     CUT_CALL_TEST(test_kmemchr);
     CUT_CALL_TEST(test_kmemcmp);
     CUT_CALL_TEST(test_kmemcpy);
+    CUT_CALL_TEST(test_kmemmove);
 CUT_END_MODULE
