@@ -115,11 +115,11 @@ CUT_DEFINE_TEST(test_kmemcpy)
     sint32 result = 0;
 
     CUT_CHECK_OPERATOR_UINT32(kmemcpy(memArea1, memArea1 + 3, 5), ==, ERROR_SUCCESS);
-    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea1, "fghjk", 5, &result), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea1, "fghjkhjk", 8, &result), ==, ERROR_SUCCESS);
     CUT_CHECK_OPERATOR_INT32(result, ==, 0);
 
     CUT_CHECK_OPERATOR_UINT32(kmemcpy(memArea2 + 3, memArea2, 5), ==, ERROR_SUCCESS);
-    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea2, "qweqw", 5, &result), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT32(kmemcmp(memArea2, "qweqweqw", 8, &result), ==, ERROR_SUCCESS);
     CUT_CHECK_OPERATOR_INT32(result, ==, 0);
 
     for (uint32 i = 0; i < _countof(testCases); i++) {
