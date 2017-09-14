@@ -7,6 +7,8 @@
 
 #define _countof(x) (sizeof(x) / sizeof(x[0]))
 
+#define MIN(a, b) (a < b ? a : b)
+
 CUT_DEFINE_TEST(test_kmemchr)
 {
     struct TestCase {
@@ -303,6 +305,150 @@ CUT_DEFINE_TEST(test_kstrcmp)
     }
 }
 
+CUT_DEFINE_TEST(test_kstrcpy)
+{
+    struct TestCase {
+        char str1[32];
+        char str2[32];
+        size_t length;
+        size_t expectedLength;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {"asdfg", "qwe"  , 6, 4, ERROR_SUCCESS},
+        {"asd"  , "asdfg", 4, 6, ERROR_INSUFFICIENT_BUFFER},
+        {"a"    , "fg"   , 2, 3, ERROR_INSUFFICIENT_BUFFER},
+        {"asd"  , "b"    , 4, 2, ERROR_SUCCESS},
+        {"a"    , "b"    , 2, 2, ERROR_SUCCESS},
+    };
+
+    char str1[] = "asdfg";
+    char str2[] = "zxcvb";
+    size_t length;
+    uint32 retValue;
+    sint32 result;
+
+    CUT_CHECK_OPERATOR_UINT32(kstrcpy(str1, &length, NULL), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kstrcpy(NULL, &length, str2), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kstrcpy(str1, NULL, str2), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kstrcpy(str1, &length, str1), ==, ERROR_SAME_POINTERS);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        length = testCases[i].length;
+        retValue = kstrcpy(testCases[i].str1, &length, testCases[i].str2);
+        CUT_CHECK_OPERATOR_UINT32(retValue, ==, testCases[i].retValue);
+
+#if defined WORDSIZE && WORDSIZE == 32
+        CUT_CHECK_OPERATOR_UINT32(length, ==, testCases[i].expectedLength);
+#elif defined WORDSIZE && WORDSIZE == 64
+        CUT_CHECK_OPERATOR_UINT64(length, ==, testCases[i].expectedLength);
+#else
+#error "Unknown wordsize"
+#endif
+
+        CUT_CHECK_OPERATOR_UINT32(
+            kmemcmp(
+                testCases[i].str1,
+                testCases[i].str2,
+                MIN(testCases[i].length, testCases[i].expectedLength),
+                &result
+            ),
+            ==,
+            ERROR_SUCCESS
+        );
+
+        CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+    }
+}
+
+CUT_DEFINE_TEST(test_kstrlen)
+{
+    struct TestCase {
+        char str[32];
+        size_t length;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {""     , 0, ERROR_SUCCESS},
+        {"a"    , 1, ERROR_SUCCESS},
+        {"as"   , 2, ERROR_SUCCESS},
+        {"asd"  , 3, ERROR_SUCCESS},
+        {"asdf" , 4, ERROR_SUCCESS}
+    };
+
+    char str[] = "asdfg";
+    size_t length;
+
+    CUT_CHECK_OPERATOR_UINT32(kstrlen(NULL, &length), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(kstrlen(str, NULL), ==, ERROR_NULL_POINTER);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK_OPERATOR_UINT32(
+            kstrlen(
+                testCases[i].str,
+                &length
+            ),
+            ==,
+            testCases[i].retValue
+        );
+
+#if defined WORDSIZE && WORDSIZE == 32
+        CUT_CHECK_OPERATOR_UINT32(length, ==, testCases[i].length);
+#elif defined WORDSIZE && WORDSIZE == 64
+        CUT_CHECK_OPERATOR_UINT64(length, ==, testCases[i].length);
+#else
+#error "Unknown wordsize"
+#endif
+    }
+}
+
+CUT_DEFINE_TEST(test_kstrrev)
+{
+    struct TestCase {
+        char str1[32];
+        char str2[32];
+        size_t length;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {""   , ""   , 0, ERROR_SUCCESS},
+        {"asd", "dsa", 3, ERROR_SUCCESS},
+        {"aaa", "aaa", 3, ERROR_SUCCESS},
+        {"asa", "asa", 3, ERROR_SUCCESS},
+        {"qwe", "ewq", 0, ERROR_SUCCESS},
+    };
+
+    sint32 result;
+
+    CUT_CHECK_OPERATOR_UINT32(kstrrev(NULL, 0), ==, ERROR_NULL_POINTER);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK_OPERATOR_UINT32(
+            kstrrev(
+                testCases[i].str1,
+                testCases[i].length
+            ),
+            ==,
+            testCases[i].retValue
+        );
+
+        CUT_CHECK_OPERATOR_UINT32(
+            kstrcmp(
+                testCases[i].str1,
+                testCases[i].str2,
+                &result
+            ),
+            ==,
+            ERROR_SUCCESS
+        );
+
+        CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+    }
+}
+
 CUT_DEFINE_MODULE(module_kstring)
     CUT_CALL_TEST(test_kmemchr);
     CUT_CALL_TEST(test_kmemcmp);
@@ -310,4 +456,7 @@ CUT_DEFINE_MODULE(module_kstring)
     CUT_CALL_TEST(test_kmemmove);
     CUT_CALL_TEST(test_kmemset);
     CUT_CALL_TEST(test_kstrcmp);
+    CUT_CALL_TEST(test_kstrcpy);
+    CUT_CALL_TEST(test_kstrlen);
+    CUT_CALL_TEST(test_kstrrev);
 CUT_END_MODULE
