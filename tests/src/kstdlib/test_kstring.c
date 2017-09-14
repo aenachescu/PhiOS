@@ -207,9 +207,58 @@ CUT_DEFINE_TEST(test_kmemmove)
     }
 }
 
+CUT_DEFINE_TEST(test_kmemset)
+{
+    struct TestCase {
+        char buffer[32];
+        char result[32];
+        size_t length;
+        sint8 value;
+        uint32 retValue;
+    };
+
+    static struct TestCase testCases[] = {
+        {"qwert", "11111", 5, '1', ERROR_SUCCESS},
+        {"asdfg", "22222", 5, '2', ERROR_SUCCESS},
+        {"zxc"  , "333"  , 3, '3', ERROR_SUCCESS}
+    };
+
+    char memArea[] = "asdfg";
+    sint32 result;
+
+    CUT_CHECK_OPERATOR_UINT32(kmemset(memArea, '1', 0), ==, ERROR_EMPTY_BUFFER);
+    CUT_CHECK_OPERATOR_UINT32(kmemset(NULL, '1', 5), ==, ERROR_NULL_POINTER);
+
+    for (uint32 i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK_OPERATOR_UINT32(
+            kmemset(
+                testCases[i].buffer,
+                testCases[i].value,
+                testCases[i].length
+            ),
+            ==,
+            testCases[i].retValue
+        );
+
+        CUT_CHECK_OPERATOR_UINT32(
+            kmemcmp(
+                testCases[i].buffer,
+                testCases[i].result,
+                testCases[i].length + 1,
+                &result
+            ),
+            ==,
+            ERROR_SUCCESS
+        );
+
+        CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+    }
+}
+
 CUT_DEFINE_MODULE(module_kstring)
     CUT_CALL_TEST(test_kmemchr);
     CUT_CALL_TEST(test_kmemcmp);
     CUT_CALL_TEST(test_kmemcpy);
     CUT_CALL_TEST(test_kmemmove);
+    CUT_CALL_TEST(test_kmemset);
 CUT_END_MODULE
