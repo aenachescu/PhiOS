@@ -16,6 +16,7 @@ uint32 kvsnprintf(
     uint32 writtenBytes = ksnprintf_helper(a_buffer, *a_length, a_format, a_arg);
 
     if (writtenBytes > *a_length) {
+        a_buffer[*a_length - 1] = 0;
         *a_length = writtenBytes;
         return ERROR_INSUFFICIENT_BUFFER;
     }
