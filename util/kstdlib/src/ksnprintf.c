@@ -21,6 +21,7 @@ uint32 ksnprintf(
     va_end(arg);
 
     if (writtenBytes > *a_length) {
+        a_buffer[*a_length - 1] = 0;
         *a_length = writtenBytes;
         return ERROR_INSUFFICIENT_BUFFER;
     }
