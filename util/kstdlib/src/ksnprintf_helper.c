@@ -637,8 +637,13 @@ end:
         }
     }
 
-    //result[currentPos] = 0;
-    //write(result);
+    if (currentPos < a_length) {
+        a_buffer[currentPos] = 0;
+    } else {
+        a_buffer[a_length - 1] = 0;
+    }
+
+    currentPos++;
 
     return currentPos;
 }
