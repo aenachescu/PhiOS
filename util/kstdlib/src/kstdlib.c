@@ -47,9 +47,13 @@ uint32 kutoa(
 
     switch (a_base) {
         case 2:
-            for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
+            for (size_t i = 0; i < sizeof(uint32) * 8; i++) {
                 if (length < (*a_length)) {
-                    a_buffer[length] = (a_value & (1 << i));
+                    if (a_value & (1 << i)) {
+                        a_buffer[length] = '1';
+                    } else {
+                        a_buffer[length] = '0';
+                    }
                 }
 
                 length++;
@@ -87,6 +91,7 @@ uint32 kutoa(
         kstrrev(a_buffer, length);
         *a_length = length;
     } else {
+        a_buffer[*a_length - 1] = '\0';
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
@@ -140,7 +145,11 @@ uint32 ku64toa(
         case 2:
             for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
                 if (length < (*a_length)) {
-                    a_buffer[length] = (a_value & (1 << i));
+                    if (a_value & (1 << i)) {
+                        a_buffer[length] = '1';
+                    } else {
+                        a_buffer[length] = '0';
+                    }
                 }
 
                 length++;
@@ -178,6 +187,7 @@ uint32 ku64toa(
         kstrrev(a_buffer, length);
         *a_length = length;
     } else {
+        a_buffer[*a_length - 1] = '\0';
         *a_length = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
     }
