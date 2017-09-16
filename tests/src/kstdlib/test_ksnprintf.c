@@ -123,14 +123,6 @@ CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
     CHECK(
         buffer,
         512,
-        "string string",
-        "string string",
-        true
-    );
-
-    CHECK(
-        buffer,
-        512,
         "N1: %d %d %+d %+d % d % d\n",
         "N1: 5 -3 +5 -3  12345 -12345\n",
         true,
@@ -170,8 +162,26 @@ CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
     )
 }
 
+CUT_DEFINE_TEST(test_ksnprintf_without_specifier)
+{
+    char buffer[512];
+    sint32 result;
+    size_t expectedLength = 0;
+
+    CHECK(
+        buffer,
+        512,
+        "string string",
+        "string string",
+        true
+    );
+}
+
 CUT_DEFINE_MODULE(module_ksnprintf)
     CUT_CALL_TEST(test_ksnprintf);
+
     CUT_CALL_TEST(test_kvsnprintf);
+
     CUT_CALL_TEST(test_ksnprintf_helper_d_specifier);
+    CUT_CALL_TEST(test_ksnprintf_without_specifier);
 CUT_END_MODULE
