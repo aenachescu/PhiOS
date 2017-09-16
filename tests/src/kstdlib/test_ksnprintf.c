@@ -5,6 +5,7 @@
 #include "util/kstdlib/include/ksnprintf_helper.h"
 #include "util/kstdlib/include/ksnprintf.h"
 #include "util/kstdlib/include/kvsnprintf.h"
+#include "util/kstdlib/include/kstring.h"
 
 #define _countof(x) (sizeof(x) / sizeof(x[0]))
 
@@ -71,7 +72,94 @@ CUT_DEFINE_TEST(test_kvsnprintf)
 
 }
 
+uint32 call_ksnprintf_helper(
+    char *a_buffer,
+    uint32 a_length,
+    const char *a_format,
+    ...)
+{
+    va_list arg;
+    va_start(arg, a_format);
+
+    uint32 retValue = ksnprintf_helper(a_buffer, a_length, a_format, arg);
+
+    va_end(arg);
+
+    return retValue;
+}
+
+CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
+{
+#define CHECK(buffer, length, format, expectedBuffer, computeExpectedLength, ...)  \
+    if (computeExpectedLength == true) {                                    \
+        kstrlen(expectedBuffer, &expectedLength);                           \
+        expectedLength++;                                                   \
+    }                                                                       \
+    CUT_CHECK_OPERATOR_UINT32(                                              \
+        call_ksnprintf_helper(                                              \
+            buffer,                                                         \
+            length,                                                         \
+            format,                                                         \
+            ##__VA_ARGS__                                                   \
+        ),                                                                  \
+        ==,                                                                 \
+        (uint32) expectedLength                                             \
+    );                                                                      \
+    CUT_CHECK_OPERATOR_UINT32(                                              \
+        kstrcmp(                                                            \
+            buffer,                                                         \
+            expectedBuffer,                                                 \
+            &result                                                         \
+        ),                                                                  \
+        ==,                                                                 \
+        ERROR_SUCCESS                                                       \
+    );                                                                      \
+    CUT_CHECK_OPERATOR_INT32(result, ==, 0);
+
+    char buffer[512];
+    sint32 result;
+    size_t expectedLength = 0;
+
+    CHECK(
+        buffer,
+        512,
+        "string string",
+        "string string",
+        true
+    );
+
+    CHECK(
+        buffer,
+        512,
+        "N1: %d %d %+d %+d % d % d\n",
+        "N1: 5 -3 +5 -3  12345 -12345\n",
+        true,
+        5, -3, 5, -3, 12345, -12345
+    );
+
+    kstrlen("Numbers: 1 2 3", &expectedLength);
+    expectedLength++;
+    CHECK(
+        buffer,
+        13,
+        "Numbers: %d %d %d",
+        "Numbers: 1 2",
+        false,
+        1, 2, 3
+    );
+
+    CHECK(
+        buffer,
+        512,
+        "Numbers: %05d %-5d %5d %0*d %-*d %*d",
+        "Numbers: 00001 2         3 01 2   3",
+        true,
+        1, 2, 3, 2, 1, 2, 2, 2, 3
+    )
+}
+
 CUT_DEFINE_MODULE(module_ksnprintf)
     CUT_CALL_TEST(test_ksnprintf);
     CUT_CALL_TEST(test_kvsnprintf);
+    CUT_CALL_TEST(test_ksnprintf_helper_d_specifier);
 CUT_END_MODULE
