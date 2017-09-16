@@ -88,8 +88,6 @@ uint32 call_ksnprintf_helper(
     return retValue;
 }
 
-CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
-{
 #define CHECK(buffer, length, format, expectedBuffer, computeExpectedLength, ...)  \
     if (computeExpectedLength == true) {                                    \
         kstrlen(expectedBuffer, &expectedLength);                           \
@@ -116,6 +114,8 @@ CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
     );                                                                      \
     CUT_CHECK_OPERATOR_INT32(result, ==, 0);
 
+CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
+{
     char buffer[512];
     sint32 result;
     size_t expectedLength = 0;
@@ -155,6 +155,18 @@ CUT_DEFINE_TEST(test_ksnprintf_helper_d_specifier)
         "Numbers: 00001 2         3 01 2   3",
         true,
         1, 2, 3, 2, 1, 2, 2, 2, 3
+    )
+
+    CHECK(
+        buffer,
+        512,
+        "Numbers: %hhd %hhd %hd %hd %ld %ld %lld %lld",
+        "Numbers: 12 -67 12345 -12345 123456 -654321 1234567890 -1234567890",
+        true,
+        12, -67,
+        12345, -12345,
+        123456, -654321,
+        1234567890LL, -1234567890LL
     )
 }
 
