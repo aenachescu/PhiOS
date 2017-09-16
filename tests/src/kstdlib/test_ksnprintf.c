@@ -244,6 +244,16 @@ CUT_DEFINE_TEST(test_ksnprintf_without_specifier)
         "string string",
         true
     );
+
+    kstrlen("string string", &expectedLength);
+    expectedLength++;
+    CHECK(
+        buffer,
+        11,
+        "string string",
+        "string str",
+        false
+    );
 }
 
 CUT_DEFINE_MODULE(module_ksnprintf)
