@@ -7,6 +7,9 @@
 /*
  * @brief Converts an integer value (signed/unsigned on 32/64 bits) to a null
  *        terminated string.
+ *        If a_buffer is too small then in a_length will be stored the needed
+ *        length including the null terminator, otherwise will be stored the
+ *        string length excluding the null terminator.
  *
  * @param a_value The value which to be converted.
  * @param a_buffer The string in which is stored the result.
