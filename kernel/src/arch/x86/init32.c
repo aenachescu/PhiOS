@@ -133,7 +133,7 @@ uint32 init_init32(
     detectSMBios();
 
     // Iterate over tags and collect info
-    uint64 memoryEnd = 0x0;
+    uint64 availableMemory = 0, totalMemory = 0;
     struct {
         uint64 startAddr;
         uint64 endAddr;
@@ -165,13 +165,15 @@ uint32 init_init32(
                             mmap->addr,
                             mmap->len);
 
-                    memoryEnd += mmap->len;
+                    totalMemory += mmap->len;
+
 
                     switch (mmap->type) {
                         case MULTIBOOT_MEMORY_AVAILABLE:
                             memoryZones[memoryZonesCount].startAddr = mmap->addr;
                             memoryZones[memoryZonesCount].endAddr = mmap->addr + mmap->len;
                             memoryZonesCount++;
+                            availableMemory += mmap->len;
 
                             kprintf("AVAILABLE\n");
                             break;
@@ -217,9 +219,8 @@ uint32 init_init32(
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve, &BitmapPMA_check));
         }
     }
-    kprintf("Memory size: %lld MiBs\n", memoryEnd / 1024 / 1024);
 
-    kprintf("Memory end: %llx\n", memoryEnd);
+    kprintf("TotalMem: %llu, AvailableMem: %llu\n", totalMemory / 1024 / 1024, availableMemory / 1024 / 1024);
 
     g_kernelArea.textStartAddr      = (size_t) &linker_textStart;
     g_kernelArea.textEndAddr        = (size_t) &linker_textEnd;
