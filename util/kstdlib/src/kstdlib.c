@@ -117,12 +117,12 @@ uint32 ki64toa(
             a_buffer++;
         }
 
-        size_t error = kutoa(-a_value, a_buffer, &length, a_base);
+        size_t error = ku64toa(-a_value, a_buffer, &length, a_base);
         *a_length = length + 1; // +1 from '-'
 
         return error;
     } else {
-        return kutoa(a_value, a_buffer, a_length, a_base);
+        return ku64toa(a_value, a_buffer, a_length, a_base);
     }
 
     return ERROR_SUCCESS;
