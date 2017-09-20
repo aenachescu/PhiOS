@@ -145,7 +145,7 @@ uint32 ku64toa(
         case 2:
             for (size_t i = 0; i < sizeof(uint64) * 8; i++) {
                 if (length < (*a_length)) {
-                    if (a_value & (1 << i)) {
+                    if (a_value & (((uint64) 1) << i)) {
                         a_buffer[length] = '1';
                     } else {
                         a_buffer[length] = '0';
