@@ -472,7 +472,7 @@ skipPrecision:
                         // intmax_t - interpreted as int64
                     case LENGTH_ll:
                         // int64
-                        uval64 = va_arg(a_arg, sint64);
+                        uval64 = va_arg(a_arg, uint64);
                         ku64toa(uval64, tmpBuff, &tmpBuffLength, 10);
                         break;
 
