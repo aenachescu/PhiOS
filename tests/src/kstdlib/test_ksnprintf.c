@@ -256,6 +256,31 @@ CUT_DEFINE_TEST(test_ksnprintf_without_specifier)
     );
 }
 
+CUT_DEFINE_TEST(test_ksnprintf_u_specifier)
+{
+    char buffer[512];
+    sint32 result;
+    size_t expectedLength = 0;
+
+    CHECK(
+        buffer,
+        512,
+        "Numbers: [%u] [%5u] [%05u] [%+u] [%-5u] [%-05u] [% 5u] [% 05u] [%*u]",
+        "Numbers: [1] [    2] [00003] [4] [5    ] [6    ] [    7] [00008] [    9]",
+        true,
+        1, 2, 3, 4, 5, 6, 7, 8, 5, 9
+    );
+
+    CHECK(
+        buffer,
+        512,
+        "Numbers: [%hhu] [%hhu] [%hu] [%u] [%lu] [%llu] [%5llu] [%5llu]",
+        "Numbers: [1] [1] [2] [3] [4] [5] [123456] [  123]",
+        true,
+        1, 257, 2, 3, 4, 5ULL, 123456ULL, 123ULL
+    );
+}
+
 CUT_DEFINE_MODULE(module_ksnprintf)
     CUT_CALL_TEST(test_ksnprintf);
 
@@ -263,4 +288,5 @@ CUT_DEFINE_MODULE(module_ksnprintf)
 
     CUT_CALL_TEST(test_ksnprintf_helper_d_specifier);
     CUT_CALL_TEST(test_ksnprintf_without_specifier);
+    CUT_CALL_TEST(test_ksnprintf_u_specifier);
 CUT_END_MODULE
