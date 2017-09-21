@@ -281,6 +281,82 @@ CUT_DEFINE_TEST(test_ksnprintf_u_specifier)
     );
 }
 
+CUT_DEFINE_TEST(test_ksnprintf_c_specifier)
+{
+    char buffer[512];
+    sint32 result;
+    size_t expectedLength = 0;
+
+    CHECK(
+        buffer,
+        512,
+        "Chars: %c %c %c",
+        "Chars: a b c",
+        true,
+        'a', 'b', 'c'
+    );
+
+    kstrlen("Chars: a b c", &expectedLength);
+    expectedLength++;
+    CHECK(
+        buffer,
+        10,
+        "Chars: %c %c %c",
+        "Chars: a ",
+        false,
+        'a', 'b', 'c'
+    );
+}
+
+CUT_DEFINE_TEST(test_ksnprintf_p_specifier)
+{
+    char buffer[512];
+    sint32 result;
+    size_t expectedLength = 0;
+
+    void *p1 = (void*)0x12AB;
+    void *p2 = (void*)0xabcd;
+    void *p3 = (void*)0x1234;
+
+#if defined WORDSIZE && WORDSIZE == 32
+    CHECK(
+        buffer,
+        512,
+        "Pointers: %p %P %0p",
+        "Pointers: 0x12ab 0XABCD 0x00001234",
+        true,
+        p1, p2, p3
+    );
+#elif defined WORDSIZE && WORDSIZE == 64
+    CHECK(
+        buffer,
+        512,
+        "Pointers: %p %P %0p",
+        "Pointers: 0x12ab 0XABCD 0x0000000000001234",
+        true,
+        p1, p2, p3
+    );
+#else
+#error "Unsupported wordsize"
+#endif
+}
+
+CUT_DEFINE_TEST(test_ksnprintf_s_specifier)
+{
+    char buffer[512];
+    sint32 result;
+    size_t expectedLength = 0;
+
+    CHECK(
+        buffer,
+        512,
+        "Strings: [%s] [%-5s] [%5s] [%3s] [%-#3s] [%#3s] [%-#*s] [%#*s]",
+        "Strings: [asdfg] [asd  ] [  asd] [asdfg] [asd] [dfg] [asd] [dfg]",
+        true,
+        "asdfg", "asd", "asd", "asdfg", "asdfg", "asdfg", 3, "asdfg", 3, "asdfg"
+    );
+}
+
 CUT_DEFINE_MODULE(module_ksnprintf)
     CUT_CALL_TEST(test_ksnprintf);
 
@@ -289,4 +365,7 @@ CUT_DEFINE_MODULE(module_ksnprintf)
     CUT_CALL_TEST(test_ksnprintf_helper_d_specifier);
     CUT_CALL_TEST(test_ksnprintf_without_specifier);
     CUT_CALL_TEST(test_ksnprintf_u_specifier);
+    CUT_CALL_TEST(test_ksnprintf_c_specifier);
+    CUT_CALL_TEST(test_ksnprintf_p_specifier);
+    CUT_CALL_TEST(test_ksnprintf_s_specifier);
 CUT_END_MODULE
