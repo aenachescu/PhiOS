@@ -236,7 +236,7 @@ uint32 kranduint(
 uint32 ksrand(
     uint64 a_seed)
 {
-    g_seed = a_seed ^ kernel_random32();
+    g_seed = a_seed;
 
     return ERROR_SUCCESS;
 }
