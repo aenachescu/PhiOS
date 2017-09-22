@@ -9,9 +9,6 @@ set(PRJ_PATH ${CMAKE_SOURCE_DIR})
 include_directories("${PRJ_PATH}/../")
 include_directories("${PRJ_PATH}/../CUT/include")
 
-# set definitions
-add_definitions(-DUNIT_TEST)
-
 if (DEFINED ARCH)
     if (ARCH STREQUAL "x86_32")
         add_definitions(-DPhiOS_ARCH_x86_32)
@@ -32,6 +29,9 @@ link_directories("${PRJ_PATH}/../CUT/bin")
 # set C flags
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wno-format -fprofile-arcs -ftest-coverage")
 
+# set definitions
+add_definitions(-DPhiOS_UNIT_TESTING_CONFIG)
+
 # PAA test
 list(APPEND PAA_SOURCES "${PRJ_PATH}/../kernel/src/memory/paa.c")
 list(APPEND PAA_SOURCES "src/test_paa.c")
@@ -44,6 +44,16 @@ list(APPEND BITMAP_SOURCES "src/test_bitmap.c")
 list(APPEND BITMAP_SOURCES "mock/mock_paa.c")
 add_executable(test_bitmap ${BITMAP_SOURCES})
 target_link_libraries(test_bitmap cut)
+
+# logging test
+list (APPEND LOGGING_SOURCES "${PRJ_PATH}/../kernel/src/logging.c")
+list (APPEND LOGGING_SOURCES "${PRJ_PATH}/../util/kstdlib/src/ksnprintf_helper.c")
+list (APPEND LOGGING_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kvsnprintf.c")
+list (APPEND LOGGING_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kstdlib.c")
+list (APPEND LOGGING_SOURCES "${PRJ_PATH}/../util/kstdlib/src/kstring.c")
+list (APPEND LOGGING_SOURCES "src/logging/test_logging.c")
+add_executable(test_logging ${LOGGING_SOURCES})
+target_link_libraries(test_logging cut)
 
 # kstdlib test
 list (APPEND KSTDLIB_SOURCES "${PRJ_PATH}/../util/kstdlib/src/ksnprintf_helper.c")
