@@ -4,18 +4,24 @@
 
 #include "util/kstdlib/include/kvsnprintf.h"
 
-#define BUFFER_SIZE 512
+#ifndef PhiOS_LOGGING_BUFFER_SIZE
+#define PhiOS_LOGGING_BUFFER_SIZE 512
+#endif
 
-static LOGGING_WRITE_PFN g_pfn[LOGGING_MAX_PFN];
-static uint32 g_numOfPfn;
-static bool g_isInitialized = false;
+#ifndef PhiOS_LOGGING_MAX_PFN
+#define PhiOS_LOGGING_MAX_PFN 5
+#endif
+
+PhiOS_STATIC logging_writePfn g_pfn[PhiOS_LOGGING_MAX_PFN];
+PhiOS_STATIC uint32 g_numOfPfn;
+PhiOS_STATIC bool g_isInitialized = false;
 
 void __klog(
     const char *a_format,
     ...)
 {
-    char buffer[BUFFER_SIZE];
-    uint32 length = BUFFER_SIZE;
+    char buffer[PhiOS_LOGGING_BUFFER_SIZE];
+    uint32 length = PhiOS_LOGGING_BUFFER_SIZE;
 
     va_list arg;
     va_start(arg, a_format);
@@ -38,7 +44,7 @@ uint32 logging_init()
     }
 
     g_numOfPfn = 0;
-    for (uint32 i = 0; i < LOGGING_MAX_PFN; i++) {
+    for (uint32 i = 0; i < PhiOS_LOGGING_MAX_PFN; i++) {
         g_pfn[i] = NULL;
     }
 
@@ -64,13 +70,13 @@ bool logging_isInitialized()
 }
 
 uint32 logging_addPfn(
-    LOGGING_WRITE_PFN a_pfn)
+    logging_writePfn a_pfn)
 {
     if (g_isInitialized == false) {
         return ERROR_UNINITIALIZED;
     }
 
-    if (g_numOfPfn == LOGGING_MAX_PFN) {
+    if (g_numOfPfn == PhiOS_LOGGING_MAX_PFN) {
         return ERROR_LIMIT_REACHED;
     }
 
