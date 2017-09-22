@@ -38,17 +38,17 @@ typedef char                        bool;
 #define true  1
 #define false 0
 
-#if defined(PhiOS32) && !defined(UNIT_TEST)
+#if defined(PhiOS32) && !defined(PhiOS_UNIT_TESTING_CONFIG)
 #define NULL  0x00000000
 typedef uint32 size_t;
 #endif
 
-#if defined(PhiOS64) && !defined(UNIT_TEST)
+#if defined(PhiOS64) && !defined(PhiOS_UNIT_TESTING_CONFIG)
 #define NULL  0x0000000000000000
 typedef uint64 size_t;
 #endif
 
-#ifdef UNIT_TEST
+#ifdef PhiOS_UNIT_TESTING_CONFIG
 #include <stddef.h>
 #endif
 
@@ -75,6 +75,12 @@ static_assert(sizeof(csint16) == 2, ASSERT_MESSAGE);
 static_assert(sizeof(csint8) == 1, ASSERT_MESSAGE);
 #undef ASSERT_MESSAGE
 #undef static_assert
+
+#ifdef PhiOS_UNIT_TESTING_CONFIG
+#define PhiOS_STATIC
+#else
+#define PhiOS_STATIC static
+#endif
 
 #endif
 
