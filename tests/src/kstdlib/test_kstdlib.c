@@ -7,11 +7,6 @@
 
 #define _countof(x) (sizeof(x) / sizeof(x[0]))
 
-uint32 kernel_random32()
-{
-    return 0;
-}
-
 CUT_DEFINE_TEST(test_kitoa)
 {
     struct TestCase {
