@@ -29,6 +29,7 @@ after_success:
         -b /home/travis/build/EnachescuAlin/PhiOS/tests/bin
         -i kernel/src/memory/bitmap_pma.c
         -i kernel/src/memory/paa.c
+        -i kernel/src/logging.c
         -i util/kstdlib/src/ksnprintf_helper.c
         -i util/kstdlib/src/ksnprintf.c
         -i util/kstdlib/src/kstdlib.c
