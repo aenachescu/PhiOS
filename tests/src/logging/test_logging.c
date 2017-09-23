@@ -85,9 +85,33 @@ CUT_DEFINE_TEST(test_logging_addPfn)
     logging_uninit();
 }
 
+CUT_DEFINE_TEST(test_logging_write)
+{
+    logging_init();
+    logging_addPfn(logging_write);
+
+    KLOG_FATAL("fatal: [%s]: %u", "test1", 1);
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   93][  FATAL]: fatal: [test1]: 1\n");
+
+    KLOG_ERROR("error: [%s]: %u", "test2", 2);
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   96][  ERROR]: error: [test2]: 2\n");
+
+    KLOG_WARNING("warning: [%s]: %u", "test3", 3);
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   99][WARNING]: warning: [test3]: 3\n");
+
+    KLOG_INFO("info: [%s]: %u", "test4", 4);
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  102][   INFO]: info: [test4]: 4\n");
+
+    KLOG_TRACE("trace: [%s]: %u", "test5", 5);
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  105][  TRACE]: trace: [test5]: 5\n");
+
+    logging_uninit();
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_logging_init);
     CUT_CALL_TEST(test_logging_uninit);
     CUT_CALL_TEST(test_logging_isInitialized);
     CUT_CALL_TEST(test_logging_addPfn);
+    CUT_CALL_TEST(test_logging_write);
 CUT_END_MAIN
