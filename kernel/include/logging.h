@@ -60,8 +60,14 @@ void __klog(
 typedef uint32 (*logging_writePfn)(const char *str);
 
 uint32 logging_init();
+
 uint32 logging_uninit();
+
 bool logging_isInitialized();
+
+uint32 logging_getPfnArrayCapacity();
+
+uint32 logging_getPfnArrayLength();
 
 uint32 logging_addPfn(
     logging_writePfn a_pfn

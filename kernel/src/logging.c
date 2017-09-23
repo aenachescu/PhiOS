@@ -53,7 +53,7 @@ uint32 logging_init()
     return ERROR_SUCCESS;
 }
 
-uint32 logging_uinit()
+uint32 logging_uninit()
 {
     if (g_isInitialized == false) {
         return ERROR_UNINITIALIZED;
@@ -67,6 +67,16 @@ uint32 logging_uinit()
 bool logging_isInitialized()
 {
     return g_isInitialized;
+}
+
+uint32 logging_getPfnArrayCapacity()
+{
+    return (uint32) PhiOS_LOGGING_MAX_PFN;
+}
+
+uint32 logging_getPfnArrayLength()
+{
+    return g_numOfPfn;
 }
 
 uint32 logging_addPfn(
