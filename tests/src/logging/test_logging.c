@@ -1,6 +1,4 @@
-#include "tests/asserts.h"
-
-#include <cut.h>
+#include "tests/config.h"
 
 #include "kernel/include/logging.h"
 
@@ -91,22 +89,22 @@ CUT_DEFINE_TEST(test_logging_write)
     logging_addPfn(logging_write);
 
     KLOG_FATAL("fatal: [%s]: %u", "test1", 1);
-    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   93][  FATAL]: fatal: [test1]: 1\n");
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   91][  FATAL]: fatal: [test1]: 1\n");
 
     KLOG_ERROR("error: [%s]: %u", "test2", 2);
-    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   96][  ERROR]: error: [test2]: 2\n");
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   94][  ERROR]: error: [test2]: 2\n");
 
     KLOG_WARNING("warning: [%s]: %u", "test3", 3);
-    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   99][WARNING]: warning: [test3]: 3\n");
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][   97][WARNING]: warning: [test3]: 3\n");
 
     KLOG_INFO("info: [%s]: %u", "test4", 4);
-    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  102][   INFO]: info: [test4]: 4\n");
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  100][   INFO]: info: [test4]: 4\n");
 
     KLOG_TRACE("trace: [%s]: %u", "test5", 5);
-    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  105][  TRACE]: trace: [test5]: 5\n");
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  103][  TRACE]: trace: [test5]: 5\n");
 
     KLOG_DEBUG("debug: [%s]: %u", "test6", 6);
-    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  108][  DEBUG]: debug: [test6]: 6\n");
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  106][  DEBUG]: debug: [test6]: 6\n");
 
     logging_uninit();
 }
