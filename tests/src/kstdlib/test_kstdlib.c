@@ -1,6 +1,4 @@
-#include "tests/asserts.h"
-
-#include <cut.h>
+#include "tests/config.h"
 
 #include "util/kstdlib/include/kstdlib.h"
 #include "util/kstdlib/include/kstring.h"
