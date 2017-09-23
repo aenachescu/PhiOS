@@ -1,5 +1,4 @@
-#include "tests/asserts.h"
-#include <cut.h>
+#include "tests/config.h"
 
 #include "util/kstdlib/include/kstring.h"
 
@@ -339,13 +338,7 @@ CUT_DEFINE_TEST(test_kstrcpy)
         retValue = kstrcpy(testCases[i].str1, &length, testCases[i].str2);
         CUT_CHECK_OPERATOR_UINT32(retValue, ==, testCases[i].retValue);
 
-#if defined WORDSIZE && WORDSIZE == 32
-        CUT_CHECK_OPERATOR_UINT32(length, ==, testCases[i].expectedLength);
-#elif defined WORDSIZE && WORDSIZE == 64
-        CUT_CHECK_OPERATOR_UINT64(length, ==, testCases[i].expectedLength);
-#else
-#error "Unknown wordsize"
-#endif
+        CUT_CHECK_OPERATOR_SIZE_T(length, ==, testCases[i].expectedLength);
 
         CUT_CHECK_OPERATOR_UINT32(
             kmemcmp(
@@ -394,13 +387,7 @@ CUT_DEFINE_TEST(test_kstrlen)
             testCases[i].retValue
         );
 
-#if defined WORDSIZE && WORDSIZE == 32
-        CUT_CHECK_OPERATOR_UINT32(length, ==, testCases[i].length);
-#elif defined WORDSIZE && WORDSIZE == 64
-        CUT_CHECK_OPERATOR_UINT64(length, ==, testCases[i].length);
-#else
-#error "Unknown wordsize"
-#endif
+        CUT_CHECK_OPERATOR_SIZE_T(length, ==, testCases[i].length);
     }
 }
 

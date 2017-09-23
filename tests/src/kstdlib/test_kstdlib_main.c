@@ -1,4 +1,4 @@
-#include <cut.h>
+#include "tests/config.h"
 
 CUT_INCLUDE_MODULE(module_kstring);
 CUT_INCLUDE_MODULE(module_kstdlib);
