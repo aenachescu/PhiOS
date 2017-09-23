@@ -57,6 +57,15 @@ void __klog(
         ##__VA_ARGS__                                               \
     )
 
+#define KLOG_DEBUG(format, ...)                                     \
+    __klog(                                                         \
+        PhiOS_LOGGING_DEFAULT_FORMAT format PhiOS_LOGGING_NEW_LINE, \
+        __FILENAME__,                                               \
+        __LINE__,                                                   \
+        "DEBUG",                                                    \
+        ##__VA_ARGS__                                               \
+    )
+
 typedef uint32 (*logging_writePfn)(const char *str);
 
 uint32 logging_init();
