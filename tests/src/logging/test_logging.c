@@ -24,6 +24,8 @@ CUT_DEFINE_TEST(test_logging_init)
     CUT_CHECK_OPERATOR_UINT32(g_numOfPfn, ==, 0);
     CUT_CHECK_OPERATOR_UINT8(g_isInitialized, ==, true);
 
+    CUT_CHECK_OPERATOR_UINT32(logging_init(), ==, ERROR_ALREADY_INITIALIZED);
+
     logging_uninit();
 }
 
