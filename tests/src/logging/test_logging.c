@@ -29,6 +29,29 @@ CUT_DEFINE_TEST(test_logging_init)
     logging_uninit();
 }
 
+CUT_DEFINE_TEST(test_logging_uninit)
+{
+    CUT_CHECK_OPERATOR_UINT32(logging_uninit(), ==, ERROR_UNINITIALIZED);
+
+    logging_init();
+
+    CUT_CHECK_OPERATOR_UINT32(logging_uninit(), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT8(g_isInitialized, ==, false);
+}
+
+CUT_DEFINE_TEST(test_logging_isInitialized)
+{
+    CUT_CHECK_OPERATOR_UINT8(logging_isInitialized(), ==, false);
+
+    logging_init();
+    CUT_CHECK_OPERATOR_UINT8(logging_isInitialized(), ==, true);
+
+    logging_uninit();
+    CUT_CHECK_OPERATOR_UINT8(logging_isInitialized(), ==, false);
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_logging_init);
+    CUT_CALL_TEST(test_logging_uninit);
+    CUT_CALL_TEST(test_logging_isInitialized);
 CUT_END_MAIN
