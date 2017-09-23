@@ -105,6 +105,9 @@ CUT_DEFINE_TEST(test_logging_write)
     KLOG_TRACE("trace: [%s]: %u", "test5", 5);
     CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  105][  TRACE]: trace: [test5]: 5\n");
 
+    KLOG_DEBUG("debug: [%s]: %u", "test6", 6);
+    CUT_CHECK_OPERATOR_STRING(g_loggingBuffer, ==, "[_logging.c][  108][  DEBUG]: debug: [test6]: 6\n");
+
     logging_uninit();
 }
 
