@@ -55,25 +55,25 @@ typedef uint64 size_t;
 #define PhiOS_STATIC_ASSERT  _Static_assert
 #define PhiOS_ASSERT_MESSAGE "Type size is not as expected."
 
-PhiOS_STATIC_ASSERT(sizeof(uint64) == 8, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(uint32) == 4, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(uint16) == 2, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(uint8) == 1, ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint8) == 1, PhiOS_ASSERT_MESSAGE);
 
-PhiOS_STATIC_ASSERT(sizeof(sint64) == 8, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(sint32) == 4, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(sint16) == 2, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(sint8) == 1, ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint8) == 1, PhiOS_ASSERT_MESSAGE);
 
-PhiOS_STATIC_ASSERT(sizeof(cuint64) == 8, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(cuint32) == 4, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(cuint16) == 2, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(cuint8) == 1, ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint8) == 1, PhiOS_ASSERT_MESSAGE);
 
-PhiOS_STATIC_ASSERT(sizeof(csint64) == 8, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(csint32) == 4, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(csint16) == 2, ASSERT_MESSAGE);
-PhiOS_STATIC_ASSERT(sizeof(csint8) == 1, ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint8) == 1, PhiOS_ASSERT_MESSAGE);
 
 #ifdef PhiOS_UNIT_TESTING_CONFIG
 #define PhiOS_STATIC
