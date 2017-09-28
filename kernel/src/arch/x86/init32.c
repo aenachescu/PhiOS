@@ -5,8 +5,10 @@
 #include "kernel/include/memory/paa.h"
 #include "kernel/include/memory/pmm.h"
 #include "kernel/include/memory/bitmap_pma.h"
+#include "kernel/include/logging.h"
 
 #include "drivers/video/include/vga/text_mode.h"
+#include "drivers/acpi/include/acpi.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -116,6 +118,10 @@ uint32 init_init32(
 {
     // Inits VGA
     VGA_Init();
+
+    logging_init();
+    logging_addPfn(VGA_WriteString);
+
     kprintf("PhiOS v0.0.1 32-bit\n");
 
     if (mboot2Magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
@@ -231,6 +237,10 @@ uint32 init_init32(
     g_kernelArea.bssStartAddr       = (size_t) &linker_bssStart;
     g_kernelArea.bssEndAddr         = (size_t) &linker_bssEnd;
     g_kernelArea.endPlacementAddr   = PAA_getCurrentAddress();
+
+    RSDP2 rsdp2;
+    uint32 acpiVer = ACPI_VERSION_UNKNOWN;
+    acpi_getRSDP(&rsdp2, &acpiVer);
 
     KERNEL_CHECK(PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
