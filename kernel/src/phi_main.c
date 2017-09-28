@@ -104,9 +104,5 @@ void kernel_main()
     uint32 addr;
     KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
 
-    logging_init();
-    logging_addPfn(VGA_WriteString);
-    KLOG_INFO("message");
-
     return;
 }
