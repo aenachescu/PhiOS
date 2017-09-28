@@ -25,6 +25,8 @@
 #define ERROR_INVALID_PORT          19
 #define ERROR_PERMISSION_DENIED     20
 #define ERROR_NO_FREE_VIRTUAL_MEMORY 21
+#define ERROR_UNKNOWN_VERSION       22
+#define ERROR_INTERNAL_ERROR        23
 
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)
