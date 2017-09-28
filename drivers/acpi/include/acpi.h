@@ -4,6 +4,8 @@
 #include "include/types.h"
 #include "include/errors.h"
 
+#include "include/compiler.h"
+
 #define ACPI_VERSION_UNKNOWN    0
 #define ACPI_VERSION_1          1
 #define ACPI_VERSION_2          2
@@ -15,7 +17,7 @@ struct _RSDP
     char   OEMID[6];
     uint8  revision;
     uint32 rsdtAddr;
-} __attribute__ ((packed));
+} PhiOS_PACKED_STRUCTURE;
 
 typedef struct _RSDP   RSDP;
 typedef struct _RSDP* PRSDP;
@@ -29,7 +31,7 @@ struct _RSDP2
     uint64 xsdtAddr;
     uint8  checksum;
     uint8  reserved[3];
-} __attribute__ ((packed));
+} PhiOS_PACKED_STRUCTURE;
 
 typedef struct _RSDP2   RSDP2;
 typedef struct _RSDP2* PRSDP2;
