@@ -26,10 +26,14 @@ typedef struct _RSDT* PRSDT;
  *  ptr - the memory area from where the structure is initialized.
  *
  * @return:
+ *  ERROR_SUCCESS - the structure was initialized.
+ *  ERROR_NULL_POINTER - rsdt or ptr are null.
+ *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into rsdt.
+ *  ERROR_NOT_FOUND - in the memory area from ptr it's not a RSDT structure.
  */
 uint32 acpi_rsdt_init(
     PRSDT rsdt,
-    uint8 *ptr
+    uint8* ptr
 );
 
 /*
@@ -41,6 +45,11 @@ uint32 acpi_rsdt_init(
  *  ptr - the memory area from where the structure is created.
  *
  * @return:
+ *  ERROR_SUCCESS - the structure was created.
+ *  ERROR_NULL_POINTER - rsdt or ptr are null.
+ *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into rsdt.
+ *  ERROR_NOT_FOUND - in the memory area from ptr it's not a RSDT structure.
+ *  ERROR_ALLOC_ERROR - could not allocate memory for entries.
  */
 uint32 acpi_rsdt_create(
     PRSDT rsdt,
