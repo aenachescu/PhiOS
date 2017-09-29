@@ -29,6 +29,7 @@
 #define ERROR_INTERNAL_ERROR        23
 #define ERROR_INCOMPATIBLE_VERSIONS 24
 #define ERROR_INCOMPATIBLE          25
+#define ERROR_ALLOC_ERROR           26
 
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)
