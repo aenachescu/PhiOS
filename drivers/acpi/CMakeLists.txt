@@ -4,6 +4,7 @@ set(MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 # Add C sources
 list(APPEND ACPI_C_SOURCES "${MODULE_PATH}/src/acpi.c")
 list(APPEND ACPI_C_SOURCES "${MODULE_PATH}/src/SDTHeader.c")
+list(APPEND ACPI_C_SOURCES "${MODULE_PATH}/src/acpi_rsdt.c")
 
 # Add include paths
 include_directories(${INCLUDE_PATH})
