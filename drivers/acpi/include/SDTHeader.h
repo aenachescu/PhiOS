@@ -2,6 +2,7 @@
 #define PhiOS_DRIVERS_ACPI_SDT_HEADER
 
 #include "include/types.h"
+#include "include/errors.h"
 #include "include/compiler.h"
 
 struct _SDTHeader
@@ -19,5 +20,24 @@ struct _SDTHeader
 
 typedef struct _SDTHeader   SDTHeader;
 typedef struct _SDTHeader* PSDTHeader;
+
+/*
+ * @brief: Checks if it's a header for a particular structure.
+ *      Also, checks if checksum is 0.
+ *
+ * @param:
+ *  header - pointer to the header which to be verified.
+ *  signature - the expected signature.
+ *
+ * @return:
+ *  ERROR_SUCCESS - it's the expected header.
+ *  ERROR_NULL_POINTER - signature or header are null.
+ *  ERROR_NOT_FOUND - the header has not the expected signature.
+ *  ERROR_INTERNAL_ERROR - the signatures could not be compared.
+ */
+uint32 SDTHeader_checkSignature(
+    const PSDTHeader header,
+    const char* signature
+);
 
 #endif
