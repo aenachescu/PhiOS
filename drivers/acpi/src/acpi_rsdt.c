@@ -1,5 +1,9 @@
 #include "drivers/acpi/include/acpi_rsdt.h"
+#include "drivers/config.h"
+
+#ifdef STATIC_LINKAGE
 #include "util/kstdlib/include/kstring.h"
+#endif
 
 uint32 acpi_rsdt_init(
     PRSDT rsdt,
