@@ -29,7 +29,7 @@ typedef struct _XSDT* PXSDT;
  */
 uint32 acpi_xsdt_init(
     PXSDT xsdt,
-    uint8 *ptr
+    uint8* ptr
 );
 
 /*
