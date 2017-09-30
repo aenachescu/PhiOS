@@ -1,6 +1,10 @@
 #include "drivers/acpi/include/acpi.h"
+#include "drivers/config.h"
+
+#ifdef STATIC_LINKAGE
 #include "kernel/include/logging.h"
 #include "util/kstdlib/include/kstring.h"
+#endif
 
 uint32 acpi_getRSDP(
     PRSDP2 rsdp2,
