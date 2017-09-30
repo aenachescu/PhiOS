@@ -70,7 +70,7 @@ uint32 acpi_rsdt_create(
 
     rsdt->entries = (uint32*) ((uint32) address);
 
-    error = kmemcpy(rsdt->entries, ptr + sizeof(SDTHeader), sizeof(SDTHeader));
+    error = kmemcpy(rsdt->entries, ptr + sizeof(SDTHeader), entriesSize);
     if (error != ERROR_SUCCESS) {
         return ERROR_INTERNAL_ERROR;
     }
