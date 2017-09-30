@@ -1,5 +1,9 @@
 #include "drivers/acpi/include/SDTHeader.h"
+#include "drivers/config.h"
+
+#ifdef STATIC_LINKAGE
 #include "util/kstdlib/include/kstring.h"
+#endif
 
 uint32 SDTHeader_checkSignature(
     const PSDTHeader header,
