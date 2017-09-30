@@ -26,6 +26,10 @@ typedef struct _XSDT* PXSDT;
  *  ptr - the memory area from where the structure is initialized.
  *
  * @return:
+ *  ERROR_SUCCESS - the structure was initialized.
+ *  ERROR_NULL_POINTER - xsdt or ptr are null.
+ *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into xsdt.
+ *  ERROR_NOT_FOUND - in the memory area from ptr it's not a XSDT structure.
  */
 uint32 acpi_xsdt_init(
     PXSDT xsdt,
@@ -41,6 +45,11 @@ uint32 acpi_xsdt_init(
  *  ptr - the memory area from where the structure is created.
  *
  * @return:
+ *  ERROR_SUCCESS - the structure was created.
+ *  ERROR_NULL_POINTER - xsdt or ptr are null.
+ *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into xsdt.
+ *  ERROR_NOT_FOUND - in the memory area from ptr it's not a XSDT structure.
+ *  ERROR_ALLOC_ERROR - could not allocate memory for entries.
  */
 uint32 acpi_xsdt_create(
     PXSDT xsdt,
@@ -49,6 +58,8 @@ uint32 acpi_xsdt_create(
 
 /*
  * @brief: Checks if the pointers from entries are 32-bit compatible.
+ *      Only checks if the signature is 32-bit compatible, but the
+ *      rest of the header may not be.
  *
  * @param:
  *  xsdt - the structure which is verified.
