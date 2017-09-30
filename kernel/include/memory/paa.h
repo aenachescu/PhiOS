@@ -27,7 +27,7 @@ uint32 PAA_init(
  *                  stored the starting address of the allocated memory area.
  * @param a_alignment The alignment size.
  *
- * @rerturn
+ * @return
  *  ERROR_SUCCESS - If the function ends successfully.
  *  ERROR_UNINITIALIZED - If PAA is not initialized.
  *  ERROR_INVALID_PARAMETER - If a_size is 0.
