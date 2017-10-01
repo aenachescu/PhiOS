@@ -27,15 +27,5 @@ uint32 SDTHeader_checkSignature(
         return ERROR_NOT_FOUND;
     }
 
-    uint8 *ptr = (uint8*) header;
-    uint8 sum = 0;
-    for (size_t i = 0; i < sizeof(SDTHeader); i++) {
-        sum += ptr[i];
-    }
-
-    if (sum != 0) {
-        return ERROR_NOT_FOUND;
-    }
-
     return ERROR_SUCCESS;
 }
