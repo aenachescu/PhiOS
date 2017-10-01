@@ -73,4 +73,23 @@ uint32 acpi_xsdt_check32BitsCompatibility(
     PXSDT xsdt
 );
 
+/*
+ * @brief: Looking for a certain signature.
+ *
+ * @param:
+ *  xsdt - pointer to the structure where it's looking for the signature.
+ *  headerSignature - the signature being searched for.
+ *  address - the address where the signature was found, NULL if it was not found.
+ *
+ * @return:
+ *  ERROR_SUCCESS - the signature was found.
+ *  ERROR_NULL_POINTER - xsdt, headerSignature or address are null.
+ *  ERROR_NOT_FOUND - the signature was not found.
+ */
+uint32 acpi_xsdt_findHeader(
+    PXSDT xsdt,
+    const char* headerSignature,
+    uint64* address
+);
+
 #endif
