@@ -5,6 +5,22 @@
 #include "util/kstdlib/include/kstring.h"
 #endif
 
+static bool acpi_xsdt_doChecksum(
+    uint8* ptr,
+    uint32 length)
+{
+    uint8 sum = 0;
+    for (uint32 i = 0; i < length; i++) {
+        sum += ptr[i];
+    }
+
+    if (sum == 0) {
+        return true;
+    }
+
+    return false;
+}
+
 uint32 acpi_xsdt_init(
     PXSDT xsdt,
     uint8* ptr)
@@ -24,6 +40,10 @@ uint32 acpi_xsdt_init(
 
     error = SDTHeader_checkSignature(&xsdt->header, "XSDT");
     if (error != ERROR_SUCCESS) {
+        return ERROR_NOT_FOUND;
+    }
+
+    if (acpi_xsdt_doChecksum(ptr, xsdt->header.length) == false) {
         return ERROR_NOT_FOUND;
     }
 
@@ -51,6 +71,10 @@ uint32 acpi_xsdt_create(
 
     error = SDTHeader_checkSignature(&xsdt->header, "XSDT");
     if (error != ERROR_SUCCESS) {
+        return ERROR_NOT_FOUND;
+    }
+
+    if (acpi_xsdt_doChecksum(ptr, xsdt->header.length) == false) {
         return ERROR_NOT_FOUND;
     }
 
