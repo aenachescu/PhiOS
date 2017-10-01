@@ -23,7 +23,6 @@ typedef struct _SDTHeader* PSDTHeader;
 
 /*
  * @brief: Checks if it's a header for a particular structure.
- *      Also, checks if checksum is 0.
  *
  * @param:
  *  header - pointer to the header which to be verified.
