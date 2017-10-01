@@ -56,4 +56,23 @@ uint32 acpi_rsdt_create(
     uint8* ptr
 );
 
+/*
+ * @brief: Looking for a certain signature.
+ *
+ * @param:
+ *  rsdt - pointer to the structure where it's looking for the signature.
+ *  headerSignature - the signature being searched for.
+ *  address - the address where the signature was found, NULL if it was not found.
+ *
+ * @return:
+ *  ERROR_SUCCESS - the signature was found.
+ *  ERROR_NULL_POINTER - rsdt, headerSignature or address are null.
+ *  ERROR_NOT_FOUND - the signature was not found.
+ */
+uint32 acpi_rsdt_findHeader(
+    PRSDT rsdt,
+    const char* headerSignature,
+    uint32* address
+);
+
 #endif
