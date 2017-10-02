@@ -31,6 +31,7 @@ void user_main()
         uint8 c = keyboard_readKey();
         if (c == '\n') {
             kprintf("\n> ");
+            continue;
         }
 
         if (c == ESC) {
