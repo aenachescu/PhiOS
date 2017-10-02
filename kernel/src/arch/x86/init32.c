@@ -9,6 +9,8 @@
 
 #include "drivers/video/include/vga/text_mode.h"
 #include "drivers/acpi/include/acpi.h"
+#include "drivers/acpi/include/acpi_xsdt.h"
+#include "drivers/acpi/include/acpi_rsdt.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -110,6 +112,70 @@ void adjustPointers()
     }
 
     adjust_got(offset);
+}
+
+void ParseAcpi()
+{
+    RSDP2 rsdp2;
+    uint32 acpiVer = ACPI_VERSION_UNKNOWN;
+    acpi_getRSDP(&rsdp2, &acpiVer);
+
+    if (acpiVer != ACPI_VERSION_2) {
+        KLOG_WARNING("unsupported acpi version");
+        return;
+    }
+
+    KLOG_INFO("revision: %hhu", rsdp2.rsdp.revision);
+    KLOG_INFO("RSDT: %p, XSDT %llu", rsdp2.rsdp.rsdtAddr, rsdp2.xsdtAddr);
+
+    XSDT xsdt;
+    RSDT rsdt;
+    uint32 err = 0;
+    uint64 sratAddr64 = 0;
+    uint32 sratAddr = 0;
+
+    if (rsdp2.xsdtAddr == 0) {
+        KLOG_INFO("RSDT address - %p", rsdp2.rsdp.rsdtAddr);
+        err = acpi_rsdt_init(&rsdt, (uint8*) rsdp2.rsdp.rsdtAddr);
+        if (err != ERROR_SUCCESS) {
+            KLOG_WARNING("rsdt init failed - %u", err);
+            return;
+        }
+
+        err = acpi_rsdt_findHeader(&rsdt, "SRAT", &sratAddr);
+        if (err != ERROR_SUCCESS) {
+            KLOG_WARNING("srat not found - %u", err);
+            return;
+        }
+
+        KLOG_INFO("srat found at [%p]", (void*) sratAddr);
+        return;
+    }
+
+    if (rsdp2.xsdtAddr > 0xFFFFFFFFULL) {
+        KLOG_ERROR("incompatible addr");
+        return;
+    }
+
+    err = acpi_xsdt_init(&xsdt, (uint8*) ((size_t) rsdp2.xsdtAddr));
+    if (err != ERROR_SUCCESS) {
+        KLOG_WARNING("xsdt init failed - %u", err);
+        return;
+    }
+
+    err = acpi_xsdt_check32BitsCompatibility(&xsdt);
+    if (err != ERROR_SUCCESS) {
+        KLOG_WARNING("xsdt is incompatible - %u", err);
+        return;
+    }
+
+    err = acpi_xsdt_findHeader(&xsdt, "SRAT", &sratAddr64);
+    if (err != ERROR_SUCCESS) {
+        KLOG_WARNING("not found SRAT in XSDT - %u", err);
+        return;
+    }
+
+    KLOG_INFO("found SRAT in XSDT at %llu", sratAddr64);
 }
 
 uint32 init_init32(
@@ -238,9 +304,7 @@ uint32 init_init32(
     g_kernelArea.bssEndAddr         = (size_t) &linker_bssEnd;
     g_kernelArea.endPlacementAddr   = PAA_getCurrentAddress();
 
-    RSDP2 rsdp2;
-    uint32 acpiVer = ACPI_VERSION_UNKNOWN;
-    acpi_getRSDP(&rsdp2, &acpiVer);
+    ParseAcpi();
 
     KERNEL_CHECK(PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,
