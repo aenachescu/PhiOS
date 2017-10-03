@@ -2,26 +2,35 @@
 
 #include "kernel/include/arch/x86/asm_io.h"
 
+#define VGA_MAX_LINES 200
+
+static uint16 g_VGA_buffer[VGA_MAX_LINES * VGA_WIDTH];
+static uint32 g_VGA_bufferCurrentRow;
+static uint32 g_VGA_bufferCurrentColumn;
+
+static enum VGA_Colors g_VGA_backgroundColor;
+static enum VGA_Colors g_VGA_foregroundColor;
+
 uint32 g_VGA_row;
 uint32 g_VGA_column;
-enum VGA_Colors g_VGA_backgroundColor;
-enum VGA_Colors g_VGA_foregroundColor;
-uint16 *g_VGA_buffer;
+uint16 *g_VGA_screen;
 
-void VGA_Init()
+static void VGA_DisableCursor()
 {
-    g_VGA_row = 0;
-    g_VGA_column = 0;
-
-    g_VGA_foregroundColor = VGA_ColorLightGrey;
-    g_VGA_backgroundColor = VGA_ColorBlack;
-
-    g_VGA_buffer = (uint16*) VGA_MEM_ADDR;
-
-    VGA_Clear();
+    io_outb(0x3D4, 0x0A);
+    io_outb(0x3D5, 0x3f);
 }
 
-void VGA_MoveCursor(
+static void VGA_EnableCursor()
+{
+    io_outb(0x3D4, 0x0A);
+    io_outb(0x3D5, (io_inb(0x3D5) & 0xC0) | 14);
+
+    io_outb(0x3D4, 0x0B);
+    io_outb(0x3D5, (io_inb(0x3E0) & 0xE0) | 15);
+}
+
+static void VGA_MoveCursor(
     uint16 a_column,
     uint16 a_row)
 {
@@ -35,6 +44,49 @@ void VGA_MoveCursor(
     io_outb(0x3D5, (uint8) ((position >> 8) & 0xFF));
 }
 
+static inline uint16 VGA_CreateEntry(
+    char a_c,
+    enum VGA_Colors a_bg,
+    enum VGA_Colors a_fg)
+{
+    return (uint16) a_c | ((uint16) (a_fg | (a_bg << 4)) << 8);
+}
+
+void VGA_Init()
+{
+    g_VGA_row = 0;
+    g_VGA_column = 0;
+
+    g_VGA_bufferCurrentColumn = 0;
+    g_VGA_bufferCurrentRow = 0;
+
+    g_VGA_foregroundColor = VGA_ColorLightGrey;
+    g_VGA_backgroundColor = VGA_ColorBlack;
+
+    g_VGA_screen = (uint16*) VGA_MEM_ADDR;
+
+    uint16 ch = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
+    uint32 index = 0;
+
+    for (uint32 y = 0; y < VGA_HEIGHT; y++) {
+        index = y * VGA_WIDTH;
+        for (uint32 x = 0; x < VGA_WIDTH; x++) {
+            g_VGA_screen[index + x] = ch;
+        }
+    }
+
+    for (uint32 y = 0; y < VGA_MAX_LINES; y++) {
+        index = y * VGA_WIDTH;
+        for (uint32 x = 0; x < VGA_WIDTH; x++) {
+            g_VGA_buffer[index + x] = ch;
+        }
+    }
+
+    VGA_MoveCursor(0, 0);
+    VGA_DisableCursor();
+    VGA_EnableCursor();
+}
+
 void VGA_SetBackgroundColor(
     enum VGA_Colors a_bg)
 {
@@ -45,13 +97,6 @@ void VGA_SetForegroundColor(
     enum VGA_Colors a_fg)
 {
     g_VGA_foregroundColor = a_fg;
-}
-
-uint16 VGA_CreateEntry(
-    char a_c, enum VGA_Colors
-    a_bg, enum VGA_Colors a_fg)
-{
-    return (uint16) a_c | ((uint16) (a_fg | (a_bg << 4)) << 8);
 }
 
 void VGA_WriteChar(
@@ -109,7 +154,7 @@ void VGA_WriteColoredChar(
             entry = VGA_CreateEntry(a_c, a_bg, a_fg);
 
             index = g_VGA_row * VGA_WIDTH + g_VGA_column;
-            g_VGA_buffer[index] = entry;
+            g_VGA_screen[index] = entry;
 
             if (++g_VGA_column == VGA_WIDTH) {
                 g_VGA_column = 0;
@@ -151,27 +196,14 @@ void VGA_Scroll()
 {
     for (uint32 i = 0; i < VGA_HEIGHT - 1; i++)  {
         for (uint32 j = 0; j < VGA_WIDTH; j++) {
-            g_VGA_buffer[i * VGA_WIDTH + j] = g_VGA_buffer[(i + 1) * VGA_WIDTH + j];
+            g_VGA_screen[i * VGA_WIDTH + j] = g_VGA_screen[(i + 1) * VGA_WIDTH + j];
         }
     }
 
     uint16 blank = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
     for (uint32 i = 0; i < VGA_WIDTH; i++) {
-        g_VGA_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + i] = blank;
+        g_VGA_screen[(VGA_HEIGHT - 1) * VGA_WIDTH + i] = blank;
     }
 
     g_VGA_row = VGA_HEIGHT - 1;
-}
-
-void VGA_Clear()
-{
-    for (uint32 y = 0; y < VGA_HEIGHT; y++) {
-        for (uint32 x = 0; x < VGA_WIDTH; x++) {
-            uint32 index = y * VGA_WIDTH + x;
-            g_VGA_buffer[index] = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
-        }
-    }
-
-    g_VGA_row = 0;
-    g_VGA_column = 0;
 }

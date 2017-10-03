@@ -29,22 +29,11 @@ enum VGA_Colors {
 
 void VGA_Init();
 
-void VGA_MoveCursor(
-    uint16 a_column, 
-    uint16 a_row
-);
-
 void VGA_SetBackgroundColor(
     enum VGA_Colors a_bg
 );
 
 void VGA_SetForegroundColor(
-    enum VGA_Colors a_fg
-);
-
-uint16 VGA_CreateEntry(
-    char a_c, 
-    enum VGA_Colors a_bg,
     enum VGA_Colors a_fg
 );
 
@@ -79,9 +68,5 @@ void VGA_WriteColoredBuffer(
     enum VGA_Colors a_bg, 
     enum VGA_Colors a_fg
 );
-
-void VGA_Scroll();
-
-void VGA_Clear();
 
 #endif
