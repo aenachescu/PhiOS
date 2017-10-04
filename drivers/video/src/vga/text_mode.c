@@ -2,18 +2,24 @@
 
 #include "kernel/include/arch/x86/asm_io.h"
 
-#define VGA_MAX_LINES 200
+#include "util/kstdlib/include/kstring.h"
+
+#define VGA_MAX_LINES 27
 
 static uint16 g_VGA_buffer[VGA_MAX_LINES * VGA_WIDTH];
 static uint32 g_VGA_bufferCurrentRow;
 static uint32 g_VGA_bufferCurrentColumn;
+static uint32 g_VGA_bufferBaseRow;
+static bool   g_VGA_bufferOverflow;
 
 static enum VGA_Colors g_VGA_backgroundColor;
 static enum VGA_Colors g_VGA_foregroundColor;
 
+uint32 g_VGA_startRow;
 uint32 g_VGA_row;
 uint32 g_VGA_column;
 uint16 *g_VGA_screen;
+bool g_VGA_focusOnLastRow;
 
 static void VGA_DisableCursor()
 {
@@ -52,18 +58,91 @@ static inline uint16 VGA_CreateEntry(
     return (uint16) a_c | ((uint16) (a_fg | (a_bg << 4)) << 8);
 }
 
+static void VGA_MoveScreen(
+    uint32 baseRow)
+{
+    if (baseRow + VGA_HEIGHT < VGA_MAX_LINES) {
+        uint16 *src = &g_VGA_buffer[baseRow * VGA_WIDTH];
+        kmemcpy(g_VGA_screen, src, VGA_WIDTH * VGA_HEIGHT * 2);
+    } else {
+        uint16 *src = &g_VGA_buffer[baseRow * VGA_WIDTH];
+        uint32 lines = VGA_MAX_LINES - baseRow;
+        kmemcpy(g_VGA_screen, src, lines * VGA_WIDTH * 2);
+        kmemcpy(g_VGA_screen + (lines * VGA_WIDTH), g_VGA_buffer, (VGA_HEIGHT - lines) * VGA_WIDTH * 2);
+    }
+}
+
+static void VGA_NewLine()
+{
+    g_VGA_bufferCurrentColumn = 0;
+    g_VGA_bufferCurrentRow++;
+
+    if (g_VGA_bufferCurrentRow == VGA_MAX_LINES) {
+        g_VGA_bufferOverflow = true;
+        g_VGA_bufferCurrentRow = 0;
+    }
+
+    if (g_VGA_bufferOverflow == true) {
+        bool moveScreen = g_VGA_bufferBaseRow == g_VGA_startRow ? true : false;
+
+        g_VGA_bufferBaseRow = g_VGA_bufferCurrentRow + 1;
+        g_VGA_bufferBaseRow %= VGA_MAX_LINES;
+
+        if (moveScreen) {
+            VGA_MoveScreen(g_VGA_bufferBaseRow);
+            g_VGA_startRow++;
+            g_VGA_startRow %= VGA_MAX_LINES;
+        }
+    }
+
+    uint32 index = g_VGA_bufferCurrentRow * VGA_WIDTH;
+    uint16 ch = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
+    for (uint32 i = 0; i < VGA_WIDTH; i++) {
+        g_VGA_buffer[index + i] = ch;
+    }
+}
+
+static void VGA_ScreenNewLine()
+{
+    g_VGA_column = 0;
+    g_VGA_row++;
+
+    g_VGA_startRow++;
+    g_VGA_startRow %= VGA_MAX_LINES;
+
+    if (g_VGA_row == VGA_HEIGHT) {
+        for (uint32 i = 1; i < VGA_HEIGHT; i++) {
+            uint32 index1 = i * VGA_WIDTH;
+            uint32 index2 = (i - 1) * VGA_WIDTH;
+            for (uint32 j = 0; j < VGA_WIDTH; j++) {
+                g_VGA_screen[index2 + j] = g_VGA_screen[index1 + j];
+            }
+        }
+
+        g_VGA_row--;
+
+        uint16 ch = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
+        for (uint32 i = 0; i < VGA_WIDTH; i++) {
+            g_VGA_screen[(VGA_HEIGHT - 1) * VGA_WIDTH + i] = ch;
+        }
+    }
+}
+
 void VGA_Init()
 {
+    g_VGA_startRow = 0;
     g_VGA_row = 0;
     g_VGA_column = 0;
+    g_VGA_screen = (uint16*) VGA_MEM_ADDR;
+    g_VGA_focusOnLastRow = true;
 
     g_VGA_bufferCurrentColumn = 0;
     g_VGA_bufferCurrentRow = 0;
+    g_VGA_bufferBaseRow = 0;
+    g_VGA_bufferOverflow = false;
 
     g_VGA_foregroundColor = VGA_ColorLightGrey;
     g_VGA_backgroundColor = VGA_ColorBlack;
-
-    g_VGA_screen = (uint16*) VGA_MEM_ADDR;
 
     uint16 ch = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
     uint32 index = 0;
@@ -129,11 +208,10 @@ void VGA_WriteColoredChar(
 
     switch (a_c) {
         case '\n':
-            g_VGA_column = 0;
-            g_VGA_row++;
+            VGA_NewLine();
 
-            if (g_VGA_row == VGA_HEIGHT) {
-                VGA_Scroll();
+            if (g_VGA_focusOnLastRow == true) {
+                VGA_ScreenNewLine();
             }
 
             break;
@@ -153,15 +231,19 @@ void VGA_WriteColoredChar(
         default:
             entry = VGA_CreateEntry(a_c, a_bg, a_fg);
 
-            index = g_VGA_row * VGA_WIDTH + g_VGA_column;
-            g_VGA_screen[index] = entry;
+            index = g_VGA_bufferCurrentRow * VGA_WIDTH + g_VGA_bufferCurrentColumn;
+            g_VGA_buffer[index] = entry;
 
-            if (++g_VGA_column == VGA_WIDTH) {
-                g_VGA_column = 0;
-                g_VGA_row++;
+            g_VGA_bufferCurrentColumn++;
+            if (g_VGA_bufferCurrentColumn == VGA_WIDTH) {
+                VGA_NewLine();
+            }
 
-                if (g_VGA_row == VGA_HEIGHT) {
-                    VGA_Scroll();
+            if (g_VGA_focusOnLastRow == true) {
+                g_VGA_screen[g_VGA_row * VGA_WIDTH + g_VGA_column] = entry;
+                g_VGA_column++;
+                if (g_VGA_column == VGA_WIDTH) {
+                    VGA_ScreenNewLine();
                 }
             }
 
@@ -190,20 +272,4 @@ void VGA_WriteColoredBuffer(
     for (size_t i = 0; i < a_len; i++) {
         VGA_WriteColoredChar(a_buffer[i], a_bg, a_fg);
     }
-}
-
-void VGA_Scroll()
-{
-    for (uint32 i = 0; i < VGA_HEIGHT - 1; i++)  {
-        for (uint32 j = 0; j < VGA_WIDTH; j++) {
-            g_VGA_screen[i * VGA_WIDTH + j] = g_VGA_screen[(i + 1) * VGA_WIDTH + j];
-        }
-    }
-
-    uint16 blank = VGA_CreateEntry(' ', g_VGA_backgroundColor, g_VGA_foregroundColor);
-    for (uint32 i = 0; i < VGA_WIDTH; i++) {
-        g_VGA_screen[(VGA_HEIGHT - 1) * VGA_WIDTH + i] = blank;
-    }
-
-    g_VGA_row = VGA_HEIGHT - 1;
 }
