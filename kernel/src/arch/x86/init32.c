@@ -11,6 +11,7 @@
 #include "drivers/acpi/include/acpi.h"
 #include "drivers/acpi/include/acpi_xsdt.h"
 #include "drivers/acpi/include/acpi_rsdt.h"
+#include "drivers/serial/include/serial.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -184,9 +185,11 @@ uint32 init_init32(
 {
     // Inits VGA
     VGA_Init();
+    serial_init();
 
     logging_init();
     logging_addPfn(VGA_WriteString);
+    //logging_addPfn(serial_writeStringDefault);
 
     kprintf("PhiOS v0.0.1 32-bit\n");
 
