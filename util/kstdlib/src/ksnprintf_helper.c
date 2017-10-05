@@ -526,9 +526,93 @@ skipPrecision:
                 REINIT;
 
             // x specifier
+#define GET_DEFAULT_WIDTH(type)                                     \
+    if (width == 0 && (flag_zero == true || flag_space == true)) {  \
+        width = sizeof(type) * 2;                                   \
+    }
+
             case 'x':
             case 'X':
+                if (widthAsterix == true) {
+                    width = va_arg(a_arg, uint32);
+                }
+
+                switch (length) {
+                    case LENGTH_L:
+                        // interpreted as int32
+                    case LENGTH_l:
+                    case LENGTH_none:
+                        // int32
+                        uval32 = va_arg(a_arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 16);
+                        GET_DEFAULT_WIDTH(uint32);
+                        break;
+
+                    case LENGTH_j:
+                        // intmax_t - interpreted as int64
+                    case LENGTH_ll:
+                        // int64
+                        uval64 = va_arg(a_arg, uint64);
+                        ku64toa(uval64, tmpBuff, &tmpBuffLength, 16);
+                        GET_DEFAULT_WIDTH(uint64);
+                        break;
+
+                    case LENGTH_h:
+                        // int16
+                        uval32 = (uint16) va_arg(a_arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 16);
+                        GET_DEFAULT_WIDTH(uint16);
+                        break;
+
+                    case LENGTH_hh:
+                        // int8
+                        uval32 = (uint8) va_arg(a_arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 16);
+                        GET_DEFAULT_WIDTH(uint8);
+                        break;
+
+                    case LENGTH_t:
+                        // ptrdiff_t - interpreted as int32 on 32bits and int64 on 64bits
+                    case LENGTH_z:
+                        // size_t
+#if defined WORDSIZE && WORDSIZE == 64
+                        uval64 = va_arg(a_arg, uint64);
+                        ku64toa(uval64, tmpBuff, &tmpBuffLength, 16);
+                        GET_DEFAULT_WIDTH(uint64);
+#else
+                        uval32 = va_arg(a_arg, uint32);
+                        kutoa(uval32, tmpBuff, &tmpBuffLength, 16);
+                        GET_DEFAULT_WIDTH(uint32);
+#endif
+                        break;
+                }
+
+                if (*a_format == 'x') {
+                    hexToLower(tmpBuff);
+                }
+
+                if (flag_hash == true) {
+                    if (*a_format == 'x') {
+                        addString(a_buffer, a_length, "0x", &currentPos);
+                    } else {
+                        addString(a_buffer, a_length, "0X", &currentPos);
+                    }
+                }
+
+                if (tmpBuffLength < width) {
+                    char ch = ' ';
+                    if (flag_zero) {
+                        ch = '0';
+                    }
+                    addChars(a_buffer, a_length, ch, width - tmpBuffLength, &currentPos);
+                    addString(a_buffer, a_length, tmpBuff, &currentPos);
+                } else {
+                    addString(a_buffer, a_length, tmpBuff, &currentPos);
+                }
+
                 REINIT;
+
+#undef GET_DEFAULT_WIDTH
 
             case 'f':
             case 'F':
