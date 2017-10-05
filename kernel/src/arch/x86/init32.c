@@ -127,7 +127,7 @@ void ParseAcpi()
     }
 
     KLOG_INFO("revision: %hhu", rsdp2.rsdp.revision);
-    KLOG_INFO("RSDT: %p, XSDT %llu", rsdp2.rsdp.rsdtAddr, rsdp2.xsdtAddr);
+    KLOG_INFO("RSDT: %#0x, XSDT %#0llx", rsdp2.rsdp.rsdtAddr, rsdp2.xsdtAddr);
 
     XSDT xsdt;
     RSDT rsdt;
