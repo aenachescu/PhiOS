@@ -4,7 +4,7 @@
 
 #include "util/kstdlib/include/kstring.h"
 
-#define VGA_MAX_LINES 27
+#define VGA_MAX_LINES 200
 
 static uint16 g_VGA_buffer[VGA_MAX_LINES * VGA_WIDTH];
 static uint32 g_VGA_bufferCurrentRow;
@@ -15,11 +15,11 @@ static bool   g_VGA_bufferOverflow;
 static enum VGA_Colors g_VGA_backgroundColor;
 static enum VGA_Colors g_VGA_foregroundColor;
 
-uint32 g_VGA_startRow;
-uint32 g_VGA_row;
-uint32 g_VGA_column;
-uint16 *g_VGA_screen;
-bool g_VGA_focusOnLastRow;
+static uint32   g_VGA_startRow;
+static uint32   g_VGA_row;
+static uint32   g_VGA_column;
+static uint16  *g_VGA_screen;
+static bool     g_VGA_focusOnLastRow;
 
 static void VGA_DisableCursor()
 {
@@ -107,10 +107,10 @@ static void VGA_ScreenNewLine()
     g_VGA_column = 0;
     g_VGA_row++;
 
-    g_VGA_startRow++;
-    g_VGA_startRow %= VGA_MAX_LINES;
-
     if (g_VGA_row == VGA_HEIGHT) {
+        g_VGA_startRow++;
+        g_VGA_startRow %= VGA_MAX_LINES;
+
         for (uint32 i = 1; i < VGA_HEIGHT; i++) {
             uint32 index1 = i * VGA_WIDTH;
             uint32 index2 = (i - 1) * VGA_WIDTH;
@@ -272,4 +272,113 @@ void VGA_WriteColoredBuffer(
     for (size_t i = 0; i < a_len; i++) {
         VGA_WriteColoredChar(a_buffer[i], a_bg, a_fg);
     }
+}
+
+void VGA_ScreenScrollUp(
+    uint32 a_num)
+{
+    if (g_VGA_bufferBaseRow == g_VGA_startRow) {
+        return;
+    }
+
+    uint32 dif = 0;
+    if (g_VGA_bufferBaseRow > g_VGA_startRow) {
+        dif = VGA_MAX_LINES - (g_VGA_bufferBaseRow - g_VGA_startRow);
+    } else {
+        dif = g_VGA_startRow - g_VGA_bufferBaseRow;
+    }
+
+    if (dif <= a_num) {
+        g_VGA_startRow = g_VGA_bufferBaseRow;
+    } else {
+        if (g_VGA_startRow > g_VGA_bufferBaseRow) {
+            g_VGA_startRow -= a_num;
+        } else {
+            if (a_num <= g_VGA_startRow) {
+                g_VGA_startRow = a_num;
+            } else {
+                a_num -= g_VGA_startRow;
+                g_VGA_startRow = VGA_MAX_LINES - a_num;
+            }
+        }
+    }
+
+    VGA_MoveScreen(g_VGA_startRow);
+
+    if (g_VGA_focusOnLastRow == true) {
+        g_VGA_focusOnLastRow = false;
+        VGA_DisableCursor();
+    }
+}
+
+void VGA_ScreenScrollDown(
+    uint32 a_num)
+{
+    uint32 dif = 0;
+    if (g_VGA_bufferCurrentRow >= g_VGA_startRow) {
+        dif = g_VGA_bufferCurrentRow - g_VGA_startRow;
+        dif++;
+    } else {
+        dif = VGA_MAX_LINES - (g_VGA_startRow - g_VGA_bufferCurrentRow);
+        dif++;
+    }
+
+    if (dif <= VGA_HEIGHT) {
+        return;
+    }
+
+    uint32 tmp = dif - VGA_HEIGHT;
+    if (tmp < a_num) {
+        a_num = tmp;
+    }
+
+    g_VGA_startRow += a_num;
+    g_VGA_startRow %= VGA_MAX_LINES;
+
+    VGA_MoveScreen(g_VGA_startRow);
+
+    if (g_VGA_focusOnLastRow == false) {
+        if (g_VGA_bufferCurrentRow > g_VGA_startRow) {
+            if (g_VGA_bufferCurrentRow - g_VGA_startRow == VGA_HEIGHT - 1) {
+                g_VGA_focusOnLastRow = true;
+            }
+        } else {
+            if ((g_VGA_startRow + VGA_HEIGHT - 1) % VGA_MAX_LINES == g_VGA_bufferCurrentRow) {
+                g_VGA_focusOnLastRow = true;
+            }
+        }
+
+        if (g_VGA_focusOnLastRow == true) {
+            g_VGA_row = VGA_HEIGHT - 1;
+            g_VGA_column = g_VGA_bufferCurrentColumn;
+
+            VGA_MoveCursor(g_VGA_column, g_VGA_row);
+            VGA_EnableCursor();
+        }
+    }
+}
+
+void VGA_Focus()
+{
+    if (g_VGA_focusOnLastRow == true) {
+        return;
+    }
+
+    g_VGA_focusOnLastRow = true;
+
+    if (g_VGA_bufferCurrentRow >= VGA_HEIGHT - 1) {
+        g_VGA_startRow = g_VGA_bufferCurrentRow - (VGA_HEIGHT - 1);
+    } else {
+        uint32 tmp = VGA_HEIGHT - 1;
+        tmp -= g_VGA_bufferCurrentRow;
+        g_VGA_startRow = VGA_MAX_LINES - tmp;
+    }
+
+    VGA_MoveScreen(g_VGA_startRow);
+
+    g_VGA_row = VGA_HEIGHT - 1;
+    g_VGA_column = g_VGA_bufferCurrentColumn;
+
+    VGA_MoveCursor(g_VGA_column, g_VGA_row);
+    VGA_EnableCursor();
 }

@@ -69,4 +69,14 @@ void VGA_WriteColoredBuffer(
     enum VGA_Colors a_fg
 );
 
+void VGA_ScreenScrollUp(
+    uint32 a_num
+);
+
+void VGA_ScreenScrollDown(
+    uint32 a_num
+);
+
+void VGA_Focus();
+
 #endif
