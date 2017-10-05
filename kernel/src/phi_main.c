@@ -29,6 +29,7 @@ void user_main()
     while (1) {
         uint8 c = keyboard_readKey();
         if (c == '\n') {
+            VGA_Focus();
             kprintf("\n> ");
             continue;
         }
@@ -42,7 +43,16 @@ void user_main()
         } else if (c == KF2) {
             qemu_shutdown();
             kprintf("\nShutdown will work only on QEMU for now...\n");
+        } else if (c == KUP) {
+            VGA_ScreenScrollUp(1);
+        } else if (c == KDOWN) {
+            VGA_ScreenScrollDown(1);
+        } else if (c == KPGUP) {
+            VGA_ScreenScrollUp(VGA_HEIGHT);
+        } else if (c == KPGDN) {
+            VGA_ScreenScrollDown(VGA_HEIGHT);
         } else {
+            VGA_Focus();
             kprintf("%c", c);
         }
     }
