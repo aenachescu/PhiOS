@@ -13,8 +13,6 @@
 #include "drivers/acpi/include/acpi_rsdt.h"
 #include "drivers/serial/include/serial.h"
 
-#include "util/kstdlib/include/kstdio.h"
-
 #include "kernel/include/multiboot2.h"
 
 #include "include/cpu.h"
@@ -45,24 +43,6 @@ struct Paging g_kernelPaging;
 
 extern struct PMA *g_allocators;
 
-__attribute__ ((unused))
-static void printKernelArea()
-{
-    kprintf("TextStart: %x TextEnd: %x\n",
-        g_kernelArea.textStartAddr, g_kernelArea.textEndAddr);
-
-    kprintf("RodataStart: %x RodataEnd: %x\n",
-        g_kernelArea.rodataStartAddr, g_kernelArea.rodataEndAddr);
-
-    kprintf("DataStart: %x DataEnd: %x\n",
-        g_kernelArea.dataStartAddr, g_kernelArea.dataEndAddr);
-
-    kprintf("BssStart: %x BssEnd: %x\n",
-        g_kernelArea.bssStartAddr, g_kernelArea.bssEndAddr);
-
-    kprintf("Placement address: %x\n", g_kernelArea.endPlacementAddr);
-}
-
 void detectSMBios()
 {
     uint8 *p = (uint8*) 0xF0000;
@@ -76,8 +56,9 @@ void detectSMBios()
                 checksum += p[i];
             }
             if (checksum == 0) {
-                kprintf("Found SMBios32 at address: %p\n", p);
-                kprintf("SMBios32 info: majorVersion[%u], minorVersion[%u], revision[%u]\n", (uint32)p[6], (uint32)p[7], (uint32)p[30]);
+                KLOG_INFO("Found SMBios32 at [%p]", p);
+                KLOG_INFO("SMBios32 info: major[%hhu], minor[%hhu], revision[%hhu]",
+                    p[6], p[7], p[30]);
                 break;
             }
         }
@@ -85,7 +66,7 @@ void detectSMBios()
     }
 
     if (p >= (uint8*) 0x100000) {
-        kprintf("NOT found SMBios32\n");
+        KLOG_INFO("NOT found SMBios32");
         return;
     }
 }
@@ -107,6 +88,7 @@ void adjustPointers()
     uint32 offset = 0xBFF00000;
 
     PMM_adjustPointers(offset);
+    logging_adjustPointers(offset);
 
     for (size_t i = 0; i < g_PMAVM_num; i++) {
         g_PMAVM[i].bitmap = (size_t*) (((size_t)g_PMAVM[i].bitmap) + offset);
@@ -189,21 +171,21 @@ uint32 init_init32(
 
     logging_init();
     logging_addPfn(VGA_WriteString);
-    //logging_addPfn(serial_writeStringDefault);
+    logging_addPfn(serial_writeStringDefault);
 
-    kprintf("PhiOS v0.0.1 32-bit\n");
+    KLOG_INFO("PhiOS v0.0.1 32-bit");
 
     if (mboot2Magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
-        VGA_WriteString("[PANIC] GRUB not multiboot2");
+        KLOG_FATAL("GRUB not multiboo2");
         return ERROR_NOT_FOUND;
     }
 
     if (mboot2Addr & 7) {
-        VGA_WriteString("[PANIC] Multiboot2 structure is not aligned");
+        KLOG_FATAL("Multiboot2 structure is not aligned");
         return ERROR_UNALIGNED_ADDRESS;
     }
 
-    VGA_WriteString("GRUB multiboot2\n");
+    KLOG_INFO("GRUB multiboot2");
 
     detectSMBios();
 
@@ -227,8 +209,8 @@ uint32 init_init32(
                 //        mem->mem_lower,
                 //        mem->mem_upper);
                 break;
-            case MULTIBOOT_TAG_TYPE_MMAP: ;
-                kprintf("[GRUB] Memory map:\n");
+            case MULTIBOOT_TAG_TYPE_MMAP:
+                KLOG_INFO("GRUB memory map:");
                 multiboot_memory_map_t *mmap;
                 struct multiboot_tag_mmap *mmapTag = (struct multiboot_tag_mmap*) tag;
 
@@ -236,13 +218,9 @@ uint32 init_init32(
                      (multiboot_uint8_t*) mmap < (multiboot_uint8_t*) tag + tag->size;
                      mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
                             + mmapTag->entry_size)) {
-                    kprintf("[addr %llx, len %llx] ",
-                            mmap->addr,
-                            mmap->len);
-
                     totalMemory += mmap->len;
 
-
+                    const char *state = "UNKNOWN";
                     switch (mmap->type) {
                         case MULTIBOOT_MEMORY_AVAILABLE:
                             memoryZones[memoryZonesCount].startAddr = mmap->addr;
@@ -250,20 +228,22 @@ uint32 init_init32(
                             memoryZonesCount++;
                             availableMemory += mmap->len;
 
-                            kprintf("AVAILABLE\n");
+                            state = "AVAILABLE";
                             break;
                         case MULTIBOOT_MEMORY_RESERVED:
-                            kprintf("RESERVED\n");
+                            state = "RESERVED";
                             break;
                         case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE:
-                            kprintf("ACPI RECLAIMABLE\n");
+                            state = "ACPI RECLAIMABLE";
                             break;
                         case MULTIBOOT_MEMORY_NVS:
-                            kprintf("NVS\n");
+                            state = "NVS";
                             break;
                         case MULTIBOOT_MEMORY_BADRAM:
-                            kprintf("BAD RAM\n");
+                            state = "BAD RAM";
                     }
+
+                    KLOG("addr[%#0llx] len[%#0llx] %s", mmap->addr, mmap->len, state);
                 }
                 break;
             default:
@@ -295,7 +275,8 @@ uint32 init_init32(
         }
     }
 
-    kprintf("TotalMem: %llu, AvailableMem: %llu\n", totalMemory / 1024 / 1024, availableMemory / 1024 / 1024);
+    KLOG_INFO("TotalMem: %llu MiBs, AvailableMem: %llu MiBs",
+        totalMemory / 1024 / 1024, availableMemory / 1024 / 1024);
 
     g_kernelArea.textStartAddr      = (size_t) &linker_textStart;
     g_kernelArea.textEndAddr        = (size_t) &linker_textEnd;
