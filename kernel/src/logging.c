@@ -99,3 +99,11 @@ uint32 logging_addPfn(
 
     return ERROR_SUCCESS;
 }
+
+void logging_adjustPointers(
+    size_t a_offset)
+{
+    for (uint32 i = 0; i < g_numOfPfn; i++) {
+        g_pfn[i] += a_offset;
+    }
+}
