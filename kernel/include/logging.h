@@ -12,6 +12,9 @@ void __klog(
 #define PhiOS_LOGGING_DEFAULT_FORMAT  "[%#10s][%5d][%7s]: "
 #define PhiOS_LOGGING_NEW_LINE        "\n"
 
+#define KLOG(format, ...)                                           \
+    __klog(format PhiOS_LOGGING_NEW_LINE, ##__VA_ARGS__)
+
 #define KLOG_FATAL(format, ...)                                     \
     __klog(                                                         \
         PhiOS_LOGGING_DEFAULT_FORMAT format PhiOS_LOGGING_NEW_LINE, \
@@ -80,6 +83,10 @@ uint32 logging_getPfnArrayLength();
 
 uint32 logging_addPfn(
     logging_writePfn a_pfn
+);
+
+void logging_adjustPointers(
+    size_t a_offset
 );
 
 #endif
