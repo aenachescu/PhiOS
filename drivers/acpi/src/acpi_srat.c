@@ -51,3 +51,43 @@ uint32 acpi_srat_init(
 
     return ERROR_SUCCESS;
 }
+
+uint32 acpi_srat_getNumberOfSRA(
+    PSRAT srat,
+    uint32 type,
+    uint32 *number)
+{
+    if (srat == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (srat->entries == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (number == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (type != SRAT_PROCESSOR_LOCAL_APIC_TYPE &&
+        type != SRAT_MEMORY_TYPE &&
+        type != SRAT_PROCESSOR_LOCAL_x2APIC_TYPE)
+    {
+        return ERROR_UNKNOWN;
+    }
+
+    *number = 0;
+    uint8 *ptr = srat->entries;
+    uint32 length = srat->header.sdt.length - sizeof(SRATHeader);
+
+    for (uint32 i = 0; i < length; i++) {
+        if (ptr[0] == type) {
+            (*number)++;
+        }
+
+        i += ptr[1];
+        ptr += ptr[1];
+    }
+
+    return ERROR_SUCCESS;
+}
