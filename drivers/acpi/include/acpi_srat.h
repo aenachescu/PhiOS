@@ -5,6 +5,8 @@
 #include "include/errors.h"
 #include "include/compiler.h"
 
+#include "drivers/acpi/include/SDTHeader.h"
+
 /*
  *  SRAT header
  */
@@ -13,20 +15,20 @@
 #define SRAT_MEMORY_TYPE                    1
 #define SRAT_PROCESSOR_LOCAL_x2APIC_TYPE    2
 
+struct _SRATHeader
+{
+    SDTHeader sdt;
+    uint8     reserved[12];
+} PhiOS_PACKED_STRUCTURE;
+
+typedef struct _SRATHeader   SRATHeader;
+typedef struct _SRATHeader* PSRATHeader;
+
 struct _SRAT
 {
-    char    signature[4];       // Contains "SRAT".
-    uint32  length;             // Length, in bytes, of the entire SRAT. The length implies the 
-                                // number of Entry fields at the end of the table
-    uint8   revision;           // 3
-    uint8   checksum;           // Entire table must sum to zero.
-    uint8   OEMID[6];           // OEM ID.
-    uint64  OEMTableID;         // For the SRAT, the table ID is the manufacturer model ID.
-    uint32  OEMRevision;        // OEM revision of System Resource Affinity Table for supplied OEM Table ID.
-    uint32  creatorID;          // Vendor ID of utility that created the table.
-    uint32  creatorRevision;    // Revision of utility that created the table.
-    uint8   reserved[12];       // Reserved.
-} PhiOS_PACKED_STRUCTURE;
+    SRATHeader header;
+    uint8 *ptr;
+};
 
 typedef struct _SRAT   SRAT;
 typedef struct _SRAT* PSRAT;
