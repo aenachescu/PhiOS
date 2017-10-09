@@ -27,7 +27,7 @@ typedef struct _SRATHeader* PSRATHeader;
 struct _SRAT
 {
     SRATHeader header;
-    uint8 *ptr;
+    uint8 *entries;
 };
 
 typedef struct _SRAT   SRAT;
@@ -101,5 +101,25 @@ struct _SRATProcessorLocalx2Apic
 
 typedef struct _SRATProcessorLocalx2Apic   SRATProcessorLocalx2Apic;
 typedef struct _SRATProcessorLocalx2Apic* PSRATProcessorLocalx2Apic;
+
+/*
+ * @brief: Initializes SRAT structure. This function does not alloc memory for
+ *      entries field, it just sets a pointer to memory area from ptr where
+ *      the entries are stored.
+ *
+ * @param:
+ *  rsdt - the structure which is initialized.
+ *  ptr - the memory area from where the structure is initialized.
+ *
+ * @return:
+ *  ERROR_SUCCESS - the structure was initialized.
+ *  ERROR_NULL_POINTER - srat or ptr are null.
+ *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into srat.
+ *  ERROR_NOT_FOUND - in the memory area from ptr it's not a SRAT structure.
+ */
+uint32 acpi_srat_init(
+    PSRAT srat,
+    uint8 *ptr
+);
 
 #endif
