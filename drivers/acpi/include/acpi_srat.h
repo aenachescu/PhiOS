@@ -122,4 +122,23 @@ uint32 acpi_srat_init(
     uint8 *ptr
 );
 
+/*
+ * @brief: Get number of system resource affinity for a certain type
+ *
+ * @param:
+ *  srat - the SRAT structure where are searched the SRA structures.
+ *  type - the type of the SRA structure. (see SRAT_*_TYPE)
+ *  number - the address where will be stored the result.
+ *
+ * @return:
+ *  ERROR_SUCCESS - operation completed successfully.
+ *  ERROR_UNKNOWN - unknown type.
+ *  ERROR_NULL_POINTER - srat, srat.entries or number are null.
+ */
+uint32 acpi_srat_getNumberOfSRA(
+    PSRAT srat,
+    uint32 type,
+    uint32 *number
+);
+
 #endif
