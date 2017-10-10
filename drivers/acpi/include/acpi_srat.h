@@ -108,37 +108,37 @@ typedef struct _SRATProcessorLocalx2Apic* PSRATProcessorLocalx2Apic;
  *      the entries are stored.
  *
  * @param:
- *  rsdt - the structure which is initialized.
- *  ptr - the memory area from where the structure is initialized.
+ *  a_srat - the structure which is initialized.
+ *  a_ptr - the memory area from where the structure is initialized.
  *
  * @return:
  *  ERROR_SUCCESS - the structure was initialized.
- *  ERROR_NULL_POINTER - srat or ptr are null.
- *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into srat.
- *  ERROR_NOT_FOUND - in the memory area from ptr it's not a SRAT structure.
+ *  ERROR_NULL_POINTER - a_srat or a_ptr are null.
+ *  ERROR_INTERNAL_ERROR - the data from ptr could not be copied into a_srat.
+ *  ERROR_NOT_FOUND - in the memory area from a_ptr it's not a SRAT structure.
  */
 uint32 acpi_srat_init(
-    PSRAT srat,
-    uint8 *ptr
+    PSRAT a_srat,
+    uint8 *a_ptr
 );
 
 /*
- * @brief: Get number of system resource affinity for a certain type
+ * @brief: Get number of system resource affinity for a certain type.
  *
  * @param:
- *  srat - the SRAT structure where are searched the SRA structures.
- *  type - the type of the SRA structure. (see SRAT_*_TYPE)
- *  number - the address where will be stored the result.
+ *  a_srat - the SRAT structure where are searched the SRA structures.
+ *  a_type - the type of the SRA structure. (see SRAT_*_TYPE)
+ *  a_number - the address where will be stored the result.
  *
  * @return:
  *  ERROR_SUCCESS - operation completed successfully.
  *  ERROR_UNKNOWN - unknown type.
- *  ERROR_NULL_POINTER - srat, srat.entries or number are null.
+ *  ERROR_NULL_POINTER - a_srat, a_srat.entries or a_number are null.
  */
 uint32 acpi_srat_getNumberOfSRA(
-    PSRAT srat,
-    uint32 type,
-    uint32 *number
+    PSRAT a_srat,
+    uint32 a_type,
+    uint32 *a_number
 );
 
 /*
