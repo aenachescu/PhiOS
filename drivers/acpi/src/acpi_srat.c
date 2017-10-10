@@ -6,12 +6,12 @@
 #endif
 
 static bool acpi_srat_doChecksum(
-    uint8* ptr,
-    uint32 length)
+    uint8* a_ptr,
+    uint32 a_length)
 {
     uint8 sum = 0;
-    for (uint32 i = 0; i < length; i++) {
-        sum += ptr[i];
+    for (uint32 i = 0; i < a_length; i++) {
+        sum += a_ptr[i];
     }
 
     if (sum == 0) {
@@ -22,67 +22,66 @@ static bool acpi_srat_doChecksum(
 }
 
 uint32 acpi_srat_init(
-    PSRAT srat,
-    uint8 *ptr)
+    PSRAT a_srat,
+    uint8 *a_ptr)
 {
-    if (srat == NULL) {
+    if (a_srat == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (ptr == NULL) {
+    if (a_ptr == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    uint32 error = kmemcpy(&srat->header, ptr, sizeof(SRATHeader));
+    uint32 error = kmemcpy(&a_srat->header, a_ptr, sizeof(SRATHeader));
     if (error != ERROR_SUCCESS) {
         return ERROR_INTERNAL_ERROR;
     }
 
-    error = SDTHeader_checkSignature(&srat->header.sdt, "SRAT");
+    error = SDTHeader_checkSignature(&a_srat->header.sdt, "SRAT");
     if (error != ERROR_SUCCESS) {
         return ERROR_NOT_FOUND;
     }
 
-    if (acpi_srat_doChecksum(ptr, srat->header.sdt.length) == false) {
+    if (acpi_srat_doChecksum(a_ptr, a_srat->header.sdt.length) == false) {
         return ERROR_NOT_FOUND;
     }
 
-    srat->entries = ptr + sizeof(SRATHeader);
+    a_srat->entries = a_ptr + sizeof(SRATHeader);
 
     return ERROR_SUCCESS;
 }
 
 uint32 acpi_srat_getNumberOfSRA(
-    PSRAT srat,
-    uint32 type,
-    uint32 *number)
+    PSRAT a_srat,
+    uint32 a_type,
+    uint32 *a_number)
 {
-    if (srat == NULL) {
+    if (a_srat == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (srat->entries == NULL) {
+    if (a_srat->entries == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (number == NULL) {
+    if (a_number == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (type != SRAT_PROCESSOR_LOCAL_APIC_TYPE &&
-        type != SRAT_MEMORY_TYPE &&
-        type != SRAT_PROCESSOR_LOCAL_x2APIC_TYPE)
-    {
+    if (a_type != SRAT_PROCESSOR_LOCAL_APIC_TYPE &&
+        a_type != SRAT_MEMORY_TYPE &&
+        a_type != SRAT_PROCESSOR_LOCAL_x2APIC_TYPE) {
         return ERROR_UNKNOWN;
     }
 
-    *number = 0;
-    uint8 *ptr = srat->entries;
-    uint32 length = srat->header.sdt.length - sizeof(SRATHeader);
+    *a_number = 0;
+    uint8 *ptr = a_srat->entries;
+    uint32 length = a_srat->header.sdt.length - sizeof(SRATHeader);
 
     for (uint32 i = 0; i < length;) {
-        if (ptr[0] == type) {
-            (*number)++;
+        if (ptr[0] == a_type) {
+            (*a_number)++;
         }
 
         i += ptr[1];
