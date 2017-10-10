@@ -107,13 +107,13 @@ uint32 acpi_srat_getNthSRAStructure(
         return ERROR_NULL_POINTER;
     }
 
-    uint32 length = srat->header.sdt.length - sizeof(SRATHeader);
-    uint8 *ptr = srat->entries;
+    uint32 length = a_srat->header.sdt.length - sizeof(SRATHeader);
+    uint8 *ptr = a_srat->entries;
     for (uint32 i = 0; i < length;) {
         if (ptr[0] == a_type) {
             a_position--;
             if (a_position == 0) {
-                if (kmemcpy(a_buffer, ptr, a_size) == ERROR_SUCCESS) {
+                if (kmemcpy(a_buffer, ptr, a_bufferSize) == ERROR_SUCCESS) {
                     return ERROR_SUCCESS;
                 }
 
