@@ -91,3 +91,39 @@ uint32 acpi_srat_getNumberOfSRA(
 
     return ERROR_SUCCESS;
 }
+
+uint32 acpi_srat_getNthSRAStructure(
+    PSRAT a_srat,
+    void *a_buffer,
+    uint32 a_bufferSize,
+    uint32 a_type,
+    uint32 a_position)
+{
+    if (a_srat == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    if (a_buffer == NULL) {
+        return ERROR_NULL_POINTER;
+    }
+
+    uint32 length = srat->header.sdt.length - sizeof(SRATHeader);
+    uint8 *ptr = srat->entries;
+    for (uint32 i = 0; i < length;) {
+        if (ptr[0] == a_type) {
+            a_position--;
+            if (a_position == 0) {
+                if (kmemcpy(a_buffer, ptr, a_size) == ERROR_SUCCESS) {
+                    return ERROR_SUCCESS;
+                }
+
+                return ERROR_INTERNAL_ERROR;
+            }
+        }
+
+        i += ptr[1];
+        ptr += ptr[1];
+    }
+
+    return ERROR_NOT_FOUND;
+}

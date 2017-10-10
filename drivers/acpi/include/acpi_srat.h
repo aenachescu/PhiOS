@@ -141,4 +141,28 @@ uint32 acpi_srat_getNumberOfSRA(
     uint32 *number
 );
 
+/*
+ * @brief: Get the a_position th SRA structure.
+ *
+ * @param:
+ *  a_srat - the SRAT structure where the SRA structure is searching.
+ *  a_buffer - the buffer where will be copied the structure.
+ *  a_bufferSize - the buffer size (implicit the structure size).
+ *  a_type - the structure type (see SRAT_*_TYPE).
+ *  a_position - the position of the structure.
+ *
+ * @return:
+ *  ERROR_SUCCESS - the structure was copied in buffer.
+ *  ERROR_INTERNAL_ERROR - the structure could not be copied in a_buffer.
+ *  ERROR_NULL_POINTER - a_buffer or a_srat are null.
+ *  ERROR_NOT_FOUND - the a_position structure was not found.
+ */
+uint32 acpi_srat_getNthSRAStructure(
+    PSRAT a_srat,
+    void *a_buffer,
+    uint32 a_bufferSize,
+    uint32 a_type,
+    uint32 a_position
+);
+
 #endif
