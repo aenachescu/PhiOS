@@ -80,7 +80,7 @@ uint32 acpi_srat_getNumberOfSRA(
     uint8 *ptr = srat->entries;
     uint32 length = srat->header.sdt.length - sizeof(SRATHeader);
 
-    for (uint32 i = 0; i < length; i++) {
+    for (uint32 i = 0; i < length;) {
         if (ptr[0] == type) {
             (*number)++;
         }
