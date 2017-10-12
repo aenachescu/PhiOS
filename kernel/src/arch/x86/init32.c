@@ -11,6 +11,7 @@
 #include "drivers/acpi/include/acpi.h"
 #include "drivers/acpi/include/acpi_xsdt.h"
 #include "drivers/acpi/include/acpi_rsdt.h"
+#include "drivers/acpi/include/acpi_srat.h"
 #include "drivers/serial/include/serial.h"
 
 #include "kernel/include/multiboot2.h"
@@ -121,17 +122,62 @@ void ParseAcpi()
         KLOG_INFO("RSDT address - %p", rsdp2.rsdp.rsdtAddr);
         err = acpi_rsdt_init(&rsdt, (uint8*) rsdp2.rsdp.rsdtAddr);
         if (err != ERROR_SUCCESS) {
-            KLOG_WARNING("rsdt init failed - %u", err);
+            KLOG_WARNING("RSDT init failed - %u", err);
             return;
         }
 
         err = acpi_rsdt_findHeader(&rsdt, "SRAT", &sratAddr);
         if (err != ERROR_SUCCESS) {
-            KLOG_WARNING("srat not found - %u", err);
+            KLOG_WARNING("SRAT not found - %u", err);
             return;
         }
 
-        KLOG_INFO("srat found at [%p]", (void*) sratAddr);
+        KLOG_INFO("SRAT found at [%p]", (void*) sratAddr);
+
+        SRAT srat;
+        err = acpi_srat_init(&srat, (uint8*)sratAddr);
+        if (err != ERROR_SUCCESS) {
+            KLOG_WARNING("SRAT init failed - %u", err);
+            return;
+        }
+
+        KLOG_INFO("SRAT init successfully, length = %u", srat.header.sdt.length);
+        uint32 num = 0;
+        err = acpi_srat_getNumberOfSRA(&srat, SRAT_MEMORY_TYPE, &num);
+        if (err != ERROR_SUCCESS) {
+            KLOG_INFO("get number of SRA structs failed - %u", err);
+            return;
+        }
+
+        KLOG_INFO("SRA memory structures:");
+        SRATMemory mem;
+        for (uint32 i = 1; i <= num; i++) {
+            err = acpi_srat_getNthSRAStructure(&srat, &mem, sizeof(SRATMemory), SRAT_MEMORY_TYPE, i);
+            if (err != ERROR_SUCCESS) {
+                KLOG_WARNING("get %u th SRA memory structure failed - %u", i, err);
+                break;
+            }
+
+            uint64 length;
+            uint64 addr;
+
+            length = mem.highLength;
+            length <<= 32;
+            length += mem.lowLength;
+
+            addr = mem.highBase;
+            addr <<= 32;
+            addr += mem.lowBase;
+
+            KLOG("#%u [%#0llx, %#0llx] %-8llu KiBs %s",
+                mem.domain,
+                addr,
+                addr + length + (length > 0 ? -1 : 0),
+                length / 1024,
+                mem.flags & MEMORY_FLAG_ENABLED ? "Enabled" : "Disabled"
+            );
+        }
+
         return;
     }
 
@@ -243,7 +289,12 @@ uint32 init_init32(
                             state = "BAD RAM";
                     }
 
-                    KLOG("addr[%#0llx] len[%#0llx] %s", mmap->addr, mmap->len, state);
+                    KLOG("[%#0llx, %#0llx] %-8llu KiBs %s",
+                        mmap->addr,
+                        mmap->addr + mmap->len + (mmap->len > 0 ? -1 : 0),
+                        mmap->len / 1024,
+                        state
+                    );
                 }
                 break;
             default:
