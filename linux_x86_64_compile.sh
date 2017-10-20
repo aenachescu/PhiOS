@@ -36,6 +36,8 @@ function build_x86_32 {
     create_dir bin
     create_dir x86_32
 
+    i686-elf-gcc -P -E ../../kernel/src/arch/x86/linker32.ld.S -o ../../kernel/src/arch/x86/linker32.ld
+
     cmake ../.. -DARCH:STRING=x86_32
     rc=$?
     if [[ $rc != 0 ]]; then
@@ -66,6 +68,8 @@ function build_x86_64 {
     
     create_dir bin
     create_dir x86_64
+
+    x86_64-elf-gcc -P -E ../../kernel/src/arch/x86/linker64.ld.S -o ../../kernel/src/arch/x86/linker64.ld
 
     cmake ../.. -DARCH:STRING=x86_64
     rc=$?
