@@ -40,3 +40,7 @@ build
 
 # Visual Studio Code
 .vscode
+
+# generated files
+kernel/src/arch/x86/linker32.ld
+kernel/src/arch/x86/linker64.ld
