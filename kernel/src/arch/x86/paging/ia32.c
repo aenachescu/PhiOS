@@ -14,6 +14,8 @@ extern struct KernelArea g_kernelArea;
 
 #define KERNEL_VIRTUAL_ADDRESS ((uint32) 0xC0000000) // 3GiB
 
+#define INVLPG(m) asm volatile ( "invlpg (%0)" : : "c"(m) : "memory" );
+
 #define IA32_4KB_PAGE_PRESENT           ((uint32) 0x00000001)
 #define IA32_4KB_PAGE_WRITE             ((uint32) 0x00000002)
 #define IA32_4KB_PAGE_USER              ((uint32) 0x00000004)
@@ -40,6 +42,34 @@ extern struct KernelArea g_kernelArea;
 #define CHECK_ALIGN(addr, align) ((addr & (align - 1)) != 0)
 #define ALIGN(addr, align) addr = addr & (~(align - 1))
 #define IS_POWER_OF_2(x) (!(x & (x - 1)))
+
+static uint32 helper_IA32_4KB_allocPageFlagsToIntelFlags(
+    uint32 a_allocPageFlags)
+{
+    uint32 ret = 0;
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_WRITE) {
+        ret |= IA32_4KB_PAGE_WRITE;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_USER) {
+        ret |= IA32_4KB_PAGE_USER;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_WRITE_THROUGH) {
+        ret |= IA32_4KB_PAGE_WRITE_THROUGH;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_CACHE_DISABLED) {
+        ret |= IA32_4KB_PAGE_CACHE_DISABLED;
+    }
+
+    if (a_allocPageFlags & PAGING_ALLOC_PAGE_FLAG_GLOBAL) {
+        ret |= IA32_4KB_PAGE_GLOBAL;
+    }
+
+    return ret;
+}
 
 static uint32 helper_IA32_4KB_createPaging(
     struct Paging *a_paging)
@@ -112,62 +142,6 @@ static uint32 helper_IA32_4KB_deletePaging(
     return error;
 }
 
-__attribute__ ((unused))
-static void helper_IA32_4KB_allocArea(
-    struct Paging *a_paging,
-    struct IA32_4KB_Paging_AllocParam *a_request)
-{
-    struct IA32_PageDirectory_4KB *pd = IA32_4KB_PD_VIRTUAL_ADDRESS;
-    struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
-
-    // TODO: remove that after you use them, for now it resolves warnings
-    pd = pd;
-
-    size_t virtualAddress = a_request->virtualAddress & (~4095);
-    size_t firstPageId = virtualAddress / 4096;
-    size_t lastVirtualAddress = a_request->virtualAddress + a_request->length;
-    if (lastVirtualAddress % 4096 != 0) {
-        lastVirtualAddress &= (~4095);
-        lastVirtualAddress += 4096;
-    }
-
-    // ADDED: save the last allocated address
-    a_paging->lastAllocatedAddress = lastVirtualAddress;
-
-    size_t pageTableId = firstPageId / PAGING_IA32_PDE_NUMBER;
-    size_t pageId = firstPageId % PAGING_IA32_PTE_NUMBER;
-
-    size_t pagesNumber = (lastVirtualAddress - virtualAddress) / 4096;
-
-    // ADDED: update the free memory count
-    a_paging->freeVirtualMemory -= pagesNumber;
-
-    size_t physicalAddress = a_request->physicalAddress;
-
-    uint32 data = 0;
-    data |= (1 << 0); // set present
-    a_request->write ? data |= (1 << 1) : 0; // set write
-    a_request->user? data |= (1 << 2) : 0; // set user
-    a_request->writeThrough ? data |= (1 << 3) : 0; // set writeThrough
-    a_request->cacheDisabled ? data |= (1 << 4) : 0; // set cacheDisabled
-
-    pageTable += pageTableId;
-
-    while (pagesNumber != 0) {
-        pagesNumber--;
-
-        pageTable->entries[pageId].data = (data | physicalAddress);
-        physicalAddress += 4096;
-
-        pageId++;
-        if (pageId == PAGING_IA32_PTE_NUMBER) {
-            pageId = 0;
-            pageTable++;
-        }
-    }
-
-}
-
 static uint32 helper_IA32_4KB_getPositionForVirtualAddress(
     uint32 a_virtualAddress,
     uint32 *a_pageId,
@@ -192,6 +166,104 @@ static void helper_IA32_4KB_initPageTable(
     // TODO: optimizes this for using kmemset()
     for (uint32 i = 0; i < PAGING_IA32_PTE_NUMBER; i++) {
         a_pt->entries[i].data = 0;
+    }
+}
+
+static void helper_IA32_4KB_allocPageTable(
+    struct IA32_PageDirectory_4KB *a_pageDirectory,
+    struct IA32_PageTable_4KB *a_pageTable0,
+    uint32 a_pageTableId,
+    uint32 a_pageTableFlags,
+    uint32 a_physicalAddress)
+{
+    // calculate where to map the new page table
+    struct IA32_PageTable_4KB *pt1023 = a_pageTable0 + 1023;
+    
+    // add page table to page directory
+    a_pageDirectory->entries[a_pageTableId].data = a_pageTableFlags | 
+                                                   (uint32) a_physicalAddress;
+
+    // map the memory for page table
+    pt1023->entries[a_pageTableId].data = IA32_4KB_PAGE_PRESENT       |
+                                          IA32_4KB_PAGE_WRITE         |
+                                          IA32_4KB_PAGE_WRITE_THROUGH | 
+                                          (uint32) a_physicalAddress;
+
+    INVLPG(a_pageTable0 + a_pageTableId);
+    helper_IA32_4KB_initPageTable(a_pageTable0 + a_pageTableId);
+}
+
+static void helper_IA32_4KB_allocPage(
+    struct IA32_PageDirectory_4KB *a_pageDirectory,
+    struct IA32_PageTable_4KB *a_pageTable0,
+    uint32 a_pageTableId,
+    uint32 a_pageId,
+    uint32 a_pageTableFlags, /* in case we need to crate the page table */
+    uint32 a_pageFlags,
+    uint32 a_physicalAddress)
+{
+    // if page table is not allocated
+    if (a_pageDirectory->entries[a_pageTableId].data == 0) {
+        uint64 ptPhysAddr;
+        PMM_alloc(
+            &ptPhysAddr, 
+            sizeof(struct IA32_PageTable_4KB_Entry) * PAGING_IA32_PTE_NUMBER,
+            PMM_FOR_VIRTUAL_MEMORY
+        );
+
+        helper_IA32_4KB_allocPageTable(
+            a_pageDirectory,
+            a_pageTable0,
+            a_pageTableId,
+            a_pageTableFlags,
+            (uint32) ptPhysAddr
+        );
+    }
+
+    // create the page
+    struct IA32_PageTable_4KB *pageTable = a_pageTable0 + a_pageTableId;
+    pageTable->entries[a_pageId].data = (a_pageFlags | a_physicalAddress);
+}
+
+/* this should be used ONLY after paging is initialized */
+static void helper_IA32_4KB_allocArea(
+    uint32 a_start,
+    uint32 a_end,
+    uint32 a_physicalAddress,
+    uint32 a_pageFlags,
+    uint32 a_pageTableFlags)
+{
+    struct IA32_PageDirectory_4KB *pageDirectory = IA32_4KB_PD_VIRTUAL_ADDRESS;
+    struct IA32_PageTable_4KB *pageTable = IA32_4KB_PT_VIRTUAL_ADDRESS;
+
+    // set present flag by default
+    a_pageFlags |= IA32_4KB_PAGE_PRESENT;
+    a_pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
+
+    uint32 pageId = 0, pageTableId = 0;
+    helper_IA32_4KB_getPositionForVirtualAddress(a_start, &pageId, &pageTableId);
+
+    while (a_start < a_end) {
+        helper_IA32_4KB_allocPage(
+            pageDirectory,
+            pageTable,
+            pageTableId,
+            pageId,
+            a_pageTableFlags,
+            a_pageFlags,
+            a_physicalAddress
+        );
+        INVLPG(a_start);
+
+        a_physicalAddress += 4096;
+
+        pageId++;
+        if (pageId == PAGING_IA32_PTE_NUMBER) {
+            pageId = 0;
+            pageTableId++;
+        }
+
+        a_start += 4096;
     }
 }
 
@@ -272,7 +344,7 @@ uint32 IA32_4KB_initKernelPaging(
 
         pt0Addr    = (uint32) tmpAddr;
         pt1022Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
-        pt1023Addr = pt0Addr + sizeof(struct IA32_PageTable_4KB);
+        pt1023Addr = pt0Addr + 2 * sizeof(struct IA32_PageTable_4KB);
 
         pdAddr = (uint32) a_paging->pagingStruct;
 
@@ -290,6 +362,30 @@ uint32 IA32_4KB_initKernelPaging(
         pageTableFlags |= IA32_4KB_PAGE_TABLE_PRESENT;
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE;
         pageTableFlags |= IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
+
+        /*helper_IA32_4KB_allocPageTable(
+            pd,
+            pt0,
+            0,
+            pageTableFlags,
+            pt0Addr           
+        );
+
+        helper_IA32_4KB_allocPageTable(
+            pd,
+            pt1022,
+            1022,
+            pageTableFlags,
+            pt1022Addr           
+        );
+
+        helper_IA32_4KB_allocPageTable(
+            pd,
+            pt1023,
+            1023,
+            pageTableFlags,
+            pt1023Addr           
+        );*/
 
         // init the page tables
         helper_IA32_4KB_initPageTable(pt0);
@@ -364,109 +460,144 @@ uint32 IA32_4KB_initKernelPaging(
 
 uint32 IA32_4KB_alloc(
     struct Paging *a_paging,
-    struct AllocFuncParam *a_request,
-    uint32 *a_address)
+    const struct VirtualAllocRequest *a_request,
+    uint64 *a_address)
 {
-    if (a_paging == NULL
-        || a_request == NULL
-        || a_address == NULL
-        || a_paging->pagingStruct == NULL
-        || a_request->param == NULL) {
+    if (a_paging == NULL ||
+        a_request == NULL ||
+        a_address == NULL ||
+        a_paging->pagingStruct == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_request->pagingType != PAGING_TYPE_IA32_4KB
-        || a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
-        return ERROR_INVALID_PARAMETER;
+    if (a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
+        return ERROR_INVALID_FUNCTION;
+    }
+
+    if (a_request->length == 0 || a_request->length > 0xFFFFFFFF) {
+        return ERROR_INVALID_SIZE;
     }
 
     uint32 error = ERROR_SUCCESS;
-
     *a_address = NULL;
 
-    struct IA32_4KB_Paging_AllocParam *request;
-    request = (struct IA32_4KB_Paging_AllocParam*) a_request->param;
-
-    if (request->length == 0) {
-        return ERROR_INVALID_PARAMETER;
-    }
-
     do {
-        bool allocAtAddr = request->flag & PAGING_FLAG_ALLOC_AT_ADDRESS ? 1 : 0;
-        bool allocCloser = request->flag & PAGING_FLAG_ALLOC_CLOSER_OF_ADDRESS ? 1 : 0;
-        bool sharedMemory = request->flag & PAGING_FLAG_ALLOC_SHARED_MEMORY ? 1 : 0;
+        bool allocAtAddr = a_request->flags & PAGING_ALLOC_FLAG_AT_ADDRESS ? true : false;
+        bool allocCloser = a_request->flags & PAGING_ALLOC_FLAG_CLOSER_TO_ADDRESS ? true : false;
+        bool sharedMemory = a_request->flags & PAGING_ALLOC_FLAG_SHARED_MEMORY ? true : false;
+
+        uint32 start = 0;
+        uint32 end   = 0;
+        
+        uint32 physicalAddress = 0, pageTableFlags = 0;
+        
+        // craft page table falgs
+        pageTableFlags = IA32_4KB_PAGE_TABLE_PRESENT | 
+                         IA32_4KB_PAGE_TABLE_WRITE   |
+                         IA32_4KB_PAGE_TABLE_WRITE_THROUGH;
+        if (a_request->pageFlags & PAGING_ALLOC_PAGE_FLAG_USER) {
+            pageTableFlags |= IA32_4KB_PAGE_TABLE_USER;
+        }
 
         // you can't alloc at some address or closer to it in the same time
         if (allocCloser && allocAtAddr) {
             error = ERROR_INVALID_PARAMETER;
             break;
-        } else if (allocAtAddr) {
-            // align the virtual address to 4 KiB
-            ALIGN(request->virtualAddress, 0x1000);
+        }
 
-            // align size too
-            if (CHECK_ALIGN(request->length, 0x1000)) {
-                ALIGN(request->length, 0x1000);
-                request->length += 0x1000;
+        // check if physical memory can be used.
+        if (sharedMemory) {
+            // physical address must be in the first 4GiB
+            if (a_request->physicalAddress > 0xFFFFFFFF) {
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
             }
 
-            // check if there is enough memory
-            if (request->length / 0x1000 > a_paging->freeVirtualMemory) {
-                return ERROR_NO_FREE_MEMORY;
+            // physical address must be multiple of 4KiB
+            if (a_request->physicalAddress % 0x1000) {
+                error = ERROR_INVALID_ALIGNMENT;
+                break;
+            }
+
+            physicalAddress = a_request->physicalAddress;
+        }
+
+        if (allocAtAddr) {
+            // in ia32 paging mode we have 4GiB of virtual memory
+            if (a_request->virtualAddress > 0xFFFFFFFF) {
+                error = ERROR_INVALID_VIRTUAL_ADDRESS;
+                break;
+            }
+
+            start = (uint32) a_request->virtualAddress;
+            end   = (uint32) a_request->length + start;
+
+            if (start >= end) {
+                error = ERROR_INVALID_VIRTUAL_ADDRESS;
+                break;
+            }
+
+            // align the virtual addresses to 4 KiB
+            ALIGN(start, 0x1000);
+
+            if (CHECK_ALIGN(end, 0x1000)) {
+                ALIGN(end, 0x1000);
+                end += 0x1000;
+            }
+
+            // check if there is enough memory, but that does not guarantee that
+            // we will find a continuous memory area of the required size
+            // but when a large area is required, we can quickly say that we
+            // don't have such a large area available without looking for
+            // a continuous area.
+            if (((uint64)(end - start)) > a_paging->freeVirtualMemory) {
+                return ERROR_NO_FREE_VIRTUAL_MEMORY;
             }
 
             // if a user page was requested
-            if (request->user) {
-                // check if start address is in the user space area
-                if (request->virtualAddress < 0x1000 ||
-                    request->virtualAddress > 0xBFFFFFFF) {
-                        error = ERROR_PERMISSION_DENIED;
-                        break;
-                }
-                // then check if the end address is in the user space area
-                if (request->virtualAddress + request->length > 0xBFFFFFFF) {
+            if (a_request->pageFlags & PAGING_ALLOC_PAGE_FLAG_USER) {
+                // check if start and end addresses is in the user space area
+                if (start < 0x1000 || start > 0xBFFFFFFF || end > 0xBFFFFFFF) {
                     error = ERROR_PERMISSION_DENIED;
                     break;
                 }
             }
 
             // for each page from start address to end address check if it is free
-            for (uint32 addr = request->virtualAddress;
-                 addr < request->virtualAddress + request->length;
-                 addr += 0x1000) {
+            for (uint32 addr = start; addr < end; addr += 0x1000) {
                 struct VirtualAddressInfo info;
-                    IA32_4KB_virtualQuery(
-                        a_paging,
-                        &info,
-                        addr
-                    );
+                IA32_4KB_virtualQuery(
+                    a_paging,
+                    &info,
+                    addr
+                );
                     
-                    if (info.state != VIRTUAL_ADDRESS_STATE_FREE) {
-                        error = ERROR_INVALID_STATE;
-                        break;
-                    }
+                if (info.state != VIRTUAL_ADDRESS_STATE_FREE) {
+                    error = ERROR_ALREADY_USED_AREA;
+                    break;
+                }
             }
 
             if (error != ERROR_SUCCESS) {
                 break;
             }
         } else if (allocCloser) {
-            // align the virtual address to 4 KiB
-            ALIGN(request->virtualAddress, 0x1000);
+            /*// align the virtual address to 4 KiB
+            ALIGN(a_request->virtualAddress, 0x1000);
 
             // align size too
-            if (CHECK_ALIGN(request->length, 0x1000)) {
-                ALIGN(request->length, 0x1000);
-                request->length += 0x1000;
+            if (CHECK_ALIGN(a_request->length, 0x1000)) {
+                ALIGN(a_request->length, 0x1000);
+                a_request->length += 0x1000;
             }
             
             // check if there is enough memory
-            size_t pagesToAlloc = request->length / 0x1000; 
+            size_t pagesToAlloc = a_request->length / 0x1000;
             if (pagesToAlloc > a_paging->freeVirtualMemory) {
                 return ERROR_NO_FREE_MEMORY;
-            }
+            }*/
 
-            struct VirtualAddressInfo info;
+            //struct VirtualAddressInfo info;
 
             /*
             TODO: this should be finished
@@ -529,6 +660,7 @@ uint32 IA32_4KB_alloc(
             }
 
             kprintf("%x\n", request->virtualAddress);*/
+
         } else {
             // TODO: search from last allocated page to end of address space for
             // an empty page, if there aren't, then search from 0x0 to last allocated page
@@ -548,24 +680,59 @@ uint32 IA32_4KB_alloc(
 
         }
 
+        // if the memory is not shared, we should alloc some physical memory
         if (!sharedMemory) {
-            // if the memory is not shared, we should alloc some physical memory
-
-            uint64 physicalAddress;
+            uint64 tempAddr;
             error = PMM_alloc(
-                &physicalAddress, 
-                (uint64) request->length, 
-                PMM_FOR_VIRTUAL_MEMORY);
+                &tempAddr, 
+                (uint64) (end - start),
+                PMM_FOR_VIRTUAL_MEMORY
+            );
 
             if (error != ERROR_SUCCESS) {
+                error = ERROR_NO_FREE_PHYSICAL_MEMORY;
                 break;
             }
 
-            request->physicalAddress = physicalAddress;
+            if (tempAddr > 0xFFFFFFFF) {
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
+            }
+            
+            physicalAddress = (uint32) tempAddr;
+
+            // the entire physical memory area must be in the first 4GiB.
+            tempAddr += (end - start);
+            if (tempAddr > 0x100000000L) {
+                error = PMM_free(
+                    physicalAddress,
+                    (uint64) (end - start),
+                    PMM_FOR_VIRTUAL_MEMORY
+                );
+
+                if (error != ERROR_SUCCESS) {
+                    // TODO: something like BSOD
+                }
+
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
+            }
+        } else {
+            uint64 physicalAddressEnd = physicalAddress;
+            physicalAddressEnd += (end - start);
+            if (physicalAddressEnd > 0x100000000L) {
+                error = ERROR_INVALID_PHYSICAL_ADDRESS;
+                break;
+            }
         }
 
-        // call allocArea
-        // TODO: here should come the actual mapping
+        helper_IA32_4KB_allocArea(
+            start,
+            end,
+            physicalAddress,
+            helper_IA32_4KB_allocPageFlagsToIntelFlags(a_request->pageFlags),
+            pageTableFlags
+        );
     } while (false);
 
     return error;
@@ -573,24 +740,19 @@ uint32 IA32_4KB_alloc(
 
 uint32 IA32_4KB_free(
     struct Paging *a_paging,
-    struct FreeFuncParam *a_request)
+    const struct VirtualFreeRequest *a_request)
 {
-    if (a_paging == NULL
-        || a_request == NULL
-        || a_paging->pagingStruct == NULL
-        || a_request->param == NULL) {
+    if (a_paging == NULL ||
+        a_request == NULL ||
+        a_paging->pagingStruct == NULL) {
         return ERROR_NULL_POINTER;
     }
 
-    if (a_request->pagingType != PAGING_TYPE_IA32_4KB
-        || a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
+    if (a_paging->pagingType != PAGING_TYPE_IA32_4KB) {
         return ERROR_INVALID_PARAMETER;
     }
 
     uint32 error = ERROR_SUCCESS;
-
-    //struct IA32_4KB_Paging_FreeParam *request;
-    //request = (struct IA32_4KB_Paging_FreeParam*) a_request->param;
 
     do {
     } while (false);

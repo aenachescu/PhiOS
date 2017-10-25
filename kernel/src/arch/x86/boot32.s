@@ -51,7 +51,7 @@ _start32:
 
     # Enable paging
     mov %cr0, %ecx
-    or $0x80000001, %ecx
+    or $0x80010001, %ecx
     mov %ecx, %cr0
 
     # Enter higher-half
