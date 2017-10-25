@@ -16,4 +16,8 @@ uint32 serial_writeString(
     uint16 a_port
 );
 
+uint32 serial_writeStringDefault(
+    const char *a_str
+);
+
 #endif

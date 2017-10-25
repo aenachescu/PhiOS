@@ -5,10 +5,14 @@
 #include "kernel/include/memory/paa.h"
 #include "kernel/include/memory/pmm.h"
 #include "kernel/include/memory/bitmap_pma.h"
+#include "kernel/include/logging.h"
 
 #include "drivers/video/include/vga/text_mode.h"
-
-#include "util/kstdlib/include/kstdio.h"
+#include "drivers/acpi/include/acpi.h"
+#include "drivers/acpi/include/acpi_xsdt.h"
+#include "drivers/acpi/include/acpi_rsdt.h"
+#include "drivers/acpi/include/acpi_srat.h"
+#include "drivers/serial/include/serial.h"
 
 #include "kernel/include/multiboot2.h"
 
@@ -40,24 +44,6 @@ struct Paging g_kernelPaging;
 
 extern struct PMA *g_allocators;
 
-__attribute__ ((unused))
-static void printKernelArea()
-{
-    kprintf("TextStart: %x TextEnd: %x\n",
-        g_kernelArea.textStartAddr, g_kernelArea.textEndAddr);
-
-    kprintf("RodataStart: %x RodataEnd: %x\n",
-        g_kernelArea.rodataStartAddr, g_kernelArea.rodataEndAddr);
-
-    kprintf("DataStart: %x DataEnd: %x\n",
-        g_kernelArea.dataStartAddr, g_kernelArea.dataEndAddr);
-
-    kprintf("BssStart: %x BssEnd: %x\n",
-        g_kernelArea.bssStartAddr, g_kernelArea.bssEndAddr);
-
-    kprintf("Placement address: %x\n", g_kernelArea.endPlacementAddr);
-}
-
 void detectSMBios()
 {
     uint8 *p = (uint8*) 0xF0000;
@@ -71,8 +57,9 @@ void detectSMBios()
                 checksum += p[i];
             }
             if (checksum == 0) {
-                kprintf("Found SMBios32 at address: %p\n", p);
-                kprintf("SMBios32 info: majorVersion[%u], minorVersion[%u], revision[%u]\n", (uint32)p[6], (uint32)p[7], (uint32)p[30]);
+                KLOG_INFO("Found SMBios32 at [%p]", p);
+                KLOG_INFO("SMBios32 info: major[%hhu], minor[%hhu], revision[%hhu]",
+                    p[6], p[7], p[30]);
                 break;
             }
         }
@@ -80,7 +67,7 @@ void detectSMBios()
     }
 
     if (p >= (uint8*) 0x100000) {
-        kprintf("NOT found SMBios32\n");
+        KLOG_INFO("NOT found SMBios32");
         return;
     }
 }
@@ -102,6 +89,7 @@ void adjustPointers()
     uint32 offset = 0xBFF00000;
 
     PMM_adjustPointers(offset);
+    logging_adjustPointers(offset);
 
     for (size_t i = 0; i < g_PMAVM_num; i++) {
         g_PMAVM[i].bitmap = (size_t*) (((size_t)g_PMAVM[i].bitmap) + offset);
@@ -110,30 +98,145 @@ void adjustPointers()
     adjust_got(offset);
 }
 
+void ParseAcpi()
+{
+    RSDP2 rsdp2;
+    uint32 acpiVer = ACPI_VERSION_UNKNOWN;
+    acpi_getRSDP(&rsdp2, &acpiVer);
+
+    if (acpiVer != ACPI_VERSION_2) {
+        KLOG_WARNING("unsupported acpi version");
+        return;
+    }
+
+    KLOG_INFO("revision: %hhu", rsdp2.rsdp.revision);
+    KLOG_INFO("RSDT: %#0x, XSDT %#0llx", rsdp2.rsdp.rsdtAddr, rsdp2.xsdtAddr);
+
+    XSDT xsdt;
+    RSDT rsdt;
+    uint32 err = 0;
+    uint64 sratAddr64 = 0;
+    uint32 sratAddr = 0;
+
+    if (rsdp2.xsdtAddr == 0) {
+        KLOG_INFO("RSDT address - %p", rsdp2.rsdp.rsdtAddr);
+        err = acpi_rsdt_init(&rsdt, (uint8*) rsdp2.rsdp.rsdtAddr);
+        if (err != ERROR_SUCCESS) {
+            KLOG_WARNING("RSDT init failed - %u", err);
+            return;
+        }
+
+        err = acpi_rsdt_findHeader(&rsdt, "SRAT", &sratAddr);
+        if (err != ERROR_SUCCESS) {
+            KLOG_WARNING("SRAT not found - %u", err);
+            return;
+        }
+
+        KLOG_INFO("SRAT found at [%p]", (void*) sratAddr);
+
+        SRAT srat;
+        err = acpi_srat_init(&srat, (uint8*)sratAddr);
+        if (err != ERROR_SUCCESS) {
+            KLOG_WARNING("SRAT init failed - %u", err);
+            return;
+        }
+
+        KLOG_INFO("SRAT init successfully, length = %u", srat.header.sdt.length);
+        uint32 num = 0;
+        err = acpi_srat_getNumberOfSRA(&srat, SRAT_MEMORY_TYPE, &num);
+        if (err != ERROR_SUCCESS) {
+            KLOG_INFO("get number of SRA structs failed - %u", err);
+            return;
+        }
+
+        KLOG_INFO("SRA memory structures:");
+        SRATMemory mem;
+        for (uint32 i = 1; i <= num; i++) {
+            err = acpi_srat_getNthSRAStructure(&srat, &mem, sizeof(SRATMemory), SRAT_MEMORY_TYPE, i);
+            if (err != ERROR_SUCCESS) {
+                KLOG_WARNING("get %u th SRA memory structure failed - %u", i, err);
+                break;
+            }
+
+            uint64 length;
+            uint64 addr;
+
+            length = mem.highLength;
+            length <<= 32;
+            length += mem.lowLength;
+
+            addr = mem.highBase;
+            addr <<= 32;
+            addr += mem.lowBase;
+
+            KLOG("#%u [%#0llx, %#0llx] %-8llu KiBs %s",
+                mem.domain,
+                addr,
+                addr + length + (length > 0 ? -1 : 0),
+                length / 1024,
+                mem.flags & MEMORY_FLAG_ENABLED ? "Enabled" : "Disabled"
+            );
+        }
+
+        return;
+    }
+
+    if (rsdp2.xsdtAddr > 0xFFFFFFFFULL) {
+        KLOG_ERROR("incompatible addr");
+        return;
+    }
+
+    err = acpi_xsdt_init(&xsdt, (uint8*) ((size_t) rsdp2.xsdtAddr));
+    if (err != ERROR_SUCCESS) {
+        KLOG_WARNING("xsdt init failed - %u", err);
+        return;
+    }
+
+    err = acpi_xsdt_check32BitsCompatibility(&xsdt);
+    if (err != ERROR_SUCCESS) {
+        KLOG_WARNING("xsdt is incompatible - %u", err);
+        return;
+    }
+
+    err = acpi_xsdt_findHeader(&xsdt, "SRAT", &sratAddr64);
+    if (err != ERROR_SUCCESS) {
+        KLOG_WARNING("not found SRAT in XSDT - %u", err);
+        return;
+    }
+
+    KLOG_INFO("found SRAT in XSDT at %llu", sratAddr64);
+}
+
 uint32 init_init32(
     uint32 mboot2Magic,
     uint32 mboot2Addr)
 {
     // Inits VGA
     VGA_Init();
-    kprintf("PhiOS v0.0.1 32-bit\n");
+    serial_init();
+
+    logging_init();
+    logging_addPfn(VGA_WriteString);
+    logging_addPfn(serial_writeStringDefault);
+
+    KLOG_INFO("PhiOS v0.0.1 32-bit");
 
     if (mboot2Magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
-        VGA_WriteString("[PANIC] GRUB not multiboot2");
+        KLOG_FATAL("GRUB not multiboo2");
         return ERROR_NOT_FOUND;
     }
 
     if (mboot2Addr & 7) {
-        VGA_WriteString("[PANIC] Multiboot2 structure is not aligned");
+        KLOG_FATAL("Multiboot2 structure is not aligned");
         return ERROR_UNALIGNED_ADDRESS;
     }
 
-    VGA_WriteString("GRUB multiboot2\n");
+    KLOG_INFO("GRUB multiboot2");
 
     detectSMBios();
 
     // Iterate over tags and collect info
-    uint64 memoryEnd = 0x0;
+    uint64 availableMemory = 0, totalMemory = 0;
     struct {
         uint64 startAddr;
         uint64 endAddr;
@@ -152,8 +255,8 @@ uint32 init_init32(
                 //        mem->mem_lower,
                 //        mem->mem_upper);
                 break;
-            case MULTIBOOT_TAG_TYPE_MMAP: ;
-                kprintf("[GRUB] Memory map:\n");
+            case MULTIBOOT_TAG_TYPE_MMAP:
+                KLOG_INFO("GRUB memory map:");
                 multiboot_memory_map_t *mmap;
                 struct multiboot_tag_mmap *mmapTag = (struct multiboot_tag_mmap*) tag;
 
@@ -161,32 +264,37 @@ uint32 init_init32(
                      (multiboot_uint8_t*) mmap < (multiboot_uint8_t*) tag + tag->size;
                      mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
                             + mmapTag->entry_size)) {
-                    kprintf("[addr %llx, len %llx] ",
-                            mmap->addr,
-                            mmap->len);
+                    totalMemory += mmap->len;
 
-                    memoryEnd += mmap->len;
-
+                    const char *state = "UNKNOWN";
                     switch (mmap->type) {
                         case MULTIBOOT_MEMORY_AVAILABLE:
                             memoryZones[memoryZonesCount].startAddr = mmap->addr;
                             memoryZones[memoryZonesCount].endAddr = mmap->addr + mmap->len;
                             memoryZonesCount++;
+                            availableMemory += mmap->len;
 
-                            kprintf("AVAILABLE\n");
+                            state = "AVAILABLE";
                             break;
                         case MULTIBOOT_MEMORY_RESERVED:
-                            kprintf("RESERVED\n");
+                            state = "RESERVED";
                             break;
                         case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE:
-                            kprintf("ACPI RECLAIMABLE\n");
+                            state = "ACPI RECLAIMABLE";
                             break;
                         case MULTIBOOT_MEMORY_NVS:
-                            kprintf("NVS\n");
+                            state = "NVS";
                             break;
                         case MULTIBOOT_MEMORY_BADRAM:
-                            kprintf("BAD RAM\n");
+                            state = "BAD RAM";
                     }
+
+                    KLOG("[%#0llx, %#0llx] %-8llu KiBs %s",
+                        mmap->addr,
+                        mmap->addr + mmap->len + (mmap->len > 0 ? -1 : 0),
+                        mmap->len / 1024,
+                        state
+                    );
                 }
                 break;
             default:
@@ -197,6 +305,7 @@ uint32 init_init32(
 
     // Inits Placement Address Allocator
     KERNEL_CHECK(PAA_init((size_t) &linker_kernelEnd));
+    KLOG_INFO("kernel end: %#08x", &linker_kernelEnd);
     KERNEL_CHECK(PAA_alloc(sizeof(struct BitmapPMA) * memoryZonesCount, (void*) &g_PMAVM, 0x1000));
 
     g_PMAVM_num = memoryZonesCount;
@@ -217,9 +326,9 @@ uint32 init_init32(
                     &BitmapPMA_alloc, &BitmapPMA_free, &BitmapPMA_reserve, &BitmapPMA_check));
         }
     }
-    kprintf("Memory size: %lld MiBs\n", memoryEnd / 1024 / 1024);
 
-    kprintf("Memory end: %llx\n", memoryEnd);
+    KLOG_INFO("TotalMem: %llu MiBs, AvailableMem: %llu MiBs",
+        totalMemory / 1024 / 1024, availableMemory / 1024 / 1024);
 
     g_kernelArea.textStartAddr      = (size_t) &linker_textStart;
     g_kernelArea.textEndAddr        = (size_t) &linker_textEnd;
@@ -230,6 +339,8 @@ uint32 init_init32(
     g_kernelArea.bssStartAddr       = (size_t) &linker_bssStart;
     g_kernelArea.bssEndAddr         = (size_t) &linker_bssEnd;
     g_kernelArea.endPlacementAddr   = PAA_getCurrentAddress();
+
+    ParseAcpi();
 
     KERNEL_CHECK(PMM_reserve(g_kernelArea.textStartAddr,
                 g_kernelArea.endPlacementAddr - g_kernelArea.textStartAddr,

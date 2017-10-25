@@ -38,7 +38,6 @@ char *g_capsOnLayout;
 uint8 g_keyboardBuffer[KEYBOARD_BUFFER_SIZE];
 volatile uint32 g_keyboardBufferPos;
 bool g_capsOn;
-bool g_special;
 bool g_shift;
 
 void helper_keyboardReadScanCode()
@@ -55,33 +54,24 @@ void helper_keyboardReadScanCode()
 
         if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT) {
             g_shift = false;
-            g_special = true;
+        }
+    } else {
+        if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT) {
+            g_shift = true;
+            return;
         }
 
         if (code == KRCAPS_LOCK) {
-            g_special = true;
             g_capsOn = !g_capsOn;
-        }
-    }
-    else {
-        if (code == KRLEFT_SHIFT || code == KRRIGHT_SHIFT) {
-            g_shift = true;
-            g_special = true;
+            return;
         }
 
         if (g_shift) {
             g_keyboardBuffer[g_keyboardBufferPos++] = g_shiftLayout[code];
-        }
-        else if (g_capsOn) {
+        } else if (g_capsOn) {
             g_keyboardBuffer[g_keyboardBufferPos++] = g_capsOnLayout[code];
-        }
-        else {
+        } else {
             g_keyboardBuffer[g_keyboardBufferPos++] = g_layout[code];
-        }
-
-        if (g_special) {
-            // TODO: implement special features like turn on LED's
-            // uint8 key = g_keyboardBuffer[g_keyboardBufferPos - 1];
         }
     }
 }
@@ -102,7 +92,6 @@ uint32 keyboard_init()
 
     g_capsOn = false;
     g_shift = false;
-    g_special = false;
 
     IDT_registerHandler(IRQ1, &keyboard_intHandler);
 

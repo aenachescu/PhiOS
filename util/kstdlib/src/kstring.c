@@ -60,11 +60,9 @@ uint32 kmemcmp(
 
         *a_result = 0;
         return ERROR_SUCCESS;
-    } else {
-        return ERROR_EMPTY_BUFFER;
     }
 
-    return ERROR_UNKNOWN;
+    return ERROR_EMPTY_BUFFER;
 }
 
 uint32 kmemcpy(
@@ -121,8 +119,8 @@ uint32 kmemmove(
 
     // TODO: remove naive implementation for p1 < p2
     if (((pSrc) < (pDest))) {
-        pSrc  += a_length;
-        pDest += a_length;
+        pSrc  += a_length - 1;
+        pDest += a_length - 1;
 
         while (a_length != 0) {
             *pDest = *pSrc;
@@ -226,7 +224,7 @@ uint32 kstrcpy(
 
     if (length < *a_destLength) {
         *a_dest = '\0';
-        *a_destLength = length;
+        *a_destLength = length + 1;
     } else {
         *a_destLength = length + 1;
         return ERROR_INSUFFICIENT_BUFFER;
@@ -262,7 +260,7 @@ uint32 kstrrev(
 
     size_t length = a_length;
     if (a_length == 0) {
-        size_t error  = kstrlen(a_str, &length);
+        uint32 error  = kstrlen(a_str, &length);
 
         if (error != ERROR_SUCCESS) {
             return error;
