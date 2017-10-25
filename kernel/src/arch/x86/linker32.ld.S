@@ -1,6 +1,9 @@
 KERNEL_VMA = 0x100000;
 KERNEL_PMA = 0x100000;
 
+#define BOOT_FILE CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o
+#define GDT_FILE CMakeFiles/phios.elf.dir/kernel/src/arch/x86/descriptors32.s.o
+
 OUTPUT_FORMAT("elf32-i386")
 ENTRY(_start32)
 SECTIONS
@@ -15,9 +18,8 @@ SECTIONS
     {
         linker_textStart = .;
 
-        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/descriptors32.s.o (.text)
-        CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o (.text)
-        *(EXCLUDE_FILE(CMakeFiles/phios.elf.dir/kernel/src/arch/x86/boot32.s.o CMakeFiles/phios.elf.dir/kernel/src/arch/x86/descriptors32.s.o) .text)
+        GDT_FILE BOOT_FILE (.text)
+        *(EXCLUDE_FILE(GDT_FILE BOOT_FILE) .text)
 
         linker_textEnd = .;
     }
