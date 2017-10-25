@@ -305,6 +305,7 @@ uint32 init_init32(
 
     // Inits Placement Address Allocator
     KERNEL_CHECK(PAA_init((size_t) &linker_kernelEnd));
+    KLOG_INFO("kernel end: %#08x", &linker_kernelEnd);
     KERNEL_CHECK(PAA_alloc(sizeof(struct BitmapPMA) * memoryZonesCount, (void*) &g_PMAVM, 0x1000));
 
     g_PMAVM_num = memoryZonesCount;
