@@ -24,12 +24,18 @@
 #define ERROR_DRNG_NOT_READY        18
 #define ERROR_INVALID_PORT          19
 #define ERROR_PERMISSION_DENIED     20
-#define ERROR_NO_FREE_VIRTUAL_MEMORY 21
-#define ERROR_UNKNOWN_VERSION       22
-#define ERROR_INTERNAL_ERROR        23
-#define ERROR_INCOMPATIBLE_VERSIONS 24
-#define ERROR_INCOMPATIBLE          25
-#define ERROR_ALLOC_ERROR           26
+#define ERROR_NO_FREE_VIRTUAL_MEMORY            21
+#define ERROR_INVALID_PHYSICAL_ADDRESS          22
+#define ERROR_INVALID_VIRTUAL_ADDRESS           23
+#define ERROR_INVALID_SIZE                      24
+#define ERROR_INVALID_ALIGNMENT                 25
+#define ERROR_ALREADY_USED_AREA                 26
+#define ERROR_NO_FREE_PHYSICAL_MEMORY           27
+#define ERROR_UNKNOWN_VERSION       28
+#define ERROR_INTERNAL_ERROR        29
+#define ERROR_INCOMPATIBLE_VERSIONS 30
+#define ERROR_INCOMPATIBLE          31
+#define ERROR_ALLOC_ERROR           32
 
 void __kernel_check(size_t err, const char *file, size_t line);
 #define _kernel_check(err, file, line) __kernel_check(err, file, line)
