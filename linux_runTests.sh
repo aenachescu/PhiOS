@@ -72,6 +72,16 @@ function running_tests {
     ./test_bitmap
     rc=$((rc + $?))
 
+    # running kstdlib tests
+    echo -e "\n${blue}***${reset} Running test_kstdlib"
+    ./test_kstdlib
+    rc=$((rc + $?))
+
+    # running logging tests
+    echo -e "\n${blue}***${reset} Running test_logging"
+    ./test_logging
+    rc=$((rc + $?))
+
     exit $rc
 }
 

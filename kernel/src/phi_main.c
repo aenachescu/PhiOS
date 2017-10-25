@@ -8,11 +8,12 @@
 #include "kernel/include/qemu/power.h"
 #include "kernel/include/arch/x86/paging/ia32.h"
 #include "kernel/include/arch/x86/paging/paging.h"
+#include "kernel/include/logging.h"
 extern struct Paging g_kernelPaging;
 
 #include "drivers/keyboard/include/keyboard.h"
 #include "drivers/rtc/include/rtc.h"
-#include "drivers/serial/include/serial.h"
+#include "drivers/video/include/vga/text_mode.h"
 
 #include "util/kstdlib/include/kstdio.h"
 
@@ -28,7 +29,9 @@ void user_main()
     while (1) {
         uint8 c = keyboard_readKey();
         if (c == '\n') {
+            VGA_Focus();
             kprintf("\n> ");
+            continue;
         }
 
         if (c == ESC) {
@@ -40,7 +43,16 @@ void user_main()
         } else if (c == KF2) {
             qemu_shutdown();
             kprintf("\nShutdown will work only on QEMU for now...\n");
+        } else if (c == KUP) {
+            VGA_ScreenScrollUp(1);
+        } else if (c == KDOWN) {
+            VGA_ScreenScrollDown(1);
+        } else if (c == KPGUP) {
+            VGA_ScreenScrollUp(VGA_HEIGHT);
+        } else if (c == KPGDN) {
+            VGA_ScreenScrollDown(VGA_HEIGHT);
         } else {
+            VGA_Focus();
             kprintf("%c", c);
         }
     }
@@ -81,24 +93,23 @@ void kernel_main()
     KERNEL_CHECK(keyboard_init());
     kprintf("[SYSTEM] Initialized keyboard.\n");
 
-    serial_init();
-    serial_writeString("oh, serial is working :o\n", SERIAL_PORT_A);
+    struct AllocFuncParam request;
+    struct IA32_4KB_Paging_AllocParam ia32_request;
 
-    struct VirtualAllocRequest ia32_request;
+    request.pagingType = PAGING_TYPE_IA32_4KB;
+    request.param = &ia32_request;
 
-    ia32_request.flags = PAGING_ALLOC_FLAG_AT_ADDRESS;
-    ia32_request.pageFlags = PAGING_ALLOC_PAGE_FLAG_WRITE;
-    ia32_request.virtualAddress = 0x1000000;
+    ia32_request.flag = PAGING_FLAG_ALLOC_AT_ADDRESS;
+    ia32_request.user = false;
+    ia32_request.write = true;
+    ia32_request.cacheDisabled = false;
+    ia32_request.writeThrough = false;
+    ia32_request.virtualAddress = 0xBFFFFFFF;
     ia32_request.length = 0x1000;
     ia32_request.physicalAddress = 0;
 
-    uint64 addr;
-    KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &ia32_request, &addr));
-    
-    // if alloc doesn't work, this should fault
-    uint32 *tmp = 0x1000000;
-    *tmp = 1;
-    kprintf("If this is not 1, then something went wrong: %u\n", *tmp);
+    uint32 addr;
+    KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
 
     return;
 }
