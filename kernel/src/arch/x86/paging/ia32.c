@@ -581,6 +581,8 @@ uint32 IA32_4KB_alloc(
             if (error != ERROR_SUCCESS) {
                 break;
             }
+
+            *a_address = start;
         } else if (allocCloser) {
             /*// align the virtual address to 4 KiB
             ALIGN(a_request->virtualAddress, 0x1000);
@@ -703,7 +705,7 @@ uint32 IA32_4KB_alloc(
 
             // the entire physical memory area must be in the first 4GiB.
             tempAddr += (end - start);
-            if (tempAddr > 0x100000000L) {
+            if (tempAddr > 0x100000000LLU) {
                 error = PMM_free(
                     physicalAddress,
                     (uint64) (end - start),
@@ -720,7 +722,7 @@ uint32 IA32_4KB_alloc(
         } else {
             uint64 physicalAddressEnd = physicalAddress;
             physicalAddressEnd += (end - start);
-            if (physicalAddressEnd > 0x100000000L) {
+            if (physicalAddressEnd > 0x100000000LLU) {
                 error = ERROR_INVALID_PHYSICAL_ADDRESS;
                 break;
             }
