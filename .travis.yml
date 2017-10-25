@@ -1,9 +1,4 @@
 notifications:
-    email:
-        recipients:
-            - alinenachescu033@gmail.com
-
-notifications:
     irc: "chat.freenode.net#cruce-devel"
 
 language: c
@@ -16,6 +11,9 @@ addons:
         - gcc-multilib
         - g++-multilib
 
+before_install:
+    - pip install --user cpp-coveralls
+
 install:
     - ./linux_x86_64_getDependencies.sh
 
@@ -24,3 +22,17 @@ script:
     - ./linux_x86_64_compile.sh build x86_32 notGenerateIso
     - ./linux_runTests.sh run x86_32
     - ./linux_runTests.sh run x86_64
+
+after_success:
+    - coveralls
+        -r /home/travis/build/EnachescuAlin/PhiOS
+        -b /home/travis/build/EnachescuAlin/PhiOS/tests/bin
+        -i kernel/src/memory/bitmap_pma.c
+        -i kernel/src/memory/paa.c
+        -i kernel/src/logging.c
+        -i util/kstdlib/src/ksnprintf_helper.c
+        -i util/kstdlib/src/ksnprintf.c
+        -i util/kstdlib/src/kstdlib.c
+        -i util/kstdlib/src/kstring.c
+        -i util/kstdlib/src/kvsnprintf.c
+        --gcov gcov --gcov-options '\-lp'
