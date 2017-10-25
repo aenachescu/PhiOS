@@ -93,23 +93,22 @@ void kernel_main()
     KERNEL_CHECK(keyboard_init());
     kprintf("[SYSTEM] Initialized keyboard.\n");
 
-    struct AllocFuncParam request;
-    struct IA32_4KB_Paging_AllocParam ia32_request;
+    struct VirtualAllocRequest request;
 
-    request.pagingType = PAGING_TYPE_IA32_4KB;
-    request.param = &ia32_request;
+    request.flags = PAGING_ALLOC_FLAG_AT_ADDRESS;
+    request.pageFlags = PAGING_ALLOC_PAGE_FLAG_WRITE;
+    request.virtualAddress = 0x00001000;
+    request.length = 0x1000;
+    request.physicalAddress = 0x0;
 
-    ia32_request.flag = PAGING_FLAG_ALLOC_AT_ADDRESS;
-    ia32_request.user = false;
-    ia32_request.write = true;
-    ia32_request.cacheDisabled = false;
-    ia32_request.writeThrough = false;
-    ia32_request.virtualAddress = 0xBFFFFFFF;
-    ia32_request.length = 0x1000;
-    ia32_request.physicalAddress = 0;
+    uint64 addr;
+    uint32 err = IA32_4KB_alloc(&g_kernelPaging, &request, &addr);
 
-    uint32 addr;
-    KERNEL_CHECK(IA32_4KB_alloc(&g_kernelPaging, &request, &addr));
+    KLOG("ptr: %llx", addr);
+    KLOG("err: %u", err);
+    uint32 *ptr = (uint32*)((uint32)addr);
+    ptr[0] = 10;
+    KLOG("ptr val: %u", ptr[0]);
 
     return;
 }
