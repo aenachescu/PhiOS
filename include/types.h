@@ -33,49 +33,52 @@ typedef const signed   int          csint32;
 typedef const signed   short        csint16;
 typedef const signed   char         csint8;
 
-typedef char                        bool;
+typedef uint8                       bool;
 
-#define true  1
-#define false 0
+#define true  (uint8) 1
+#define false (uint8) 0
 
-#if defined(PhiOS32) && !defined(UNIT_TEST)
+#if defined(PhiOS32) && !defined(PhiOS_UNIT_TESTING_CONFIG)
 #define NULL  0x00000000
 typedef uint32 size_t;
 #endif
 
-#if defined(PhiOS64) && !defined(UNIT_TEST)
+#if defined(PhiOS64) && !defined(PhiOS_UNIT_TESTING_CONFIG)
 #define NULL  0x0000000000000000
 typedef uint64 size_t;
 #endif
 
-#ifdef UNIT_TEST
+#ifdef PhiOS_UNIT_TESTING_CONFIG
 #include <stddef.h>
 #endif
 
-#define static_assert _Static_assert
-#define ASSERT_MESSAGE "Type size is not as expected."
-static_assert(sizeof(uint64) == 8, ASSERT_MESSAGE);
-static_assert(sizeof(uint32) == 4, ASSERT_MESSAGE);
-static_assert(sizeof(uint16) == 2, ASSERT_MESSAGE);
-static_assert(sizeof(uint8) == 1, ASSERT_MESSAGE);
+#define PhiOS_STATIC_ASSERT  _Static_assert
+#define PhiOS_ASSERT_MESSAGE "Type size is not as expected."
 
-static_assert(sizeof(sint64) == 8, ASSERT_MESSAGE);
-static_assert(sizeof(sint32) == 4, ASSERT_MESSAGE);
-static_assert(sizeof(sint16) == 2, ASSERT_MESSAGE);
-static_assert(sizeof(sint8) == 1, ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(uint8) == 1, PhiOS_ASSERT_MESSAGE);
 
-static_assert(sizeof(cuint64) == 8, ASSERT_MESSAGE);
-static_assert(sizeof(cuint32) == 4, ASSERT_MESSAGE);
-static_assert(sizeof(cuint16) == 2, ASSERT_MESSAGE);
-static_assert(sizeof(cuint8) == 1, ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(sint8) == 1, PhiOS_ASSERT_MESSAGE);
 
-static_assert(sizeof(csint64) == 8, ASSERT_MESSAGE);
-static_assert(sizeof(csint32) == 4, ASSERT_MESSAGE);
-static_assert(sizeof(csint16) == 2, ASSERT_MESSAGE);
-static_assert(sizeof(csint8) == 1, ASSERT_MESSAGE);
-#undef ASSERT_MESSAGE
-#undef static_assert
+PhiOS_STATIC_ASSERT(sizeof(cuint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(cuint8) == 1, PhiOS_ASSERT_MESSAGE);
 
+PhiOS_STATIC_ASSERT(sizeof(csint64) == 8, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint32) == 4, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint16) == 2, PhiOS_ASSERT_MESSAGE);
+PhiOS_STATIC_ASSERT(sizeof(csint8) == 1, PhiOS_ASSERT_MESSAGE);
+
+#ifdef PhiOS_UNIT_TESTING_CONFIG
+#define PhiOS_STATIC
+#else
+#define PhiOS_STATIC static
 #endif
 
-
+#endif

@@ -148,3 +148,9 @@ uint32 serial_writeString(
 
     return ERROR_SUCCESS;
 }
+
+uint32 serial_writeStringDefault(
+    const char *a_str)
+{
+    return serial_writeString(a_str, SERIAL_PORT_A);
+}

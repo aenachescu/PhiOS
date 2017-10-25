@@ -2,6 +2,7 @@
 #define _PhiOS_drivers_text_mode
 
 #include "include/types.h"
+#include "include/errors.h"
 
 #define VGA_WIDTH    80
 #define VGA_HEIGHT   25
@@ -28,11 +29,6 @@ enum VGA_Colors {
 
 void VGA_Init();
 
-void VGA_MoveCursor(
-    uint16 a_column, 
-    uint16 a_row
-);
-
 void VGA_SetBackgroundColor(
     enum VGA_Colors a_bg
 );
@@ -41,17 +37,11 @@ void VGA_SetForegroundColor(
     enum VGA_Colors a_fg
 );
 
-uint16 VGA_CreateEntry(
-    char a_c, 
-    enum VGA_Colors a_bg,
-    enum VGA_Colors a_fg
-);
-
 void VGA_WriteChar(
     char a_c
 );
 
-void VGA_WriteString(
+uint32 VGA_WriteString(
     const char *a_str
 );
 
@@ -79,8 +69,14 @@ void VGA_WriteColoredBuffer(
     enum VGA_Colors a_fg
 );
 
-void VGA_Scroll();
+void VGA_ScreenScrollUp(
+    uint32 a_num
+);
 
-void VGA_Clear();
+void VGA_ScreenScrollDown(
+    uint32 a_num
+);
+
+void VGA_Focus();
 
 #endif
