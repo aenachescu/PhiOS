@@ -10,6 +10,21 @@
 #error "copy function is mandatory"
 #endif
 
+// bool opEqual(type* a, type* b)
+#ifndef AVL_TYPE_OPERATOR_EQUAL
+#error "operator== is mandatory"
+#endif
+
+// bool opGreater(type* a, type* b)
+#ifndef AVL_TYPE_OPERATOR_GREATER
+#error "operator> is mandatory "
+#endif
+
+// bool opLess(type* a, type* b)
+#ifndef AVL_TYPE_OPERATOR_LESS
+#error "operator< is mandatory"
+#endif
+
 #ifndef AVL_FREE_TYPE_FUNC
 #define AVL_FREE_TYPE_FUNC(x)
 #endif
@@ -33,6 +48,7 @@
     IMPLEMENT_AVL_NODE_FUNC_ROTATE_LEFT(type, name)                             \
     IMPLEMENT_AVL_NODE_FUNC_ROTATE_RIGHT(type, name)                            \
     IMPLEMENT_AVL_NODE_FUNC_BALANCE(type, name)                                 \
+    IMPLEMENT_AVL_NODE_FUNC_INSERT(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_INIT(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                                  \
     IMPLEMENT_AVL_FUNC_INIT(type, name)                                         \
@@ -167,7 +183,23 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, balance) (                        
 }
 
 // implement avl node insert
-
+#define IMPLEMENT_AVL_NODE_FUNC_INSERT(type, name)                              \
+static AVLNodeStruct(name)* AVLNodeFunc(name, insert) (                         \
+    AVLNodeStruct(name) *a_parent,                                              \
+    AVLNodeStruct(name) *a_node)                                                \
+{                                                                               \
+    if (a_parent == NULL) {                                                     \
+        return a_node;                                                          \
+    }                                                                           \
+                                                                                \
+    if (AVL_TYPE_OPERATOR_LESS((&a_node->data), (&a_parent->data))) {           \
+        a_parent->left = AVLNodeFunc(name, insert) (a_parent->left, a_node);    \
+    } else {                                                                    \
+        a_parent->right = AVLNodeFunc(name, insert) (a_parent->right, a_node);  \
+    }                                                                           \
+                                                                                \
+    return AVLNodeFunc(name, balance) (a_parent);                               \
+}
 
 // declare & implement INIT function for avl node
 #define DECLARE_AVL_NODE_FUNC_INIT(type, name)                                  \
