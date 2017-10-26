@@ -78,6 +78,32 @@ static inline void AVLNodeFunc(name, calculateHeight) (                         
 {                                                                               \
     a_node->height =                                                            \
         1 + AVLNodeFunc(name, getMaxHeight) (a_node->left, a_node->right);      \
+}                                                                               \
+                                                                                \
+static inline bool AVLNodeFunc(name, isHeightGreater) (                         \
+    AVLNodeStruct(name) *a_node1,                                               \
+    AVLNodeStruct(name) *a_node2)                                               \
+{                                                                               \
+    if (AVLNodeFunc(name, getHeight) (a_node1) >                                \
+        AVLNodeFunc(name, getHeight) (a_node2)) {                               \
+        return true;                                                            \
+    }                                                                           \
+                                                                                \
+    return false;                                                               \
+}                                                                               \
+                                                                                \
+static inline uint32 AVLNodeFunc(name, diffHeight) (                            \
+    AVLNodeStruct(name) *a_node1,                                               \
+    AVLNodeStruct(name) *a_node2)                                               \
+{                                                                               \
+    uint32 height1 = AVLNodeFunc(name, getHeight) (a_node1);                    \
+    uint32 height2 = AVLNodeFunc(name, getHeight) (a_node2);                    \
+                                                                                \
+    if (height1 > height2) {                                                    \
+        return height1 - height2;                                               \
+    }                                                                           \
+                                                                                \
+    return 0;                                                                   \
 }
 
 // implement avl node rotate left
@@ -113,26 +139,25 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, rotateRight) (                    
 }
 
 // implement avl node balance
-#define GET_HEIGHT(x) AVLNodeFunc(name, getHeight) (x)
 #define IMPLEMENT_AVL_NODE_FUNC_BALANCE(type, name)                             \
 static AVLNodeStruct(name)* AVLNodeFunc(name, balance) (                        \
     AVLNodeStruct(name) *a_parent)                                              \
 {                                                                               \
     AVLNodeFunc(name, calculateHeight) (a_parent);                              \
                                                                                 \
-    if (GET_HEIGHT(a_parent->left) - GET_HEIGHT(a_parent->right) == 2) {        \
-        if (GET_HEIGHT(a_parent->left->right) >                                 \
-            GET_HEIGHT(a_parent->left->left)) {                                 \
+    if (AVLNodeFunc(name, diffHeight) (a_parent->left, a_parent->right) == 2) { \
+        if (AVLNodeFunc(name, isHeightGreater) (                                \
+                a_parent->left->right, a_parent->left->left)) {                 \
             a_parent->left = AVLNodeFunc(name, rotateLeft) (a_parent->left);    \
         }                                                                       \
                                                                                 \
         return AVLNodeFunc(name, rotateRight) (a_parent);                       \
     }                                                                           \
                                                                                 \
-    if (GET_HEIGHT(a_parent->right) - GET_HEIGHT(a_parent->left) == 2) {        \
-        if (GET_HEIGHT(a_parent->right->left) >                                 \
-            GET_HEIGHT(a_parent->right->right)) {                               \
-            a_parent->right = AVLNodeFunc(name, rotateRight) (a_parent->right)  \
+    if (AVLNodeFunc(name, diffHeight) (a_parent->right, a_parent->left) == 2) { \
+        if (AVLNodeFunc(name, isHeightGreater) (                                \
+                a_parent->right->left, a_parent->right->right)) {               \
+            a_parent->right = AVLNodeFunc(name, rotateRight) (a_parent->right); \
         }                                                                       \
                                                                                 \
         return AVLNodeFunc(name, rotateLeft) (a_parent);                        \
@@ -140,7 +165,9 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, balance) (                        
                                                                                 \
     return a_parent;                                                            \
 }
-#undef GET_HEIGHT
+
+// implement avl node insert
+
 
 // declare & implement INIT function for avl node
 #define DECLARE_AVL_NODE_FUNC_INIT(type, name)                                  \
