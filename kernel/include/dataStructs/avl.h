@@ -78,14 +78,14 @@ typedef struct CONCAT(AVLStruct(name), _t)                                      
 // implement avl node helper functions
 #define IMPLEMENT_AVL_NODE_HELPERS(type, name)                                  \
 static inline uint32 AVLNodeFunc(name, getHeight) (                             \
-    AVLNodeStruct(name) *a_node)                                                \
+    const AVLNodeStruct(name) *a_node)                                          \
 {                                                                               \
     return a_node ? a_node->height : 0;                                         \
 }                                                                               \
                                                                                 \
 static inline uint32 AVLNodeFunc(name, getMaxHeight) (                          \
-    AVLNodeStruct(name) *a_node1,                                               \
-    AVLNodeStruct(name) *a_node2)                                               \
+    const AVLNodeStruct(name) *a_node1,                                         \
+    const AVLNodeStruct(name) *a_node2)                                         \
 {                                                                               \
     uint32 height1 = AVLNodeFunc(name, getHeight) (a_node1);                    \
     uint32 height2 = AVLNodeFunc(name, getHeight) (a_node2);                    \
@@ -101,8 +101,8 @@ static inline void AVLNodeFunc(name, calculateHeight) (                         
 }                                                                               \
                                                                                 \
 static inline bool AVLNodeFunc(name, isHeightGreater) (                         \
-    AVLNodeStruct(name) *a_node1,                                               \
-    AVLNodeStruct(name) *a_node2)                                               \
+    const AVLNodeStruct(name) *a_node1,                                         \
+    const AVLNodeStruct(name) *a_node2)                                         \
 {                                                                               \
     if (AVLNodeFunc(name, getHeight) (a_node1) >                                \
         AVLNodeFunc(name, getHeight) (a_node2)) {                               \
@@ -209,13 +209,13 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, insert) (                         
 #define DECLARE_AVL_NODE_FUNC_INIT(type, name)                                  \
 uint32 AVLNodeFunc(name, init) (                                                \
     AVLNodeStruct(name) *a_node,                                                \
-    type *a_data                                                                \
+    const type *a_data                                                          \
 );
 
 #define IMPLEMENT_AVL_NODE_FUNC_INIT(type, name)                                \
 uint32 AVLNodeFunc(name, init) (                                                \
     AVLNodeStruct(name) *a_node,                                                \
-    type *a_data)                                                               \
+    const type *a_data)                                                         \
 {                                                                               \
     if (a_node == NULL) {                                                       \
         return ERROR_NULL_POINTER;                                              \
@@ -244,13 +244,13 @@ uint32 AVLNodeFunc(name, init) (                                                
 #define DECLARE_AVL_NODE_FUNC_CREATE(type, name)                                \
 uint32 AVLNodeFunc(name, create) (                                              \
     AVLNodeStruct(name) **a_node,                                               \
-    type *a_data                                                                \
+    const type *a_data                                                          \
 );
 
 #define IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                              \
 uint32 AVLNodeFunc(name, create) (                                              \
     AVLNodeStruct(name) **a_node,                                               \
-    type *a_data)                                                               \
+    const type *a_data)                                                         \
 {                                                                               \
     if (a_node == NULL) {                                                       \
         return ERROR_NULL_POINTER;                                              \
