@@ -205,6 +205,27 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, insert) (                         
     return AVLNodeFunc(name, balance) (a_parent);                               \
 }
 
+// implement avl node find
+#define IMPLEMENT_AVL_NODE_FUNC_FIND(type, name)                                \
+static const AVLNodeStruct(name)* AVLNodeFunc(name, find) (                     \
+    const AVLNodeStruct(name) *a_parent,                                        \
+    const type *a_value)                                                        \
+{                                                                               \
+    if (a_parent == NULL) {                                                     \
+        return NULL;                                                            \
+    }                                                                           \
+                                                                                \
+    if (AVL_TYPE_OPERATOR_LESS(a_value, &a_parent->data)) {                     \
+        return AVLNodeFunc(name, find) (a_parent->left, a_value);               \
+    }                                                                           \
+                                                                                \
+    if (AVL_TYPE_OPERATOR_GREATER(a_value, &a_parent->data)) {                  \
+        return AVLNodeFunc(name, find) (a_parent->right, a_value);              \
+    }                                                                           \
+                                                                                \
+    return a_parent;                                                            \
+}
+
 // declare & implement INIT function for avl node
 #define DECLARE_AVL_NODE_FUNC_INIT(type, name)                                  \
 uint32 AVLNodeFunc(name, init) (                                                \
@@ -360,12 +381,12 @@ uint32 AVLFunc(name, free) (                                                    
 // declare & implement avl get height
 #define DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                 \
 uint32 AVLFunc(name, getHeight) (                                               \
-    AVLStruct(name) *a_avl                                                      \
+    const AVLStruct(name) *a_avl                                                \
 );
 
 #define IMPLEMENT_AVL_FUNC_GET_HEIGHT(type, name)                               \
 uint32 AVLFunc(name, getHeight) (                                               \
-    AVLStruct(name) *a_avl)                                                     \
+    const AVLStruct(name) *a_avl)                                               \
 {                                                                               \
     if (a_avl == NULL) {                                                        \
         return 0;                                                               \
