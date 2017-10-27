@@ -41,7 +41,9 @@
     DECLARE_AVL_NODE_FUNC_INIT(type, name)                                      \
     DECLARE_AVL_NODE_FUNC_CREATE(type, name)                                    \
     DECLARE_AVL_FUNC_INIT(type, name)                                           \
-    DECLARE_AVL_FUNC_FREE(type, name)
+    DECLARE_AVL_FUNC_FREE(type, name)                                           \
+    DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                     \
+    DECLARE_AVL_FUNC_INSERT_NODE(type, name)
 
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
     IMPLEMENT_AVL_NODE_HELPERS(type, name)                                      \
@@ -52,7 +54,9 @@
     IMPLEMENT_AVL_NODE_FUNC_INIT(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                                  \
     IMPLEMENT_AVL_FUNC_INIT(type, name)                                         \
-    IMPLEMENT_AVL_FUNC_FREE(type, name)
+    IMPLEMENT_AVL_FUNC_FREE(type, name)                                         \
+    IMPLEMENT_AVL_FUNC_GET_HEIGHT(type, name)                                   \
+    IMPLEMENT_AVL_FUNC_INSERT_NODE(type, name)
 
 // declare AVLNodeStruct
 #define DECLARE_AVL_NODE_STRUCT(type, name)                                     \
@@ -352,5 +356,47 @@ uint32 AVLFunc(name, free) (                                                    
 #define IMPLEMENT_AVL_FUNC_FREE(type, name)
 
 #endif
+
+// declare & implement avl get height
+#define DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                 \
+uint32 AVLFunc(name, getHeight) (                                               \
+    AVLStruct(name) *a_avl                                                      \
+);
+
+#define IMPLEMENT_AVL_FUNC_GET_HEIGHT(type, name)                               \
+uint32 AVLFunc(name, getHeight) (                                               \
+    AVLStruct(name) *a_avl)                                                     \
+{                                                                               \
+    if (a_avl == NULL) {                                                        \
+        return 0;                                                               \
+    }                                                                           \
+                                                                                \
+    return AVLNodeFunc(name, getHeight) (a_avl->root);                          \
+}
+
+// declare & implement avl insertNode
+#define DECLARE_AVL_FUNC_INSERT_NODE(type, name)                                \
+uint32 AVLFunc(name, insertNode) (                                              \
+    AVLStruct(name) *a_avl,                                                     \
+    AVLNodeStruct(name) *a_node                                                 \
+);
+
+#define IMPLEMENT_AVL_FUNC_INSERT_NODE(type, name)                              \
+uint32 AVLFunc(name, insertNode) (                                              \
+    AVLStruct(name) *a_avl,                                                     \
+    AVLNodeStruct(name) *a_node)                                                \
+{                                                                               \
+    if (a_avl == NULL) {                                                        \
+        return ERROR_NULL_POINTER;                                              \
+    }                                                                           \
+                                                                                \
+    if (a_node == NULL) {                                                       \
+        return ERROR_NULL_POINTER;                                              \
+    }                                                                           \
+                                                                                \
+    a_avl->root = AVLNodeFunc(name, insert) (a_avl->root, a_node);              \
+                                                                                \
+    return ERROR_SUCCESS;                                                       \
+}
 
 #endif
