@@ -406,7 +406,7 @@ uint32 AVLNodeFunc(name, init) (                                                
     a_node->right = NULL;                                                       \
     a_node->height = 1;                                                         \
                                                                                 \
-    uint32 err = AVL_COPY_TYPE_FUNC(&a_node->data, a_data, sizeof(type));       \
+    uint32 err = AVL_COPY_TYPE_FUNC(&a_node->data, a_data);                     \
     if (err != ERROR_SUCCESS) {                                                 \
         return err;                                                             \
     }                                                                           \
@@ -446,7 +446,7 @@ uint32 AVLNodeFunc(name, create) (                                              
     (*a_node)->right = NULL;                                                    \
     (*a_node)->height = 1;                                                      \
                                                                                 \
-    uint32 err = AVL_COPY_TYPE_FUNC(&(*a_node)->data, a_data, sizeof(type));    \
+    uint32 err = AVL_COPY_TYPE_FUNC(&(*a_node)->data, a_data);                  \
     if (err != ERROR_SUCCESS) {                                                 \
         return err;                                                             \
     }                                                                           \
