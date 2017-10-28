@@ -28,9 +28,9 @@
  *       Signature: void avlFree(void *a_ptr)
  *       Brief: free the memory area where the node was stored.
  *
- *    6. AVL_FREE_TYPE_FUNC
- *       Signature: void avlFreeType(type *a_ptr)
- *       Brief: free the object (NOT the memory area).
+ *    6. AVL_DESTROY_TYPE_FUNC
+ *       Signature: void avlDestroyType(type *a_ptr)
+ *       Brief: destroy the object (NOT free the memory area).
  *
  *    7. AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID
  *       Signature: bool scoreIsInvalid(const ScoreType *a_score)
@@ -77,7 +77,7 @@
  *              - AVL_FREE_FUNC
  *
  *          Optional:
- *              - AVL_FREE_TYPE_FUNC
+ *              - AVL_DESTROY_TYPE_FUNC
  *
  *   4. AVL_free() - enable this functions defining AVL_USE_AVL_NODE_FREE.
  *          Additional requirements: just line the AVLNode_free().

@@ -8,9 +8,9 @@
 #error "free function is mandatory"
 #endif
 
-// void avlFreeType(type *a_ptr)
-#ifndef AVL_FREE_TYPE_FUNC
-#define AVL_FREE_TYPE_FUNC(data)
+// void avlDestroyType(type *a_ptr)
+#ifndef AVL_DESTROY_TYPE_FUNC
+#define AVL_DESTROY_TYPE_FUNC(data)
 #endif
 
 #define DECLARE_AVL_NODE_FUNC_FREE(type, name)                                  \
@@ -29,7 +29,7 @@ uint32 AVLNodeFunc(name, free) (                                                
     AVLNodeFunc(name, free)(a_node->left);                                      \
     AVLNodeFunc(name, free)(a_node->right);                                     \
                                                                                 \
-    AVL_FREE_TYPE_FUNC((&a_node->data));                                        \
+    AVL_DESTROY_TYPE_FUNC((&a_node->data));                                     \
                                                                                 \
     AVL_FREE_FUNC(a_node);                                                      \
                                                                                 \
