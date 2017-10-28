@@ -300,10 +300,20 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findGreaterOrEqual) (       
     const type *a_value,                                                        \
     AVL_TYPE_SCORE_GREATER_OR_EQUAL *a_currentScore)                            \
 {                                                                               \
+    /*************************************************************************/ \
+    /* if the score is perfect then return this node.                        */ \
+    /*************************************************************************/ \
     if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT(a_currentScore)) {           \
         return a_parent;                                                        \
     }                                                                           \
                                                                                 \
+    /*************************************************************************/ \
+    /* if the current node has an invalid score:                             */ \
+    /*    - if the right child is null then return null, means we do not     */ \
+    /*      have a node that matches the demand.                             */ \
+    /*    - if the right child is not null then we continue to look on the   */ \
+    /*      right branch for a node that has the best score or perfect score.*/ \
+    /*************************************************************************/ \
     if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID(a_currentScore)) {           \
         if (a_parent->right == NULL) {                                          \
             return NULL;                                                        \
@@ -322,10 +332,21 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findGreaterOrEqual) (       
         );                                                                      \
     }                                                                           \
                                                                                 \
+    /*************************************************************************/ \
+    /* if the current node has an valid score:                               */ \
+    /*    - if the left child is null then return a_parent because means     */ \
+    /*      that is the best score.                                          */ \
+    /*    - otherwise, we continue to look on the left branch for a node that*/ \
+    /*      has the best score or the perfect score.                         */ \
+    /*************************************************************************/ \
     if (a_parent->left == NULL) {                                               \
         return a_parent;                                                        \
     }                                                                           \
                                                                                 \
+    /*************************************************************************/ \
+    /* get the score for the left child and then get the node with the best  */ \
+    /* score from the left.                                                  */ \
+    /*************************************************************************/ \
     AVL_TYPE_SCORE_GREATER_OR_EQUAL scoreLeft;                                  \
     AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE(                                  \
         (&a_parent->left->data),                                                \
@@ -333,16 +354,23 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findGreaterOrEqual) (       
         (&scoreLeft)                                                            \
     );                                                                          \
                                                                                 \
+    const AVLNodeStruct(name) *result =                                         \
+        AVLNodeFunc(name, findGreaterOrEqual) (                                 \
+            a_parent->left, a_value, (&scoreLeft)                               \
+        );                                                                      \
+                                                                                \
+    /*************************************************************************/ \
+    /* if the node with the best score from the left branch has an score     */ \
+    /* better than the score of the current node, then copy the score in the */ \
+    /* a_currentScore parameter and return the node from the left branch,    */ \
+    /* otherwise return the current node.                                    */ \
+    /*************************************************************************/ \
     if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER(                              \
             (&scoreLeft), a_currentScore)) {                                    \
                                                                                 \
         AVL_TYPE_SCORE_GREATER_OR_EQUAL_COPY(a_currentScore, (&scoreLeft));     \
                                                                                 \
-        return AVLNodeFunc(name, findGreaterOrEqual) (                          \
-            a_parent->left,                                                     \
-            a_value,                                                            \
-            a_currentScore                                                      \
-        );                                                                      \
+        return result;                                                          \
     }                                                                           \
                                                                                 \
     return a_parent;                                                            \
