@@ -25,6 +25,46 @@
 #error "operator< is mandatory"
 #endif
 
+#ifdef AVL_USE_FIND_GREATER_OR_EQUAL
+
+// that is an structure for the score between two elements from avl
+#ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL
+#error "type score greater or equal undefined"
+#endif
+
+// bool scoreIsInvalid(const ScoreType *a_score)
+// return true if a_score is invalid
+#ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID
+#error "score greater or equal is invalid undefined"
+#endif
+
+// bool scoreIsPerfect(const ScoreType *a_score)
+// return true if a_score is perfect
+#ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT
+#error "score greater or equal is perfect undefined"
+#endif
+
+// bool scoreIsBetter(const ScoreType *a, const ScoreType *b)
+// return true if a is better than b
+#ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER
+#error "score greater or equal is better undefined"
+#endif
+
+// void getScore(const Type *a_current, const Type *a_value, ScoreType *a_res)
+// a_current - the node for which it's computed the score
+// a_value - the value you are looking for
+// a_res - the score for a_current
+#ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE
+#error "score greater or equal get score undefined"
+#endif
+
+// void scoreCopy(ScoreType *a_dst, const ScoreType *a_src)
+#ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_COPY
+#error "score greater or equal copy undefined"
+#endif
+
+#endif // end if AVL_USE_FIND_GREATER_OR_EQUAL
+
 #ifndef AVL_FREE_TYPE_FUNC
 #define AVL_FREE_TYPE_FUNC(x)
 #endif
@@ -35,11 +75,16 @@
 #define AVLNodeStruct(name) CONCAT(name, AVLNode)
 #define AVLNodeFunc(name, func) CONCAT(AVLNodeStruct(name), CONCAT(_, func))
 
-#define DECLARE_AVL_TYPE(type, name)                                            \
+// declare avl type
+#define DECLARE_AVL_STRUCTS(type, name)                                         \
     DECLARE_AVL_NODE_STRUCT(type, name)                                         \
-    DECLARE_AVL_STRUCT(type, name)                                              \
+    DECLARE_AVL_STRUCT(type, name)
+
+#define DECLARE_AVL_NODE_FUNC(type, name)                                       \
     DECLARE_AVL_NODE_FUNC_INIT(type, name)                                      \
-    DECLARE_AVL_NODE_FUNC_CREATE(type, name)                                    \
+    DECLARE_AVL_NODE_FUNC_CREATE(type, name)
+
+#define DECLARE_AVL_FUNC(type, name)                                            \
     DECLARE_AVL_FUNC_INIT(type, name)                                           \
     DECLARE_AVL_FUNC_FREE(type, name)                                           \
     DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                     \
@@ -48,7 +93,13 @@
     DECLARE_AVL_FUNC_FIND(type, name)                                           \
     DECLARE_AVL_FUNC_FIND_TYPE(type, name)
 
-#define IMPLEMENT_AVL_TYPE(type, name)                                          \
+#define DECLARE_AVL_TYPE(type, name)                                            \
+    DECLARE_AVL_STRUCTS(type, name)                                             \
+    DECLARE_AVL_NODE_FUNC(type, name)                                           \
+    DECLARE_AVL_FUNC(type, name)
+
+// implement avl type
+#define IMPLEMENT_AVL_NODE_FUNC(type, name)                                     \
     IMPLEMENT_AVL_NODE_HELPERS(type, name)                                      \
     IMPLEMENT_AVL_NODE_FUNC_ROTATE_LEFT(type, name)                             \
     IMPLEMENT_AVL_NODE_FUNC_ROTATE_RIGHT(type, name)                            \
@@ -57,6 +108,9 @@
     IMPLEMENT_AVL_NODE_FUNC_INIT(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_FIND(type, name)                                    \
+    IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)
+
+#define IMPLEMENT_AVL_FUNC(type, name)                                          \
     IMPLEMENT_AVL_FUNC_INIT(type, name)                                         \
     IMPLEMENT_AVL_FUNC_FREE(type, name)                                         \
     IMPLEMENT_AVL_FUNC_GET_HEIGHT(type, name)                                   \
@@ -64,6 +118,10 @@
     IMPLEMENT_AVL_FUNC_INSERT(type, name)                                       \
     IMPLEMENT_AVL_FUNC_FIND(type, name)                                         \
     IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)
+
+#define IMPLEMENT_AVL_TYPE(type, name)                                          \
+    IMPLEMENT_AVL_NODE_FUNC(type, name)                                         \
+    IMPLEMENT_AVL_FUNC(type, name)
 
 // declare AVLNodeStruct
 #define DECLARE_AVL_NODE_STRUCT(type, name)                                     \
@@ -232,6 +290,69 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, find) (                     
                                                                                 \
     return a_parent;                                                            \
 }
+
+// implement avl node find greater than or equal to
+#ifdef AVL_USE_FIND_GREATER_OR_EQUAL
+
+#define IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)               \
+static const AVLNodeStruct(name)* AVLNodeFunc(name, findGreaterOrEqual) (       \
+    const AVLNodeStruct(name) *a_parent,                                        \
+    const type *a_value,                                                        \
+    AVL_TYPE_SCORE_GREATER_OR_EQUAL *a_currentScore)                            \
+{                                                                               \
+    if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT(a_currentScore)) {           \
+        return a_parent;                                                        \
+    }                                                                           \
+                                                                                \
+    if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID(a_currentScore)) {           \
+        if (a_parent->right == NULL) {                                          \
+            return NULL;                                                        \
+        }                                                                       \
+                                                                                \
+        AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE(                              \
+            (&a_parent->right->data),                                           \
+            a_value,                                                            \
+            a_currentScore                                                      \
+        );                                                                      \
+                                                                                \
+        return AVLNodeFunc(name, findGreaterOrEqual) (                          \
+            a_parent->right,                                                    \
+            a_value,                                                            \
+            a_currentScore                                                      \
+        );                                                                      \
+    }                                                                           \
+                                                                                \
+    if (a_parent->left == NULL) {                                               \
+        return a_parent;                                                        \
+    }                                                                           \
+                                                                                \
+    AVL_TYPE_SCORE_GREATER_OR_EQUAL scoreLeft;                                  \
+    AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE(                                  \
+        (&a_parent->left->data),                                                \
+        a_value,                                                                \
+        (&scoreLeft)                                                            \
+    );                                                                          \
+                                                                                \
+    if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER(                              \
+            (&scoreLeft), a_currentScore)) {                                    \
+                                                                                \
+        AVL_TYPE_SCORE_GREATER_OR_EQUAL_COPY(a_currentScore, (&scoreLeft));     \
+                                                                                \
+        return AVLNodeFunc(name, findGreaterOrEqual) (                          \
+            a_parent->left,                                                     \
+            a_value,                                                            \
+            a_currentScore                                                      \
+        );                                                                      \
+    }                                                                           \
+                                                                                \
+    return a_parent;                                                            \
+}
+
+#else
+
+#define IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)
+
+#endif
 
 // declare & implement INIT function for avl node
 #define DECLARE_AVL_NODE_FUNC_INIT(type, name)                                  \
