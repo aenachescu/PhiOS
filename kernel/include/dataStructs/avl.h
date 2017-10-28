@@ -354,7 +354,7 @@ uint32 AVLNodeFunc(name, free) (                                                
     AVLNodeFunc(name, free)(a_node->left);                                      \
     AVLNodeFunc(name, free)(a_node->right);                                     \
                                                                                 \
-    AVL_FREE_TYPE_FUNC(a_node->data);                                           \
+    AVL_FREE_TYPE_FUNC(&a_node->data);                                          \
                                                                                 \
     AVL_FREE_FUNC(a_node);                                                      \
                                                                                 \
