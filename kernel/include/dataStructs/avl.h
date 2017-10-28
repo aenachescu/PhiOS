@@ -43,7 +43,10 @@
     DECLARE_AVL_FUNC_INIT(type, name)                                           \
     DECLARE_AVL_FUNC_FREE(type, name)                                           \
     DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                     \
-    DECLARE_AVL_FUNC_INSERT_NODE(type, name)
+    DECLARE_AVL_FUNC_INSERT_NODE(type, name)                                    \
+    DECLARE_AVL_FUNC_INSERT(type, name)                                         \
+    DECLARE_AVL_FUNC_FIND(type, name)                                           \
+    DECLARE_AVL_FUNC_FIND_TYPE(type, name)
 
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
     IMPLEMENT_AVL_NODE_HELPERS(type, name)                                      \
@@ -53,10 +56,14 @@
     IMPLEMENT_AVL_NODE_FUNC_INSERT(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_INIT(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                                  \
+    IMPLEMENT_AVL_NODE_FUNC_FIND(type, name)                                    \
     IMPLEMENT_AVL_FUNC_INIT(type, name)                                         \
     IMPLEMENT_AVL_FUNC_FREE(type, name)                                         \
     IMPLEMENT_AVL_FUNC_GET_HEIGHT(type, name)                                   \
-    IMPLEMENT_AVL_FUNC_INSERT_NODE(type, name)
+    IMPLEMENT_AVL_FUNC_INSERT_NODE(type, name)                                  \
+    IMPLEMENT_AVL_FUNC_INSERT(type, name)                                       \
+    IMPLEMENT_AVL_FUNC_FIND(type, name)                                         \
+    IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)
 
 // declare AVLNodeStruct
 #define DECLARE_AVL_NODE_STRUCT(type, name)                                     \
@@ -418,6 +425,99 @@ uint32 AVLFunc(name, insertNode) (                                              
     a_avl->root = AVLNodeFunc(name, insert) (a_avl->root, a_node);              \
                                                                                 \
     return ERROR_SUCCESS;                                                       \
+}
+
+// if AVL_ALLOC_FUNC is defined then declare & implement avl insert
+#ifdef AVL_ALLOC_FUNC
+
+#define DECLARE_AVL_FUNC_INSERT(type, name)                                     \
+uint32 AVLFunc(name, insert) (                                                  \
+    AVLStruct(name) *a_avl,                                                     \
+    const type *a_value                                                         \
+);
+
+#define IMPLEMENT_AVL_FUNC_INSERT(type, name)                                   \
+uint32 AVLFunc(name, insert) (                                                  \
+    AVLStruct(name) *a_avl,                                                     \
+    const type *a_value)                                                        \
+{                                                                               \
+    if (a_avl == NULL) {                                                        \
+        return ERROR_NULL_POINTER;                                              \
+    }                                                                           \
+                                                                                \
+    if (a_value == NULL) {                                                      \
+        return ERROR_NULL_POINTER;                                              \
+    }                                                                           \
+                                                                                \
+    AVLNodeStruct(name) *node = NULL;                                           \
+    uint32 err = AVLNodeFunc(name, create) (&node, a_value);                    \
+    if (err != ERROR_SUCCESS) {                                                 \
+        return err;                                                             \
+    }                                                                           \
+                                                                                \
+    a_avl->root = AVLNodeFunc(name, insert) (a_avl->root, node);                \
+                                                                                \
+    return ERROR_SUCCESS;                                                       \
+}
+
+#else
+
+#define DECLARE_AVL_FUNC_INSERT(type, name)
+#define IMPLEMENT_AVL_FUNC_INSERT(type, name)
+
+#endif
+
+// declare & implement avl find
+#define DECLARE_AVL_FUNC_FIND(type, name)                                       \
+const AVLNodeStruct(name)* AVLFunc(name, find) (                                \
+    const AVLStruct(name) *a_avl,                                               \
+    const type *a_value                                                         \
+);
+
+#define IMPLEMENT_AVL_FUNC_FIND(type, name)                                     \
+const AVLNodeStruct(name)* AVLFunc(name, find) (                                \
+    const AVLStruct(name) *a_avl,                                               \
+    const type *a_value)                                                        \
+{                                                                               \
+    if (a_avl == NULL) {                                                        \
+        return NULL;                                                            \
+    }                                                                           \
+                                                                                \
+    if (a_value == NULL) {                                                      \
+        return NULL;                                                            \
+    }                                                                           \
+                                                                                \
+    return AVLNodeFunc(name, find) (a_avl->root, a_value);                      \
+}
+
+// declare & implement avl findType
+#define DECLARE_AVL_FUNC_FIND_TYPE(type, name)                                  \
+const type* AVLFunc(name, findType) (                                           \
+    const AVLStruct(name) *a_avl,                                               \
+    const type *a_value                                                         \
+);
+
+#define IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)                                \
+const type* AVLFunc(name, findType) (                                           \
+    const AVLStruct(name) *a_avl,                                               \
+    const type *a_value)                                                        \
+{                                                                               \
+    if (a_avl == NULL) {                                                        \
+        return NULL;                                                            \
+    }                                                                           \
+                                                                                \
+    if (a_value == NULL) {                                                      \
+        return NULL;                                                            \
+    }                                                                           \
+                                                                                \
+    const AVLNodeStruct(name) *node =                                           \
+        AVLNodeFunc(name, find) (a_avl->root, a_value);                         \
+                                                                                \
+    if (node == NULL) {                                                         \
+        return NULL;                                                            \
+    }                                                                           \
+                                                                                \
+    return &node->data;                                                         \
 }
 
 #endif
