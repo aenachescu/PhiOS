@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_GET_HEIGHT
-#define PhiOS_DATA_STRUCTURES_AVL_GET_HEIGHT
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_GET_HEIGHT
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_GET_HEIGHT
 
 #define DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                 \
 uint32 AVLFunc(name, getHeight) (                                               \
@@ -25,4 +25,4 @@ uint32 AVLFunc(name, getHeight) (                                               
     return ERROR_SUCCESS;                                                       \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_GET_HEIGHT
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_GET_HEIGHT

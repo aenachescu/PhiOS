@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_ROTATE_RIGHT
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_ROTATE_RIGHT
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_ROTATE_RIGHT
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_ROTATE_RIGHT
 
 #define IMPLEMENT_AVL_NODE_FUNC_ROTATE_RIGHT(type, name)                        \
 static AVLNodeStruct(name)* AVLNodeFunc(name, rotateRight) (                    \
@@ -16,4 +16,4 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, rotateRight) (                    
     return newParent;                                                           \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_ROTATE_RIGHT
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_ROTATE_RIGHT

@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_BALANCE
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_BALANCE
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_BALANCE
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_BALANCE
 
 #define IMPLEMENT_AVL_NODE_FUNC_BALANCE(type, name)                             \
 static AVLNodeStruct(name)* AVLNodeFunc(name, balance) (                        \
@@ -28,4 +28,4 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, balance) (                        
     return a_parent;                                                            \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_BALANCE
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_BALANCE

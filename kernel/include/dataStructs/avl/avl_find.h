@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_FIND
-#define PhiOS_DATA_STRUCTURES_AVL_FIND
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_FIND
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_FIND
 
 #define DECLARE_AVL_FUNC_FIND(type, name)                                       \
 uint32 AVLFunc(name, find) (                                                    \
@@ -36,4 +36,4 @@ uint32 AVLFunc(name, find) (                                                    
     return ERROR_SUCCESS;                                                       \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_FIND
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_FIND

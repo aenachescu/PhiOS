@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_INIT
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_INIT
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INIT
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INIT
 
 // uint32 copyType(type *a_dest, const type *a_src)
 #ifndef AVL_COPY_TYPE_FUNC
@@ -37,4 +37,4 @@ uint32 AVLNodeFunc(name, init) (                                                
     return ERROR_SUCCESS;                                                       \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_INIT
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INIT

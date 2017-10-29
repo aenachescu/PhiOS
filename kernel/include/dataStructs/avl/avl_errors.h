@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_ERRORS
-#define PhiOS_DATA_STRUCTURES_AVL_ERRORS
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_ERRORS
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_ERRORS
 
 typedef unsigned int avl_error_code_t;
 
@@ -7,4 +7,4 @@ typedef unsigned int avl_error_code_t;
 #define AVL_ERROR_NULL_POINTER      ((avl_error_code_t) 1)
 #define AVL_ERROR_NOT_FOUND         ((avl_error_code_t) 2)
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_ERRORS
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_ERRORS
