@@ -41,7 +41,7 @@ CUT_DEFINE_TEST(test_avl_free)
 
     CUT_CHECK(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
 
-    for (int i = 0; i < 10; i ++) {
+    for (int i = 0; i < 1000; i ++) {
         data.data = i;
         CUT_CHECK(UTDataAVL_insert(&tree, &data) == AVL_ERROR_SUCCESS);
     }
