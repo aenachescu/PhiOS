@@ -535,6 +535,10 @@ size_t GetMemoryInUsage();
 void ResetMemoryInUsage();
 size_t GetObjectsInUsage();
 void ResetObjectsInUsage();
+size_t GetAllocCalls();
+void ResetAllocCalls();
+size_t GetFreeCalls();
+void ResetFreeCalls();
 typedef struct UTDataAVLNode_t {
   struct UTDataAVLNode_t *left;
   struct UTDataAVLNode_t *right;
@@ -663,7 +667,7 @@ avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
   if (a_data == ((void *)0)) {
     return ((avl_error_code_t)1);
   }
-  *a_node = (UTDataAVLNode *)AVLAllocNode((sizeof(*a_node)));
+  *a_node = (UTDataAVLNode *)AVLAllocNode((sizeof(**a_node)));
   if (a_node == ((void *)0)) {
     return ((avl_error_code_t)3);
   }
@@ -743,11 +747,10 @@ avl_error_code_t UTDataAVL_free(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
     return ((avl_error_code_t)1);
   }
-  if (a_avl->root == ((void *)0)) {
-    return ((avl_error_code_t)5);
+  if (a_avl->root != ((void *)0)) {
+    UTDataAVLNode_free(a_avl->root);
+    a_avl->root = ((void *)0);
   }
-  UTDataAVLNode_free(a_avl->root);
-  a_avl->root = ((void *)0);
   return ((avl_error_code_t)0);
 }
 avl_error_code_t UTDataAVL_getHeight(const UTDataAVL *a_avl,
@@ -851,12 +854,16 @@ avl_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
 };
 static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;
+static size_t g_allocCalls = 0;
+static size_t g_freeCalls = 0;
 void *AVLAllocNode(size_t a_size) {
   g_memInUsage += a_size;
+  g_allocCalls++;
   return malloc(a_size);
 }
 void AVLFreeNode(void *a_node) {
   g_memInUsage -= sizeof(UTDataAVLNode);
+  g_freeCalls++;
   return free(a_node);
 }
 void AVLDestroyData(Data *a_data) { g_objectsInUsage--; }
@@ -869,3 +876,7 @@ size_t GetMemoryInUsage() { return g_memInUsage; }
 void ResetMemoryInUsage() { g_memInUsage = 0; }
 size_t GetObjectsInUsage() { return g_objectsInUsage; }
 void ResetObjectsInUsage() { g_objectsInUsage = 0; }
+size_t GetAllocCalls() { return g_allocCalls; }
+void ResetAllocCalls() { g_allocCalls = 0; }
+size_t GetFreeCalls() { return g_freeCalls; }
+void ResetFreeCalls() { g_freeCalls = 0; }
