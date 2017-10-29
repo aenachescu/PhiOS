@@ -550,6 +550,7 @@ typedef struct UTDataAVL_t {
 } UTDataAVL;
 typedef void (*UTDataAVLForeachCbk_t)(const Data *a_value);
 avl_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data);
+avl_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node);
 avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
                                       const Data *a_data);
 avl_error_code_t UTDataAVLNode_free(UTDataAVLNode *a_node);
@@ -664,6 +665,16 @@ avl_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data) {
   if (err != ((avl_error_code_t)0)) {
     return err;
   }
+  return ((avl_error_code_t)0);
+}
+avl_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node) {
+  if (a_node == ((void *)0)) {
+    return ((avl_error_code_t)1);
+  }
+  a_node->left = ((void *)0);
+  a_node->right = ((void *)0);
+  a_node->height = 0;
+  AVLDestroyData((&a_node->data));
   return ((avl_error_code_t)0);
 }
 avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
