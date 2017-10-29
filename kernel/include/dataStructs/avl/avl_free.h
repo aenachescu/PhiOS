@@ -17,7 +17,7 @@ avl_error_code_t AVLFunc(name, free) (                                          
     }                                                                           \
                                                                                 \
     if (a_avl->root == CLIB_NULLPTR) {                                          \
-        return ERROR_UNINITIALIZED;                                             \
+        return AVL_ERROR_UNINITIALIZED;                                         \
     }                                                                           \
                                                                                 \
     AVLNodeFunc(name, free)(a_avl->root);                                       \
