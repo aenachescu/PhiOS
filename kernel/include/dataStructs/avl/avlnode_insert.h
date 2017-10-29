@@ -1,7 +1,7 @@
 #ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INSERT
 #define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INSERT
 
-// bool opLess(const type* a, const type* b)
+// clib_bool_t opLess(const type* a, const type* b)
 #ifndef AVL_TYPE_OPERATOR_LESS
 #error "operator< is mandatory"
 #endif
