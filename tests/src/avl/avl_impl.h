@@ -27,7 +27,7 @@
 #define AVL_USE_AVL_NODE_CREATE
 
 // basic defines
-#define CLIB_NULLPTR NULL
+#define CLIB_NULLPTR                        NULL
 #define AVL_DESTROY_TYPE_FUNC(x)            AVLDestroyData(x)
 #define AVL_FREE_FUNC(x)                    AVLFreeNode(x)
 #define AVL_ALLOC_FUNC(x)                   AVLAllocNode(x)
@@ -53,6 +53,12 @@ void ResetMemoryInUsage();
 
 size_t GetObjectsInUsage();
 void ResetObjectsInUsage();
+
+size_t GetAllocCalls();
+void ResetAllocCalls();
+
+size_t GetFreeCalls();
+void ResetFreeCalls();
 
 DECLARE_AVL_TYPE(Data, UTData);
 
