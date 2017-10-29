@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_INSERT
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_INSERT
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INSERT
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INSERT
 
 // bool opLess(const type* a, const type* b)
 #ifndef AVL_TYPE_OPERATOR_LESS
@@ -24,4 +24,4 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, insert) (                         
     return AVLNodeFunc(name, balance) (a_parent);                               \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_INSERT
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_INSERT

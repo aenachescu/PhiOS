@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL
-#define PhiOS_DATA_STRUCTURES_AVL
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL
 
 /*
  * Using:
@@ -177,4 +177,4 @@
     IMPLEMENT_AVL_NODE_FUNC(type, name)                                         \
     IMPLEMENT_AVL_FUNC(type, name)
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL

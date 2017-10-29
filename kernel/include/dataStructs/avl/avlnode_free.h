@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_FREE
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_FREE
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FREE
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FREE
 
 #ifdef AVL_USE_AVL_NODE_FREE
 
@@ -43,4 +43,4 @@ uint32 AVLNodeFunc(name, free) (                                                
 
 #endif // end if AVL_USE_AVL_NODE_FREE
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_FREE
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FREE

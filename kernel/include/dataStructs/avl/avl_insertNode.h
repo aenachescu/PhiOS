@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_INSERT_NODE
-#define PhiOS_DATA_STRUCTURES_AVL_INSERT_NODE
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INSERT_NODE
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INSERT_NODE
 
 #define DECLARE_AVL_FUNC_INSERT_NODE(type, name)                                \
 uint32 AVLFunc(name, insertNode) (                                              \
@@ -25,4 +25,4 @@ uint32 AVLFunc(name, insertNode) (                                              
     return ERROR_SUCCESS;                                                       \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_INSERT_NODE
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INSERT_NODE
