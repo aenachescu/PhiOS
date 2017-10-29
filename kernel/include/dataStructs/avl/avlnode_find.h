@@ -16,8 +16,8 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, find) (                     
     const AVLNodeStruct(name) *a_parent,                                        \
     const type *a_value)                                                        \
 {                                                                               \
-    if (a_parent == NULL) {                                                     \
-        return NULL;                                                            \
+    if (a_parent == CLIB_NULLPTR) {                                             \
+        return CLIB_NULLPTR;                                                    \
     }                                                                           \
                                                                                 \
     if (AVL_TYPE_OPERATOR_LESS(a_value, (&a_parent->data))) {                   \

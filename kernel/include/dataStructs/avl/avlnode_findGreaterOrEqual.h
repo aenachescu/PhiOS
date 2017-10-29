@@ -61,8 +61,8 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findGreaterOrEqual) (       
     /*      right branch for a node that has the best score or perfect score.*/ \
     /*************************************************************************/ \
     if (AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID(a_currentScore)) {           \
-        if (a_parent->right == NULL) {                                          \
-            return NULL;                                                        \
+        if (a_parent->right == CLIB_NULLPTR) {                                  \
+            return CLIB_NULLPTR;                                                \
         }                                                                       \
                                                                                 \
         AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE(                              \
@@ -85,7 +85,7 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findGreaterOrEqual) (       
     /*    - otherwise, we continue to look on the left branch for a node that*/ \
     /*      has the best score or the perfect score.                         */ \
     /*************************************************************************/ \
-    if (a_parent->left == NULL) {                                               \
+    if (a_parent->left == CLIB_NULLPTR) {                                       \
         return a_parent;                                                        \
     }                                                                           \
                                                                                 \

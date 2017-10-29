@@ -10,11 +10,11 @@ avl_error_code_t AVLFunc(name, init) (                                          
 avl_error_code_t AVLFunc(name, init) (                                          \
     AVLStruct(name) *a_avl)                                                     \
 {                                                                               \
-    if (a_avl == NULL) {                                                        \
+    if (a_avl == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    a_avl->root = NULL;                                                         \
+    a_avl->root = CLIB_NULLPTR;                                                 \
                                                                                 \
     return AVL_ERROR_SUCCESS;                                                   \
 }

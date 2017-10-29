@@ -14,15 +14,15 @@ avl_error_code_t AVLFunc(name, insert) (                                        
     AVLStruct(name) *a_avl,                                                     \
     const type *a_value)                                                        \
 {                                                                               \
-    if (a_avl == NULL) {                                                        \
+    if (a_avl == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_value == NULL) {                                                      \
+    if (a_value == CLIB_NULLPTR) {                                              \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    AVLNodeStruct(name) *node = NULL;                                           \
+    AVLNodeStruct(name) *node = CLIB_NULLPTR;                                   \
     avl_error_code_t err = AVLNodeFunc(name, create) (&node, a_value);          \
     if (err != AVL_ERROR_SUCCESS) {                                             \
         return err;                                                             \

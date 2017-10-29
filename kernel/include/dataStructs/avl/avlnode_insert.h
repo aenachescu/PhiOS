@@ -11,7 +11,7 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, insert) (                         
     AVLNodeStruct(name) *a_parent,                                              \
     AVLNodeStruct(name) *a_node)                                                \
 {                                                                               \
-    if (a_parent == NULL) {                                                     \
+    if (a_parent == CLIB_NULLPTR) {                                             \
         return a_node;                                                          \
     }                                                                           \
                                                                                 \
