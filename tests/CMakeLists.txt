@@ -27,7 +27,7 @@ endif()
 link_directories("${PRJ_PATH}/../CUT/bin")
 
 # set C flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wno-format -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Wall -Wextra -Werror -Wno-format -fprofile-arcs -ftest-coverage")
 set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} -D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
 
 # set definitions
