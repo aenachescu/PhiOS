@@ -7,7 +7,6 @@
 
 CUT_DEFINE_TEST(test_PAA)
 {
-    uint32 err = ERROR_SUCCESS;
     uint64 addr = 0;
 
     CUT_CHECK_OPERATOR_UINT32(PAA_init(0), ==, ERROR_INVALID_PARAMETER);
@@ -29,11 +28,11 @@ CUT_DEFINE_TEST(test_PAA)
      * third column: expected address
      */
     static uint64 testCases[][3] = {
-        0x00000010, 0x00000002, 0x00001000,
-        0x00000123, 0x00001000, 0x00002000,
-        0x00000123, 0x00000010, 0x00002130,
-        0x00001234, 0x00000001, 0x00002253,
-        0x00001000, 0x00100000, 0x00100000
+        { 0x00000010, 0x00000002, 0x00001000, },
+        { 0x00000123, 0x00001000, 0x00002000, },
+        { 0x00000123, 0x00000010, 0x00002130, },
+        { 0x00001234, 0x00000001, 0x00002253, },
+        { 0x00001000, 0x00100000, 0x00100000, },
     };
     static uint32 testCasesLength = 5;
 
