@@ -56,7 +56,133 @@ CUT_DEFINE_TEST(test_avl_free)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_node_init)
+{
+    RESET_STATISTICS;
+
+    Data data;
+    UTDataAVLNode node;
+
+    data.data = 5;
+
+    CUT_CHECK(UTDataAVLNode_init(NULL, &data) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_init(&node, NULL) == AVL_ERROR_NULL_POINTER);
+
+    CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_SUCCESS);
+
+    CUT_CHECK(node.left == NULL);
+    CUT_CHECK(node.right == NULL);
+    CUT_CHECK(node.height == 1);
+    CUT_CHECK(node.data.data == 5);
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 1);
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
+
+    CUT_CHECK(UTDataAVLNode_uninit(&node) == AVL_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_node_uninit)
+{
+    RESET_STATISTICS;
+
+    UTDataAVLNode node, left, right;
+    Data data;
+
+    CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_SUCCESS);
+
+    data.data = 10;
+    node.left = &left;
+    node.right = &right;
+
+    CUT_CHECK(UTDataAVLNode_uninit(NULL) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_uninit(&node) == AVL_ERROR_SUCCESS);
+
+    CUT_CHECK(node.left == NULL);
+    CUT_CHECK(node.right == NULL);
+    CUT_CHECK(node.height == 0);
+    CUT_CHECK(node.data.data == 0);
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 0);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_node_create)
+{
+    RESET_STATISTICS;
+
+    Data data;
+    UTDataAVLNode *node = NULL;
+
+    data.data = 15;
+
+    CUT_CHECK(UTDataAVLNode_create(NULL, &data) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_create(&node, NULL) == AVL_ERROR_NULL_POINTER);
+
+    CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_SUCCESS);
+
+    CUT_CHECK(node != NULL);
+    CUT_CHECK(node->left == NULL);
+    CUT_CHECK(node->right == NULL);
+    CUT_CHECK(node->height == 1);
+    CUT_CHECK(node->data.data == 15);
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 1);
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 1);
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, sizeof(UTDataAVLNode));
+
+    CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_node_free)
+{
+    RESET_STATISTICS;
+
+    Data data1, data2, data3;
+    UTDataAVLNode *node = NULL, *left = NULL, *right = NULL;
+
+    data1.data = 20;
+    data2.data = 30;
+    data3.data = 40;
+
+    CUT_CHECK(UTDataAVLNode_create(&node, &data1) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(node != NULL);
+
+    CUT_CHECK(UTDataAVLNode_free(NULL) == AVL_ERROR_NULL_POINTER);
+
+    CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 1);
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
+
+    CUT_CHECK(UTDataAVLNode_create(&node, &data1) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(node != NULL);
+    CUT_CHECK(UTDataAVLNode_create(&left, &data2) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(left != NULL);
+    CUT_CHECK(UTDataAVLNode_create(&right, &data3) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(right != NULL);
+
+    node->left = left;
+    node->right = right;
+
+    CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 4);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_init);
     CUT_CALL_TEST(test_avl_free);
+
+    CUT_CALL_TEST(test_avl_node_init);
+    CUT_CALL_TEST(test_avl_node_uninit);
+    CUT_CALL_TEST(test_avl_node_create);
+    CUT_CALL_TEST(test_avl_node_free);
+
 CUT_END_MAIN
