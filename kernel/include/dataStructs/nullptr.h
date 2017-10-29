@@ -3,6 +3,6 @@
 
 #ifndef CLIB_NULLPTR
 #define CLIB_NULLPTR ((void*) 0x0)
-#endif  CLIB_NULLPTR
+#endif
 
 #endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_NULLPTR
