@@ -35,16 +35,16 @@ static inline void AVLNodeFunc(name, calculateHeight) (                         
 }
 
 #define IMPLEMENT_AVL_NODE_HELPER_IS_HEIGHT_GREATER(type, name)                 \
-static inline bool AVLNodeFunc(name, isHeightGreater) (                         \
+static inline clib_bool_t AVLNodeFunc(name, isHeightGreater) (                  \
     const AVLNodeStruct(name) *a_node1,                                         \
     const AVLNodeStruct(name) *a_node2)                                         \
 {                                                                               \
     if (AVLNodeFunc(name, getHeight) (a_node1) >                                \
         AVLNodeFunc(name, getHeight) (a_node2)) {                               \
-        return true;                                                            \
+        return CLIB_TRUE;                                                       \
     }                                                                           \
                                                                                 \
-    return false;                                                               \
+    return CLIB_FALSE;                                                          \
 }
 
 #define IMPLEMENT_AVL_NODE_HELPER_DIFF_HEIGHT(type, name)                       \
