@@ -18,11 +18,12 @@
  *
  *    3. AVL_COPY_TYPE_FUNC
  *       Signature: avl_error_code_t copyType(type *a_dest, const type *a_src)
- *       Brief: return true if the a_src was copied into a_dest, otherwise error.
+ *       Brief: return AVL_ERROR_SUCCESS if the a_src was copied into a_dest, otherwise error.
  *
  *    4. AVL_ALLOC_FUNC
  *       Signature: void* avlAlloc(size_t a_size)
- *       Brief: return an pointer where the node will be stored.
+ *       Brief: return an pointer where the node will be stored, or NULL if
+ *              there is no available memroy.
  *
  *    5. AVL_FREE_FUNC
  *       Signature: void avlFree(void *a_ptr)
