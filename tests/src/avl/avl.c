@@ -548,6 +548,7 @@ typedef struct UTDataAVLNode_t {
 typedef struct UTDataAVL_t {
   UTDataAVLNode *root;
 } UTDataAVL;
+typedef void (*UTDataAVLForeachCbk_t)(const Data *a_value);
 avl_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data);
 avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
                                       const Data *a_data);
@@ -565,6 +566,12 @@ avl_error_code_t UTDataAVL_findType(const UTDataAVL *a_avl, const Data *a_value,
 avl_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
                                               const Data *a_value,
                                               const UTDataAVLNode **a_res);
+avl_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
+                                          UTDataAVLForeachCbk_t a_cbk);
+avl_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
+                                           UTDataAVLForeachCbk_t a_cbk);
+avl_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
+                                            UTDataAVLForeachCbk_t a_cbk);
 ;
 static inline unsigned int
 UTDataAVLNode_getHeight(const UTDataAVLNode *a_node) {
@@ -736,6 +743,33 @@ UTDataAVLNode_findGreaterOrEqual(const UTDataAVLNode *a_parent,
   }
   return a_parent;
 }
+static void UTDataAVLNode_foreachInorder(const UTDataAVLNode *a_parent,
+                                         UTDataAVLForeachCbk_t a_cbk) {
+  if (a_parent == ((void *)0)) {
+    return;
+  }
+  UTDataAVLNode_foreachInorder(a_parent->left, a_cbk);
+  a_cbk((&a_parent->data));
+  UTDataAVLNode_foreachInorder(a_parent->right, a_cbk);
+}
+static void UTDataAVLNode_foreachPreorder(const UTDataAVLNode *a_parent,
+                                          UTDataAVLForeachCbk_t a_cbk) {
+  if (a_parent == ((void *)0)) {
+    return;
+  }
+  a_cbk((&a_parent->data));
+  UTDataAVLNode_foreachPreorder(a_parent->left, a_cbk);
+  UTDataAVLNode_foreachPreorder(a_parent->right, a_cbk);
+}
+static void UTDataAVLNode_foreachPostorder(const UTDataAVLNode *a_parent,
+                                           UTDataAVLForeachCbk_t a_cbk) {
+  if (a_parent == ((void *)0)) {
+    return;
+  }
+  UTDataAVLNode_foreachPostorder(a_parent->left, a_cbk);
+  UTDataAVLNode_foreachPostorder(a_parent->right, a_cbk);
+  a_cbk((&a_parent->data));
+}
 avl_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
     return ((avl_error_code_t)1);
@@ -851,6 +885,39 @@ avl_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
     return ((avl_error_code_t)2);
   }
   return ((avl_error_code_t)0);
+}
+avl_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
+                                          UTDataAVLForeachCbk_t a_cbk) {
+  if (a_avl == ((void *)0)) {
+    return ((avl_error_code_t)1);
+  }
+  if (a_cbk == ((void *)0)) {
+    return ((avl_error_code_t)6);
+  }
+  UTDataAVLNode_foreachInorder(a_avl->root, a_cbk);
+  return ((avl_error_code_t)0);
+}
+avl_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
+                                           UTDataAVLForeachCbk_t a_cbk) {
+  if (a_avl == ((void *)0)) {
+    return ((avl_error_code_t)1);
+  }
+  if (a_cbk == ((void *)0)) {
+    return ((avl_error_code_t)6);
+  }
+  UTDataAVLNode_foreachPreorder(a_avl->root, a_cbk);
+  return ((avl_error_code_t)0);
+}
+avl_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
+                                            UTDataAVLForeachCbk_t a_cbk) {
+  if (a_avl == ((void *)0)) {
+    return ((avl_error_code_t)1);
+  }
+  if (a_cbk == ((void *)0)) {
+    return ((avl_error_code_t)6);
+  }
+  UTDataAVLNode_foreachPostorder(a_avl->root, a_cbk);
+  return ((avl_error_code_t)0);
 };
 static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;
@@ -866,7 +933,10 @@ void AVLFreeNode(void *a_node) {
   g_freeCalls++;
   return free(a_node);
 }
-void AVLDestroyData(Data *a_data) { g_objectsInUsage--; }
+void AVLDestroyData(Data *a_data) {
+  g_objectsInUsage--;
+  a_data->data = 0;
+}
 avl_error_code_t AVLCopyData(Data *dest, const Data *src) {
   g_objectsInUsage++;
   dest->data = src->data;
