@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_HELPERS
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_HELPERS
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_HELPERS
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_HELPERS
 
 #define IMPLEMENT_AVL_NODE_HELPERS(type, name)                                  \
     IMPLEMENT_AVL_NODE_HELPER_GET_HEIGHT(type, name)                            \
@@ -62,4 +62,4 @@ static inline uint32 AVLNodeFunc(name, diffHeight) (                            
     return 0;                                                                   \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_HELPERS
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_HELPERS

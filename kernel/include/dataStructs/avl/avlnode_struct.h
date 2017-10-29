@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_STRUCT
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_STRUCT
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_STRUCT
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_STRUCT
 
 #define AVLNodeStruct(name)                                                     \
     C_TEMPLATE_DATA_STRUCTURES_CONCAT(                                          \
@@ -31,4 +31,4 @@ typedef struct AVLNodeStruct_t(name)                                            
     type data;                                                                  \
 } AVLNodeStruct(name);
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_STRUCT
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_STRUCT

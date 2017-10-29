@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_INIT
-#define PhiOS_DATA_STRUCTURES_AVL_INIT
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INIT
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INIT
 
 #define DECLARE_AVL_FUNC_INIT(type, name)                                       \
 uint32 AVLFunc(name, init) (                                                    \
@@ -19,4 +19,4 @@ uint32 AVLFunc(name, init) (                                                    
     return ERROR_SUCCESS;                                                       \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_INIT
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INIT
