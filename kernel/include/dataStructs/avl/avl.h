@@ -119,6 +119,7 @@
 #include "kernel/include/dataStructs/avl/avl_getHeight.h"
 #include "kernel/include/dataStructs/avl/avl_insert.h"
 #include "kernel/include/dataStructs/avl/avl_insertNode.h"
+#include "kernel/include/dataStructs/avl/avl_findGreaterOrEqual.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
@@ -139,7 +140,8 @@
     DECLARE_AVL_FUNC_INSERT_NODE(type, name)                                    \
     DECLARE_AVL_FUNC_INSERT(type, name)                                         \
     DECLARE_AVL_FUNC_FIND(type, name)                                           \
-    DECLARE_AVL_FUNC_FIND_TYPE(type, name)
+    DECLARE_AVL_FUNC_FIND_TYPE(type, name)                                      \
+    DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -168,7 +170,8 @@
     IMPLEMENT_AVL_FUNC_INSERT_NODE(type, name)                                  \
     IMPLEMENT_AVL_FUNC_INSERT(type, name)                                       \
     IMPLEMENT_AVL_FUNC_FIND(type, name)                                         \
-    IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)
+    IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)                                    \
+    IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
