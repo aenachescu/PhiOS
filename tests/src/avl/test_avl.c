@@ -41,9 +41,14 @@ CUT_DEFINE_TEST(test_avl_free)
 
     CUT_CHECK(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
 
-    for (int i = 0; i < 1000; i ++) {
-        data.data = i;
+    for (size_t i = 0; i < ((size_t) 1000); i++) {
+        data.data = (unsigned int) i;
+
         CUT_CHECK(UTDataAVL_insert(&tree, &data) == AVL_ERROR_SUCCESS);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
+        CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, ((i + 1) * sizeof(UTDataAVLNode)));
     }
 
     CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
