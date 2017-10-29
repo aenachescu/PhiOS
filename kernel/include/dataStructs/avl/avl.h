@@ -105,6 +105,7 @@
 #include "kernel/include/dataStructs/avl/avl_errors.h"
 #include "kernel/include/dataStructs/preprocessor.h"
 #include "kernel/include/dataStructs/nullptr.h"
+#include "kernel/include/dataStructs/bool.h"
 
 // include avl node headers
 #include "kernel/include/dataStructs/avl/avlnode_struct.h"
