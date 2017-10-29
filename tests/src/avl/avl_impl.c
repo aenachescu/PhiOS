@@ -28,6 +28,8 @@ void AVLFreeNode(void *a_node)
 void AVLDestroyData(Data *a_data)
 {
     g_objectsInUsage--;
+
+    a_data->data = 0;
 }
 
 avl_error_code_t AVLCopyData(Data *dest, const Data *src)
