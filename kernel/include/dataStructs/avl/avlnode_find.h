@@ -1,5 +1,5 @@
-#ifndef PhiOS_DATA_STRUCTURES_AVL_NODE_FIND
-#define PhiOS_DATA_STRUCTURES_AVL_NODE_FIND
+#ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FIND
+#define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FIND
 
 // bool opGreater(const type *a, const type *b)
 #ifndef AVL_TYPE_OPERATOR_GREATER
@@ -31,4 +31,4 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, find) (                     
     return a_parent;                                                            \
 }
 
-#endif // end if PhiOS_DATA_STRUCTURES_AVL_NODE_FIND
+#endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FIND
