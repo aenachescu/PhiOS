@@ -9,20 +9,20 @@
 #error "type score greater or equal undefined"
 #endif
 
-// bool scoreIsInvalid(const ScoreType *a_score)
-// return true if a_score is invalid
+// clib_bool_t scoreIsInvalid(const ScoreType *a_score)
+// return CLIB_TRUE if a_score is invalid
 #ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID
 #error "score greater or equal is invalid undefined"
 #endif
 
-// bool scoreIsPerfect(const ScoreType *a_score)
-// return true if a_score is perfect
+// clib_bool_t scoreIsPerfect(const ScoreType *a_score)
+// return CLIB_TRUE if a_score is perfect
 #ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT
 #error "score greater or equal is perfect undefined"
 #endif
 
-// bool scoreIsBetter(const ScoreType *a, const ScoreType *b)
-// return true if a is better than b
+// clib_bool_t scoreIsBetter(const ScoreType *a, const ScoreType *b)
+// return CLIB_TRUE if a is better than b
 #ifndef AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER
 #error "score greater or equal is better undefined"
 #endif

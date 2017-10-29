@@ -9,12 +9,12 @@
  *
  * Macro functions:
  *    1. AVL_TYPE_OPERATOR_GREATER
- *       Signature: bool opGreater(const type *a, const type *b)
- *       Brief: return true if a > b, otherwise false.
+ *       Signature: clib_bool_t opGreater(const type *a, const type *b)
+ *       Brief: return CLIB_TRUE if a > b, otherwise CLIB_FALSE.
  *
  *    2. AVL_TYPE_OPERATOR_LESS
- *       Signature: bool opLess(const type *a, const type *b)
- *       Brief: return true if a < b, otherwise false.
+ *       Signature: clib_bool_t opLess(const type *a, const type *b)
+ *       Brief: return CLIB_TRUE if a < b, otherwise CLIB_FALSE.
  *
  *    3. AVL_COPY_TYPE_FUNC
  *       Signature: avl_error_code_t copyType(type *a_dest, const type *a_src)
@@ -34,16 +34,16 @@
  *       Brief: destroy the object (NOT free the memory area).
  *
  *    7. AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID
- *       Signature: bool scoreIsInvalid(const ScoreType *a_score)
- *       Brief: return true if a_score is invalid, otherwise false.
+ *       Signature: clib_bool_t scoreIsInvalid(const ScoreType *a_score)
+ *       Brief: return CLIB_TRUE if a_score is invalid, otherwise CLIB_FALSE.
  *
  *    8. AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT
- *       Signature: bool scoreIsPerfect(const ScoreType *a_score)
- *       Brief: return true if the a_score is perfect, otherwise false.
+ *       Signature: clib_bool_t scoreIsPerfect(const ScoreType *a_score)
+ *       Brief: return CLIB_TRUE if the a_score is perfect, otherwise CLIB_FALSE.
  *
  *    9. AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER
- *       Signature: bool scoreIsBetter(const ScoreType *a, const ScoreType *b)
- *       Brief: return true if the score from a is better than the score from b, otherwise false.
+ *       Signature: clib_bool_t scoreIsBetter(const ScoreType *a, const ScoreType *b)
+ *       Brief: return CLIB_TRUE if the score from a is better than the score from b, otherwise CLIB_FALSE.
  *
  *   10. AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE
  *       Signature: void getScore(const Type *a_current, const Type *a_value, ScoreType *a_res)
@@ -58,7 +58,11 @@
  *       Default it has ((void*) 0x0) value, but if you have a special nullptr then
  *       you can define CLIB_NULLPTR with your value.
  *
- *    2. AVL_TYPE_SCORE_GREATER_OR_EQUAL
+ *    2. CLIB_TRUE
+ *
+ *    3. CLIB_FALSE
+ *
+ *    4. AVL_TYPE_SCORE_GREATER_OR_EQUAL
  *       This is a data structure (or primitive data type) where the score between
  *       the element being searched and another element it's stored.
  *

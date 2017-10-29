@@ -1,12 +1,12 @@
 #ifndef CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FIND
 #define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_FIND
 
-// bool opGreater(const type *a, const type *b)
+// clib_bool_t opGreater(const type *a, const type *b)
 #ifndef AVL_TYPE_OPERATOR_GREATER
 #error "operator> is mandatory "
 #endif
 
-// bool opLess(const type *a, const type *b)
+// clib_bool_t opLess(const type *a, const type *b)
 #ifndef AVL_TYPE_OPERATOR_LESS
 #error "operator< is mandatory"
 #endif
