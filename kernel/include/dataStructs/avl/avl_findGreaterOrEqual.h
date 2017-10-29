@@ -12,34 +12,34 @@
 #endif
 
 #define DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                      \
-uint32 AVLFunc(name, findGreaterOrEqual) (                                      \
+avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            \
     const AVLStruct(name) *a_avl,                                               \
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res                                           \
 );
 
 #define IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                    \
-uint32 AVLFunc(name, findGreaterOrEqual) (                                      \
+avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            \
     const AVLStruct(name) *a_avl,                                               \
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res)                                          \
 {                                                                               \
     if (a_res == NULL) {                                                        \
-        return ERROR_NULL_POINTER;                                              \
+        return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
     *a_res = NULL;                                                              \
                                                                                 \
     if (a_avl == NULL) {                                                        \
-        return ERROR_NULL_POINTER;                                              \
+        return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
     if (a_value == NULL) {                                                      \
-        return ERROR_NULL_POINTER;                                              \
+        return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
     if (a_avl->root == NULL) {                                                  \
-        return ERROR_NOT_FOUND;                                                 \
+        return AVL_ERROR_NOT_FOUND;                                             \
     }                                                                           \
                                                                                 \
     AVL_TYPE_SCORE_GREATER_OR_EQUAL score;                                      \
@@ -56,10 +56,10 @@ uint32 AVLFunc(name, findGreaterOrEqual) (                                      
     );                                                                          \
                                                                                 \
     if (*a_res == NULL) {                                                       \
-        return ERROR_NOT_FOUND;                                                 \
+        return AVL_ERROR_NOT_FOUND;                                             \
     }                                                                           \
                                                                                 \
-    return ERROR_SUCCESS;                                                       \
+    return AVL_ERROR_SUCCESS;                                                   \
 }
 
 #else // AVL_USE_FIND_GREATER_OR_EQUAL is not defined

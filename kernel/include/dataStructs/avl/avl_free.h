@@ -4,16 +4,16 @@
 #ifdef AVL_USE_AVL_NODE_FREE
 
 #define DECLARE_AVL_FUNC_FREE(type, name)                                       \
-uint32 AVLFunc(name, free) (                                                    \
+avl_error_code_t AVLFunc(name, free) (                                          \
     AVLStruct(name) *a_avl                                                      \
 );
 
 #define IMPLEMENT_AVL_FUNC_FREE(type, name)                                     \
-uint32 AVLFunc(name, free) (                                                    \
+avl_error_code_t AVLFunc(name, free) (                                          \
     AVLStruct(name) *a_avl)                                                     \
 {                                                                               \
     if (a_avl == NULL) {                                                        \
-        return ERROR_NULL_POINTER;                                              \
+        return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
     if (a_avl->root == NULL) {                                                  \
@@ -23,7 +23,7 @@ uint32 AVLFunc(name, free) (                                                    
     AVLNodeFunc(name, free)(a_avl->root);                                       \
     a_avl->root = NULL;                                                         \
                                                                                 \
-    return ERROR_SUCCESS;                                                       \
+    return AVL_ERROR_SUCCESS;                                                   \
 }
 
 #else // AVL_USE_AVL_NODE_FREE is not defined
