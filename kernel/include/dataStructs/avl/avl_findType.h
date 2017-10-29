@@ -14,24 +14,24 @@ avl_error_code_t AVLFunc(name, findType) (                                      
     const type *a_value,                                                        \
     const type **a_res)                                                         \
 {                                                                               \
-    if (a_res == NULL) {                                                        \
+    if (a_res == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    *a_res = NULL;                                                              \
+    *a_res = CLIB_NULLPTR;                                                      \
                                                                                 \
-    if (a_avl == NULL) {                                                        \
+    if (a_avl == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_value == NULL) {                                                      \
+    if (a_value == CLIB_NULLPTR) {                                              \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
     const AVLNodeStruct(name) *node =                                           \
         AVLNodeFunc(name, find) (a_avl->root, a_value);                         \
                                                                                 \
-    if (node == NULL) {                                                         \
+    if (node == CLIB_NULLPTR) {                                                 \
         return AVL_ERROR_NOT_FOUND;                                             \
     }                                                                           \
                                                                                 \

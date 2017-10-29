@@ -12,11 +12,11 @@ avl_error_code_t AVLFunc(name, getHeight) (                                     
     const AVLStruct(name) *a_avl,                                               \
     unsigned int *a_res)                                                        \
 {                                                                               \
-    if (a_avl == NULL) {                                                        \
+    if (a_avl == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_res == NULL) {                                                        \
+    if (a_res == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \

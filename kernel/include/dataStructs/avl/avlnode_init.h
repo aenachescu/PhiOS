@@ -17,16 +17,16 @@ avl_error_code_t AVLNodeFunc(name, init) (                                      
     AVLNodeStruct(name) *a_node,                                                \
     const type *a_data)                                                         \
 {                                                                               \
-    if (a_node == NULL) {                                                       \
+    if (a_node == CLIB_NULLPTR) {                                               \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_data == NULL) {                                                       \
+    if (a_data == CLIB_NULLPTR) {                                               \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    a_node->left = NULL;                                                        \
-    a_node->right = NULL;                                                       \
+    a_node->left = CLIB_NULLPTR;                                                \
+    a_node->right = CLIB_NULLPTR;                                               \
     a_node->height = 1;                                                         \
                                                                                 \
     avl_error_code_t err = AVL_COPY_TYPE_FUNC((&a_node->data), a_data);         \
