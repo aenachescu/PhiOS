@@ -22,7 +22,7 @@ avl_error_code_t AVLNodeFunc(name, free) (                                      
 avl_error_code_t AVLNodeFunc(name, free) (                                      \
     AVLNodeStruct(name) *a_node)                                                \
 {                                                                               \
-    if (a_node == NULL) {                                                       \
+    if (a_node == CLIB_NULLPTR) {                                               \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \

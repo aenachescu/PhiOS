@@ -12,11 +12,11 @@ avl_error_code_t AVLFunc(name, insertNode) (                                    
     AVLStruct(name) *a_avl,                                                     \
     AVLNodeStruct(name) *a_node)                                                \
 {                                                                               \
-    if (a_avl == NULL) {                                                        \
+    if (a_avl == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_node == NULL) {                                                       \
+    if (a_node == CLIB_NULLPTR) {                                               \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
