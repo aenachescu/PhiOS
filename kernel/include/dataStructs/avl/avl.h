@@ -7,6 +7,12 @@
  *   - use IMPLEMENT_AVL_TYPE(type, name) to implement the avl functions (both public
  *         private functions).
  *
+ * Typedefs:
+ *    1. nameAVLForeachCbk_t
+ *       Signature void func(const type *a_value);
+ *       Brief: You must pass an function of this type to the functions of traversals,
+ *              and this function will be called for each element from AVL.
+ *
  * Macro functions:
  *    1. AVL_TYPE_OPERATOR_GREATER
  *       Signature: clib_bool_t opGreater(const type *a, const type *b)
@@ -119,6 +125,7 @@
 #include "kernel/include/dataStructs/avl/avlnode_create.h"
 #include "kernel/include/dataStructs/avl/avlnode_free.h"
 #include "kernel/include/dataStructs/avl/avlnode_findGreaterOrEqual.h"
+#include "kernel/include/dataStructs/avl/avlnode_traversals.h"
 
 // include avl headers
 #include "kernel/include/dataStructs/avl/avl_struct.h"
@@ -130,11 +137,13 @@
 #include "kernel/include/dataStructs/avl/avl_insert.h"
 #include "kernel/include/dataStructs/avl/avl_insertNode.h"
 #include "kernel/include/dataStructs/avl/avl_findGreaterOrEqual.h"
+#include "kernel/include/dataStructs/avl/avl_traversals.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
     DECLARE_AVL_NODE_STRUCT(type, name)                                         \
-    DECLARE_AVL_STRUCT(type, name)
+    DECLARE_AVL_STRUCT(type, name)                                              \
+    DECLARE_AVL_FOR_EACH_CALLBACK_TYPE(type, name)
 
 // declare avl node public functions
 #define DECLARE_AVL_NODE_FUNC(type, name)                                       \
@@ -151,7 +160,10 @@
     DECLARE_AVL_FUNC_INSERT(type, name)                                         \
     DECLARE_AVL_FUNC_FIND(type, name)                                           \
     DECLARE_AVL_FUNC_FIND_TYPE(type, name)                                      \
-    DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)
+    DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                          \
+    DECLARE_AVL_FUNC_FOR_EACH_INORDER(type, name)                               \
+    DECLARE_AVL_FUNC_FOR_EACH_PREORDER(type, name)                              \
+    DECLARE_AVL_FUNC_FOR_EACH_POSTORDER(type, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -170,7 +182,10 @@
     IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_FREE(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_FIND(type, name)                                    \
-    IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)
+    IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)                   \
+    IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_INORDER(type, name)                        \
+    IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_PREORDER(type, name)                       \
+    IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_POSTORDER(type, name)
 
 // implement avl functions
 #define IMPLEMENT_AVL_FUNC(type, name)                                          \
@@ -181,7 +196,10 @@
     IMPLEMENT_AVL_FUNC_INSERT(type, name)                                       \
     IMPLEMENT_AVL_FUNC_FIND(type, name)                                         \
     IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)                                    \
-    IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)
+    IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                        \
+    IMPLEMENT_AVL_FUNC_FOR_EACH_INORDER(type, name)                             \
+    IMPLEMENT_AVL_FUNC_FOR_EACH_PREORDER(type, name)                            \
+    IMPLEMENT_AVL_FUNC_FOR_EACH_POSTORDER(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
