@@ -4,10 +4,14 @@ IMPLEMENT_AVL_TYPE(Data, UTData);
 
 static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;
+static size_t g_allocCalls = 0;
+static size_t g_freeCalls = 0;
 
 void* AVLAllocNode(size_t a_size)
 {
     g_memInUsage += a_size;
+
+    g_allocCalls++;
 
     return malloc(a_size);
 }
@@ -15,6 +19,8 @@ void* AVLAllocNode(size_t a_size)
 void AVLFreeNode(void *a_node)
 {
     g_memInUsage -= sizeof(UTDataAVLNode);
+
+    g_freeCalls++;
 
     return free(a_node);
 }
@@ -51,4 +57,24 @@ size_t GetObjectsInUsage()
 void ResetObjectsInUsage()
 {
     g_objectsInUsage = 0;
+}
+
+size_t GetAllocCalls()
+{
+    return g_allocCalls;
+}
+
+void ResetAllocCalls()
+{
+    g_allocCalls = 0;
+}
+
+size_t GetFreeCalls()
+{
+    return g_freeCalls;
+}
+
+void ResetFreeCalls()
+{
+    g_freeCalls = 0;
 }
