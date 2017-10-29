@@ -4,13 +4,13 @@
 #define DECLARE_AVL_FUNC_GET_HEIGHT(type, name)                                 \
 uint32 AVLFunc(name, getHeight) (                                               \
     const AVLStruct(name) *a_avl,                                               \
-    uint32 *a_res                                                               \
+    unsigned int *a_res                                                         \
 );
 
 #define IMPLEMENT_AVL_FUNC_GET_HEIGHT(type, name)                               \
 uint32 AVLFunc(name, getHeight) (                                               \
     const AVLStruct(name) *a_avl,                                               \
-    uint32 *a_res)                                                              \
+    unsigned int *a_res)                                                        \
 {                                                                               \
     if (a_avl == NULL) {                                                        \
         return ERROR_NULL_POINTER;                                              \

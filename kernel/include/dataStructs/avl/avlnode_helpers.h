@@ -9,19 +9,19 @@
     IMPLEMENT_AVL_NODE_HELPER_DIFF_HEIGHT(type, name)
 
 #define IMPLEMENT_AVL_NODE_HELPER_GET_HEIGHT(type, name)                        \
-static inline uint32 AVLNodeFunc(name, getHeight) (                             \
+static inline unsigned int AVLNodeFunc(name, getHeight) (                       \
     const AVLNodeStruct(name) *a_node)                                          \
 {                                                                               \
     return a_node ? a_node->height : 0;                                         \
 }
 
 #define IMPLEMENT_AVL_NODE_HELPER_GET_MAX_HEIGHT(type, name)                    \
-static inline uint32 AVLNodeFunc(name, getMaxHeight) (                          \
+static inline unsigned int AVLNodeFunc(name, getMaxHeight) (                    \
     const AVLNodeStruct(name) *a_node1,                                         \
     const AVLNodeStruct(name) *a_node2)                                         \
 {                                                                               \
-    uint32 height1 = AVLNodeFunc(name, getHeight) (a_node1);                    \
-    uint32 height2 = AVLNodeFunc(name, getHeight) (a_node2);                    \
+    unsigned int height1 = AVLNodeFunc(name, getHeight) (a_node1);              \
+    unsigned int height2 = AVLNodeFunc(name, getHeight) (a_node2);              \
                                                                                 \
     return height1 > height2 ? height1 : height2;                               \
 }
@@ -48,12 +48,12 @@ static inline bool AVLNodeFunc(name, isHeightGreater) (                         
 }
 
 #define IMPLEMENT_AVL_NODE_HELPER_DIFF_HEIGHT(type, name)                       \
-static inline uint32 AVLNodeFunc(name, diffHeight) (                            \
+static inline unsigned int AVLNodeFunc(name, diffHeight) (                      \
     AVLNodeStruct(name) *a_node1,                                               \
     AVLNodeStruct(name) *a_node2)                                               \
 {                                                                               \
-    uint32 height1 = AVLNodeFunc(name, getHeight) (a_node1);                    \
-    uint32 height2 = AVLNodeFunc(name, getHeight) (a_node2);                    \
+    unsigned int height1 = AVLNodeFunc(name, getHeight) (a_node1);              \
+    unsigned int height2 = AVLNodeFunc(name, getHeight) (a_node2);              \
                                                                                 \
     if (height1 > height2) {                                                    \
         return height1 - height2;                                               \
