@@ -93,9 +93,8 @@
  */
 
 // include basic headers
-#include "include/types.h"
-#include "include/errors.h"
-#include "include/preprocessor.h"
+#include "kernel/include/dataStructs/avl/avl_errors.h"
+#include "kernel/include/dataStructs/preprocessor.h"
 
 // include avl node headers
 #include "kernel/include/dataStructs/avl/avlnode_struct.h"
