@@ -35,4 +35,5 @@ after_success:
         -i util/kstdlib/src/kstdlib.c
         -i util/kstdlib/src/kstring.c
         -i util/kstdlib/src/kvsnprintf.c
+        -i tests/src/avl/avl.c
         --gcov gcov --gcov-options '\-lp'
