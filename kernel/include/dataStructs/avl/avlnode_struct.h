@@ -27,7 +27,7 @@ typedef struct AVLNodeStruct_t(name)                                            
 {                                                                               \
     struct AVLNodeStruct_t(name) *left;                                         \
     struct AVLNodeStruct_t(name) *right;                                        \
-    uint32 height;                                                              \
+    unsigned int height;                                                        \
     type data;                                                                  \
 } AVLNodeStruct(name);
 
