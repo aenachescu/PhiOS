@@ -22,7 +22,7 @@
  *
  *    4. AVL_ALLOC_FUNC
  *       Signature: void* avlAlloc(size_t a_size)
- *       Brief: return an pointer where the node will be stored, or NULL if
+ *       Brief: return an pointer where the node will be stored, or CLIB_NULLPTR if
  *              there is no available memroy.
  *
  *    5. AVL_FREE_FUNC
@@ -54,7 +54,11 @@
  *       Brief: Copies ScoreType pointed by a_src into ScoreType pointed by a_dst.
  *
  * Other macros:
- *    1. AVL_TYPE_SCORE_GREATER_OR_EQUAL
+ *    1. CLIB_NULLPTR
+ *       Default it has ((void*) 0x0) value, but if you have a special nullptr then
+ *       you can define CLIB_NULLPTR with your value.
+ *
+ *    2. AVL_TYPE_SCORE_GREATER_OR_EQUAL
  *       This is a data structure (or primitive data type) where the score between
  *       the element being searched and another element it's stored.
  *
@@ -96,6 +100,7 @@
 // include basic headers
 #include "kernel/include/dataStructs/avl/avl_errors.h"
 #include "kernel/include/dataStructs/preprocessor.h"
+#include "kernel/include/dataStructs/nullptr.h"
 
 // include avl node headers
 #include "kernel/include/dataStructs/avl/avlnode_struct.h"

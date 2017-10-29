@@ -24,21 +24,21 @@ avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res)                                          \
 {                                                                               \
-    if (a_res == NULL) {                                                        \
+    if (a_res == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    *a_res = NULL;                                                              \
+    *a_res = CLIB_NULLPTR;                                                      \
                                                                                 \
-    if (a_avl == NULL) {                                                        \
+    if (a_avl == CLIB_NULLPTR) {                                                \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_value == NULL) {                                                      \
+    if (a_value == CLIB_NULLPTR) {                                              \
         return AVL_ERROR_NULL_POINTER;                                          \
     }                                                                           \
                                                                                 \
-    if (a_avl->root == NULL) {                                                  \
+    if (a_avl->root == CLIB_NULLPTR) {                                          \
         return AVL_ERROR_NOT_FOUND;                                             \
     }                                                                           \
                                                                                 \
@@ -55,7 +55,7 @@ avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            
         &score                                                                  \
     );                                                                          \
                                                                                 \
-    if (*a_res == NULL) {                                                       \
+    if (*a_res == CLIB_NULLPTR) {                                               \
         return AVL_ERROR_NOT_FOUND;                                             \
     }                                                                           \
                                                                                 \
