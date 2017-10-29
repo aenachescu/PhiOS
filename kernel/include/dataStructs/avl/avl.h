@@ -17,7 +17,7 @@
  *       Brief: return true if a < b, otherwise false.
  *
  *    3. AVL_COPY_TYPE_FUNC
- *       Signature: uint32 copyType(type *a_dest, const type *a_src)
+ *       Signature: avl_error_code_t copyType(type *a_dest, const type *a_src)
  *       Brief: return true if the a_src was copied into a_dest, otherwise error.
  *
  *    4. AVL_ALLOC_FUNC
