@@ -13,6 +13,8 @@
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);              \
     CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, GetFreeCalls());
 
+#define _countof(x) (sizeof(x) / sizeof(x[0]))
+
 CUT_DEFINE_TEST(test_avl_init)
 {
     RESET_STATISTICS;
@@ -151,7 +153,7 @@ CUT_DEFINE_TEST(test_avl_node_free)
     data3.data = 40;
 
     CUT_CHECK(UTDataAVLNode_create(&node, &data1) == AVL_ERROR_SUCCESS);
-    CUT_CHECK(node != NULL);
+    CUT_ASSERT(node != NULL);
 
     CUT_CHECK(UTDataAVLNode_free(NULL) == AVL_ERROR_NULL_POINTER);
 
@@ -161,17 +163,59 @@ CUT_DEFINE_TEST(test_avl_node_free)
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
     CUT_CHECK(UTDataAVLNode_create(&node, &data1) == AVL_ERROR_SUCCESS);
-    CUT_CHECK(node != NULL);
+    CUT_ASSERT(node != NULL);
     CUT_CHECK(UTDataAVLNode_create(&left, &data2) == AVL_ERROR_SUCCESS);
-    CUT_CHECK(left != NULL);
+    CUT_ASSERT(left != NULL);
     CUT_CHECK(UTDataAVLNode_create(&right, &data3) == AVL_ERROR_SUCCESS);
-    CUT_CHECK(right != NULL);
+    CUT_ASSERT(right != NULL);
 
     node->left = left;
     node->right = right;
 
     CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
     CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 4);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_getHeight)
+{
+    RESET_STATISTICS;
+
+    static struct TestCases {
+        Data data;
+        unsigned int expectedHeight;
+    } testCases[] = {
+        { { 61 }, 1 },
+        { { 58 }, 2 },
+        { { 41 }, 2 },
+        { {  5 }, 3 },
+        { { 29 }, 3 },
+        { { 17 }, 3 },
+        { { 25 }, 3 },
+        { { 97 }, 4 },
+        { { 87 }, 4 },
+        { { 57 }, 4 },
+    };
+
+    UTDataAVL tree;
+    unsigned int height;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_getHeight(NULL, &height) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_getHeight(&tree, NULL) == AVL_ERROR_NULL_POINTER);
+
+    CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(height == 0);
+
+    for (size_t i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK(UTDataAVL_insert(&tree, &testCases[i].data) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == AVL_ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_UINT32(height, ==, testCases[i].expectedHeight);
+    }
+
+    CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
 
     CHECK_STATISTICS;
 }
@@ -184,5 +228,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_node_uninit);
     CUT_CALL_TEST(test_avl_node_create);
     CUT_CALL_TEST(test_avl_node_free);
+
+    CUT_CALL_TEST(test_avl_getHeight);
 
 CUT_END_MAIN
