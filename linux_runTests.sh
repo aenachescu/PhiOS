@@ -82,6 +82,11 @@ function running_tests {
     ./test_logging
     rc=$((rc + $?))
 
+    # running avl tests
+    echo -e "\n${blue}***${reset} Running test_avl"
+    ./test_avl
+    rc=$((rc + $?))
+
     exit $rc
 }
 

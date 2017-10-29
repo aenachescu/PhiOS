@@ -71,3 +71,9 @@ list (APPEND KSTDLIB_SOURCES "src/kstdlib/test_kstdlib_main.c")
 
 add_executable(test_kstdlib ${KSTDLIB_SOURCES})
 target_link_libraries(test_kstdlib cut)
+
+# avl test
+list (APPEND AVL_SOURCES "${PRJ_PATH}/src/avl/avl.c")
+list (APPEND AVL_SOURCES "${PRJ_PATH}/src/avl/test_avl.c")
+add_executable(test_avl ${AVL_SOURCES})
+target_link_libraries(test_avl cut)
