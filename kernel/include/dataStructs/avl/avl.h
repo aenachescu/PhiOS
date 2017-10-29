@@ -122,6 +122,7 @@
 #include "kernel/include/dataStructs/avl/avlnode_insert.h"
 #include "kernel/include/dataStructs/avl/avlnode_find.h"
 #include "kernel/include/dataStructs/avl/avlnode_init.h"
+#include "kernel/include/dataStructs/avl/avlnode_uninit.h"
 #include "kernel/include/dataStructs/avl/avlnode_create.h"
 #include "kernel/include/dataStructs/avl/avlnode_free.h"
 #include "kernel/include/dataStructs/avl/avlnode_findGreaterOrEqual.h"
@@ -148,6 +149,7 @@
 // declare avl node public functions
 #define DECLARE_AVL_NODE_FUNC(type, name)                                       \
     DECLARE_AVL_NODE_FUNC_INIT(type, name)                                      \
+    DECLARE_AVL_NODE_FUNC_UNINIT(type, name)                                    \
     DECLARE_AVL_NODE_FUNC_CREATE(type, name)                                    \
     DECLARE_AVL_NODE_FUNC_FREE(type, name)
 
@@ -179,6 +181,7 @@
     IMPLEMENT_AVL_NODE_FUNC_BALANCE(type, name)                                 \
     IMPLEMENT_AVL_NODE_FUNC_INSERT(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_INIT(type, name)                                    \
+    IMPLEMENT_AVL_NODE_FUNC_UNINIT(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_FREE(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_FIND(type, name)                                    \
