@@ -24,6 +24,8 @@ CUT_DEFINE_TEST(test_avl_init)
     CUT_CHECK(UTDataAVL_init(NULL) == AVL_ERROR_NULL_POINTER);
     CUT_CHECK(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
 
+    CUT_CHECK(tree.root == NULL);
+
     UTDataAVL_free(&tree);
 
     CHECK_STATISTICS;
@@ -69,6 +71,12 @@ CUT_DEFINE_TEST(test_avl_node_init)
 
     CUT_CHECK(UTDataAVLNode_init(NULL, &data) == AVL_ERROR_NULL_POINTER);
     CUT_CHECK(UTDataAVLNode_init(&node, NULL) == AVL_ERROR_NULL_POINTER);
+
+    AVLCopyDataSetError();
+    CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_INTERNAL_ERROR);
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
     CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_SUCCESS);
 
@@ -124,6 +132,18 @@ CUT_DEFINE_TEST(test_avl_node_create)
     CUT_CHECK(UTDataAVLNode_create(NULL, &data) == AVL_ERROR_NULL_POINTER);
     CUT_CHECK(UTDataAVLNode_create(&node, NULL) == AVL_ERROR_NULL_POINTER);
 
+    AVLAllocNodeSetError();
+    CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_NO_FREE_MEMORY);
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
+
+    AVLCopyDataSetError();
+    CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_INTERNAL_ERROR);
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 1);
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
+
     CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_SUCCESS);
 
     CUT_CHECK(node != NULL);
@@ -132,7 +152,7 @@ CUT_DEFINE_TEST(test_avl_node_create)
     CUT_CHECK(node->height == 1);
     CUT_CHECK(node->data.data == 15);
 
-    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 1);
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 2);
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 1);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, sizeof(UTDataAVLNode));
 
