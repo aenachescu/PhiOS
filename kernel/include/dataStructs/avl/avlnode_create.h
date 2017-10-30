@@ -38,7 +38,7 @@ avl_error_code_t AVLNodeFunc(name, create) (                                    
     }                                                                           \
                                                                                 \
     *a_node = (AVLNodeStruct(name)*) AVL_ALLOC_FUNC((sizeof(**a_node)));        \
-    if (a_node == CLIB_NULLPTR) {                                               \
+    if (*a_node == CLIB_NULLPTR) {                                              \
         return AVL_ERROR_NO_FREE_MEMORY;                                        \
     }                                                                           \
                                                                                 \
