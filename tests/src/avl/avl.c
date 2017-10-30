@@ -527,9 +527,11 @@ typedef unsigned char clib_bool_t;
 typedef struct _Data {
   unsigned int data;
 } Data;
+void AVLAllocNodeSetError();
 void *AVLAllocNode(size_t a_size);
 void AVLFreeNode(void *a_node);
 void AVLDestroyData(Data *a_data);
+void AVLCopyDataSetError();
 avl_error_code_t AVLCopyData(Data *dest, const Data *src);
 size_t GetMemoryInUsage();
 void ResetMemoryInUsage();
@@ -686,7 +688,7 @@ avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
     return ((avl_error_code_t)1);
   }
   *a_node = (UTDataAVLNode *)AVLAllocNode((sizeof(**a_node)));
-  if (a_node == ((void *)0)) {
+  if (*a_node == ((void *)0)) {
     return ((avl_error_code_t)3);
   }
   (*a_node)->left = ((void *)0);
@@ -934,7 +936,14 @@ static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;
 static size_t g_allocCalls = 0;
 static size_t g_freeCalls = 0;
+static int g_allocError = 0;
+static int g_copyError = 0;
+void AVLAllocNodeSetError() { g_allocError = 1; }
 void *AVLAllocNode(size_t a_size) {
+  if (g_allocError == 1) {
+    g_allocError = 0;
+    return ((void *)0);
+  }
   g_memInUsage += a_size;
   g_allocCalls++;
   return malloc(a_size);
@@ -948,7 +957,12 @@ void AVLDestroyData(Data *a_data) {
   g_objectsInUsage--;
   a_data->data = 0;
 }
+void AVLCopyDataSetError() { g_copyError = 1; }
 avl_error_code_t AVLCopyData(Data *dest, const Data *src) {
+  if (g_copyError == 1) {
+    g_copyError = 0;
+    return ((avl_error_code_t)4);
+  }
   g_objectsInUsage++;
   dest->data = src->data;
   return ((avl_error_code_t)0);
