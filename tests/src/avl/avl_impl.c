@@ -6,9 +6,21 @@ static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;
 static size_t g_allocCalls = 0;
 static size_t g_freeCalls = 0;
+static int g_allocError = 0;
+static int g_copyError = 0;
+
+void AVLAllocNodeSetError()
+{
+    g_allocError = 1;
+}
 
 void* AVLAllocNode(size_t a_size)
 {
+    if (g_allocError == 1) {
+        g_allocError = 0;
+        return NULL;
+    }
+
     g_memInUsage += a_size;
 
     g_allocCalls++;
@@ -32,8 +44,18 @@ void AVLDestroyData(Data *a_data)
     a_data->data = 0;
 }
 
+void AVLCopyDataSetError()
+{
+    g_copyError = 1;
+}
+
 avl_error_code_t AVLCopyData(Data *dest, const Data *src)
 {
+    if (g_copyError == 1) {
+        g_copyError = 0;
+        return AVL_ERROR_INTERNAL_ERROR;
+    }
+
     g_objectsInUsage++;
 
     dest->data = src->data;
