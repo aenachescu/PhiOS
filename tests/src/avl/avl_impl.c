@@ -49,18 +49,18 @@ void AVLCopyDataSetError()
     g_copyError = 1;
 }
 
-avl_error_code_t AVLCopyData(Data *dest, const Data *src)
+clib_error_code_t AVLCopyData(Data *dest, const Data *src)
 {
     if (g_copyError == 1) {
         g_copyError = 0;
-        return AVL_ERROR_INTERNAL_ERROR;
+        return CLIB_ERROR_INTERNAL_ERROR;
     }
 
     g_objectsInUsage++;
 
     dest->data = src->data;
 
-    return AVL_ERROR_SUCCESS;
+    return CLIB_ERROR_SUCCESS;
 }
 
 size_t GetMemoryInUsage()

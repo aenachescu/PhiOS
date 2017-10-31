@@ -21,8 +21,8 @@ CUT_DEFINE_TEST(test_avl_init)
 
     UTDataAVL tree;
 
-    CUT_CHECK(UTDataAVL_init(NULL) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_init(NULL) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
     CUT_CHECK(tree.root == NULL);
 
@@ -38,24 +38,24 @@ CUT_DEFINE_TEST(test_avl_free)
     UTDataAVL tree;
     Data data;
 
-    CUT_CHECK(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
-    CUT_CHECK(UTDataAVL_free(NULL) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_free(NULL) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
 
-    CUT_CHECK(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
     for (size_t i = 0; i < ((size_t) 1000); i++) {
         data.data = (unsigned int) i;
 
-        CUT_CHECK(UTDataAVL_insert(&tree, &data) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
 
         CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
         CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
         CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, ((i + 1) * sizeof(UTDataAVLNode)));
     }
 
-    CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
     CUT_CHECK_OPERATOR_ADDRESS(tree.root, ==, NULL);
 
     CHECK_STATISTICS;
@@ -70,16 +70,16 @@ CUT_DEFINE_TEST(test_avl_node_init)
 
     data.data = 5;
 
-    CUT_CHECK(UTDataAVLNode_init(NULL, &data) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVLNode_init(&node, NULL) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_init(NULL, &data) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_init(&node, NULL) == CLIB_ERROR_NULL_POINTER);
 
     AVLCopyDataSetError();
-    CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_INTERNAL_ERROR);
+    CUT_CHECK(UTDataAVLNode_init(&node, &data) == CLIB_ERROR_INTERNAL_ERROR);
     CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
-    CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_init(&node, &data) == CLIB_ERROR_SUCCESS);
 
     CUT_CHECK(node.left == NULL);
     CUT_CHECK(node.right == NULL);
@@ -90,7 +90,7 @@ CUT_DEFINE_TEST(test_avl_node_init)
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 1);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
-    CUT_CHECK(UTDataAVLNode_uninit(&node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_uninit(&node) == CLIB_ERROR_SUCCESS);
 
     CHECK_STATISTICS;
 }
@@ -102,14 +102,14 @@ CUT_DEFINE_TEST(test_avl_node_uninit)
     UTDataAVLNode node, left, right;
     Data data;
 
-    CUT_CHECK(UTDataAVLNode_init(&node, &data) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_init(&node, &data) == CLIB_ERROR_SUCCESS);
 
     data.data = 10;
     node.left = &left;
     node.right = &right;
 
-    CUT_CHECK(UTDataAVLNode_uninit(NULL) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVLNode_uninit(&node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_uninit(NULL) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_uninit(&node) == CLIB_ERROR_SUCCESS);
 
     CUT_CHECK(node.left == NULL);
     CUT_CHECK(node.right == NULL);
@@ -130,22 +130,22 @@ CUT_DEFINE_TEST(test_avl_node_create)
 
     data.data = 15;
 
-    CUT_CHECK(UTDataAVLNode_create(NULL, &data) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVLNode_create(&node, NULL) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_create(NULL, &data) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_create(&node, NULL) == CLIB_ERROR_NULL_POINTER);
 
     AVLAllocNodeSetError();
-    CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_NO_FREE_MEMORY);
+    CUT_CHECK(UTDataAVLNode_create(&node, &data) == CLIB_ERROR_NO_FREE_MEMORY);
     CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
     AVLCopyDataSetError();
-    CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_INTERNAL_ERROR);
+    CUT_CHECK(UTDataAVLNode_create(&node, &data) == CLIB_ERROR_INTERNAL_ERROR);
     CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 1);
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
-    CUT_CHECK(UTDataAVLNode_create(&node, &data) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_create(&node, &data) == CLIB_ERROR_SUCCESS);
 
     CUT_CHECK(node != NULL);
     CUT_CHECK(node->left == NULL);
@@ -157,7 +157,7 @@ CUT_DEFINE_TEST(test_avl_node_create)
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 1);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, sizeof(UTDataAVLNode));
 
-    CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_free(node) == CLIB_ERROR_SUCCESS);
 
     CHECK_STATISTICS;
 }
@@ -173,27 +173,27 @@ CUT_DEFINE_TEST(test_avl_node_free)
     data2.data = 30;
     data3.data = 40;
 
-    CUT_CHECK(UTDataAVLNode_create(&node, &data1) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_create(&node, &data1) == CLIB_ERROR_SUCCESS);
     CUT_ASSERT(node != NULL);
 
-    CUT_CHECK(UTDataAVLNode_free(NULL) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVLNode_free(NULL) == CLIB_ERROR_NULL_POINTER);
 
-    CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_free(node) == CLIB_ERROR_SUCCESS);
     CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 1);
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
-    CUT_CHECK(UTDataAVLNode_create(&node, &data1) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_create(&node, &data1) == CLIB_ERROR_SUCCESS);
     CUT_ASSERT(node != NULL);
-    CUT_CHECK(UTDataAVLNode_create(&left, &data2) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_create(&left, &data2) == CLIB_ERROR_SUCCESS);
     CUT_ASSERT(left != NULL);
-    CUT_CHECK(UTDataAVLNode_create(&right, &data3) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_create(&right, &data3) == CLIB_ERROR_SUCCESS);
     CUT_ASSERT(right != NULL);
 
     node->left = left;
     node->right = right;
 
-    CUT_CHECK(UTDataAVLNode_free(node) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVLNode_free(node) == CLIB_ERROR_SUCCESS);
     CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 4);
 
     CHECK_STATISTICS;
@@ -222,21 +222,21 @@ CUT_DEFINE_TEST(test_avl_getHeight)
     UTDataAVL tree;
     unsigned int height;
 
-    CUT_ASSERT(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
-    CUT_CHECK(UTDataAVL_getHeight(NULL, &height) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVL_getHeight(&tree, NULL) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_getHeight(NULL, &height) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_getHeight(&tree, NULL) == CLIB_ERROR_NULL_POINTER);
 
-    CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == CLIB_ERROR_SUCCESS);
     CUT_CHECK(height == 0);
 
     for (size_t i = 0; i < _countof(testCases); i++) {
-        CUT_CHECK(UTDataAVL_insert(&tree, &testCases[i].data) == AVL_ERROR_SUCCESS);
-        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_insert(&tree, &testCases[i].data) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_UINT32(height, ==, testCases[i].expectedHeight);
     }
 
-    CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
 
     CHECK_STATISTICS;
 }
@@ -337,36 +337,36 @@ CUT_DEFINE_TEST(test_avl_insert)
     const Data *data = NULL;
     char buffer[2048];
 
-    CUT_ASSERT(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
-    CUT_CHECK(UTDataAVL_insert(&tree, NULL) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVL_insert(NULL, &g_insertTestCases[0].data) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_insert(&tree, NULL) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_insert(NULL, &g_insertTestCases[0].data) == CLIB_ERROR_NULL_POINTER);
 
     AVLAllocNodeSetError();
-    CUT_CHECK(UTDataAVL_insert(&tree, &g_insertTestCases[0].data) == AVL_ERROR_NO_FREE_MEMORY);
+    CUT_CHECK(UTDataAVL_insert(&tree, &g_insertTestCases[0].data) == CLIB_ERROR_NO_FREE_MEMORY);
     CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, 0);
     CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, 0);
 
     for (size_t i = 0; i < _countof(g_insertTestCases); i++) {
-        CUT_CHECK(UTDataAVL_insert(&tree, &g_insertTestCases[i].data) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_insert(&tree, &g_insertTestCases[i].data) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
         CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
         CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, (i + 1) * sizeof(UTDataAVLNode));
 
-        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_UINT32(height, ==, g_insertTestCases[i].expectedHeight);
 
-        CUT_CHECK(UTDataAVL_findType(&tree, &g_insertTestCases[i].data, &data) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_findType(&tree, &g_insertTestCases[i].data, &data) == CLIB_ERROR_SUCCESS);
 
         getSubarraySortedAsString(buffer, i);
         avlInorderBuffer[0] = 0;
 
-        CUT_CHECK(UTDataAVL_foreachInorder(&tree, avlInorderToString) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, avlInorderToString) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_STRING(avlInorderBuffer, ==, buffer);
     }
 
-    CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
 
     CHECK_STATISTICS;
 }
@@ -382,32 +382,32 @@ CUT_DEFINE_TEST(test_avl_insertNode)
     UTDataAVLNode unusedNode;
     char buffer[2048];
 
-    CUT_ASSERT(UTDataAVL_init(&tree) == AVL_ERROR_SUCCESS);
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
-    CUT_CHECK(UTDataAVL_insertNode(&tree, NULL) == AVL_ERROR_NULL_POINTER);
-    CUT_CHECK(UTDataAVL_insertNode(NULL, &unusedNode) == AVL_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_insertNode(&tree, NULL) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_insertNode(NULL, &unusedNode) == CLIB_ERROR_NULL_POINTER);
 
     for (size_t i = 0; i < _countof(g_insertTestCases); i++) {
-        CUT_CHECK(UTDataAVLNode_create(&node, &g_insertTestCases[i].data) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVLNode_create(&node, &g_insertTestCases[i].data) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
         CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
         CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, (i + 1) * sizeof(UTDataAVLNode));
 
-        CUT_CHECK(UTDataAVL_insertNode(&tree, node) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_insertNode(&tree, node) == CLIB_ERROR_SUCCESS);
 
-        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_getHeight(&tree, &height) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_UINT32(height, ==, g_insertTestCases[i].expectedHeight);
 
-        CUT_CHECK(UTDataAVL_findType(&tree, &g_insertTestCases[i].data, &data) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_findType(&tree, &g_insertTestCases[i].data, &data) == CLIB_ERROR_SUCCESS);
 
         getSubarraySortedAsString(buffer, i);
         avlInorderBuffer[0] = 0;
 
-        CUT_CHECK(UTDataAVL_foreachInorder(&tree, avlInorderToString) == AVL_ERROR_SUCCESS);
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, avlInorderToString) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_STRING(avlInorderBuffer, ==, buffer);
     }
 
-    CUT_CHECK(UTDataAVL_free(&tree) == AVL_ERROR_SUCCESS);
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
 
     CHECK_STATISTICS;
 }

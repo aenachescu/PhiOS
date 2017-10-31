@@ -49,7 +49,7 @@ void AVLFreeNode(void *a_node);
 void AVLDestroyData(Data *a_data);
 
 void AVLCopyDataSetError();
-avl_error_code_t AVLCopyData(Data *dest, const Data *src);
+clib_error_code_t AVLCopyData(Data *dest, const Data *src);
 
 size_t GetMemoryInUsage();
 void ResetMemoryInUsage();

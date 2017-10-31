@@ -522,7 +522,7 @@ extern int getsubopt(char **__restrict __optionp,
 extern int getloadavg(double __loadavg[], int __nelem)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 
-typedef unsigned int avl_error_code_t;
+typedef unsigned int clib_error_code_t;
 typedef unsigned char clib_bool_t;
 typedef struct _Data {
   unsigned int data;
@@ -532,7 +532,7 @@ void *AVLAllocNode(size_t a_size);
 void AVLFreeNode(void *a_node);
 void AVLDestroyData(Data *a_data);
 void AVLCopyDataSetError();
-avl_error_code_t AVLCopyData(Data *dest, const Data *src);
+clib_error_code_t AVLCopyData(Data *dest, const Data *src);
 size_t GetMemoryInUsage();
 void ResetMemoryInUsage();
 size_t GetObjectsInUsage();
@@ -551,30 +551,30 @@ typedef struct UTDataAVL_t {
   UTDataAVLNode *root;
 } UTDataAVL;
 typedef void (*UTDataAVLForeachCbk_t)(const Data *a_value);
-avl_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data);
-avl_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node);
-avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
-                                      const Data *a_data);
-avl_error_code_t UTDataAVLNode_free(UTDataAVLNode *a_node);
-avl_error_code_t UTDataAVL_init(UTDataAVL *a_avl);
-avl_error_code_t UTDataAVL_free(UTDataAVL *a_avl);
-avl_error_code_t UTDataAVL_getHeight(const UTDataAVL *a_avl,
-                                     unsigned int *a_res);
-avl_error_code_t UTDataAVL_insertNode(UTDataAVL *a_avl, UTDataAVLNode *a_node);
-avl_error_code_t UTDataAVL_insert(UTDataAVL *a_avl, const Data *a_value);
-avl_error_code_t UTDataAVL_find(const UTDataAVL *a_avl, const Data *a_value,
-                                const UTDataAVLNode **a_res);
-avl_error_code_t UTDataAVL_findType(const UTDataAVL *a_avl, const Data *a_value,
-                                    const Data **a_res);
-avl_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
-                                              const Data *a_value,
-                                              const UTDataAVLNode **a_res);
-avl_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
-                                          UTDataAVLForeachCbk_t a_cbk);
-avl_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
+clib_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data);
+clib_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node);
+clib_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
+                                       const Data *a_data);
+clib_error_code_t UTDataAVLNode_free(UTDataAVLNode *a_node);
+clib_error_code_t UTDataAVL_init(UTDataAVL *a_avl);
+clib_error_code_t UTDataAVL_free(UTDataAVL *a_avl);
+clib_error_code_t UTDataAVL_getHeight(const UTDataAVL *a_avl,
+                                      unsigned int *a_res);
+clib_error_code_t UTDataAVL_insertNode(UTDataAVL *a_avl, UTDataAVLNode *a_node);
+clib_error_code_t UTDataAVL_insert(UTDataAVL *a_avl, const Data *a_value);
+clib_error_code_t UTDataAVL_find(const UTDataAVL *a_avl, const Data *a_value,
+                                 const UTDataAVLNode **a_res);
+clib_error_code_t UTDataAVL_findType(const UTDataAVL *a_avl,
+                                     const Data *a_value, const Data **a_res);
+clib_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
+                                               const Data *a_value,
+                                               const UTDataAVLNode **a_res);
+clib_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
                                            UTDataAVLForeachCbk_t a_cbk);
-avl_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
+clib_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
                                             UTDataAVLForeachCbk_t a_cbk);
+clib_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
+                                             UTDataAVLForeachCbk_t a_cbk);
 ;
 static inline unsigned int
 UTDataAVLNode_getHeight(const UTDataAVLNode *a_node) {
@@ -653,63 +653,64 @@ static UTDataAVLNode *UTDataAVLNode_insert(UTDataAVLNode *a_parent,
   }
   return UTDataAVLNode_balance(a_parent);
 }
-avl_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data) {
+clib_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node,
+                                     const Data *a_data) {
   if (a_node == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_data == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   a_node->left = ((void *)0);
   a_node->right = ((void *)0);
   a_node->height = 1;
-  avl_error_code_t err = AVLCopyData((&a_node->data), a_data);
-  if (err != ((avl_error_code_t)0)) {
+  clib_error_code_t err = AVLCopyData((&a_node->data), a_data);
+  if (err != ((clib_error_code_t)0)) {
     return err;
   }
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node) {
+clib_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node) {
   if (a_node == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   a_node->left = ((void *)0);
   a_node->right = ((void *)0);
   a_node->height = 0;
   AVLDestroyData((&a_node->data));
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
-                                      const Data *a_data) {
+clib_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
+                                       const Data *a_data) {
   if (a_node == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_data == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   *a_node = (UTDataAVLNode *)AVLAllocNode((sizeof(**a_node)));
   if (*a_node == ((void *)0)) {
-    return ((avl_error_code_t)3);
+    return ((clib_error_code_t)3);
   }
   (*a_node)->left = ((void *)0);
   (*a_node)->right = ((void *)0);
   (*a_node)->height = 1;
-  avl_error_code_t err = AVLCopyData((&(*a_node)->data), a_data);
-  if (err != ((avl_error_code_t)0)) {
+  clib_error_code_t err = AVLCopyData((&(*a_node)->data), a_data);
+  if (err != ((clib_error_code_t)0)) {
     AVLFreeNode((*a_node));
     return err;
   }
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVLNode_free(UTDataAVLNode *a_node) {
+clib_error_code_t UTDataAVLNode_free(UTDataAVLNode *a_node) {
   if (a_node == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   UTDataAVLNode_free(a_node->left);
   UTDataAVLNode_free(a_node->right);
   AVLDestroyData((&a_node->data));
   AVLFreeNode(a_node);
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
 static const UTDataAVLNode *UTDataAVLNode_find(const UTDataAVLNode *a_parent,
                                                const Data *a_value) {
@@ -783,111 +784,112 @@ static void UTDataAVLNode_foreachPostorder(const UTDataAVLNode *a_parent,
   UTDataAVLNode_foreachPostorder(a_parent->right, a_cbk);
   a_cbk((&a_parent->data));
 }
-avl_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
+clib_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   a_avl->root = ((void *)0);
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_free(UTDataAVL *a_avl) {
+clib_error_code_t UTDataAVL_free(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_avl->root != ((void *)0)) {
     UTDataAVLNode_free(a_avl->root);
     a_avl->root = ((void *)0);
   }
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_getHeight(const UTDataAVL *a_avl,
-                                     unsigned int *a_res) {
+clib_error_code_t UTDataAVL_getHeight(const UTDataAVL *a_avl,
+                                      unsigned int *a_res) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_res == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   *a_res = UTDataAVLNode_getHeight(a_avl->root);
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_insertNode(UTDataAVL *a_avl, UTDataAVLNode *a_node) {
+clib_error_code_t UTDataAVL_insertNode(UTDataAVL *a_avl,
+                                       UTDataAVLNode *a_node) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_node == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   a_avl->root = UTDataAVLNode_insert(a_avl->root, a_node);
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_insert(UTDataAVL *a_avl, const Data *a_value) {
+clib_error_code_t UTDataAVL_insert(UTDataAVL *a_avl, const Data *a_value) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_value == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   UTDataAVLNode *node = ((void *)0);
-  avl_error_code_t err = UTDataAVLNode_create(&node, a_value);
-  if (err != ((avl_error_code_t)0)) {
+  clib_error_code_t err = UTDataAVLNode_create(&node, a_value);
+  if (err != ((clib_error_code_t)0)) {
     return err;
   }
   a_avl->root = UTDataAVLNode_insert(a_avl->root, node);
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_find(const UTDataAVL *a_avl, const Data *a_value,
-                                const UTDataAVLNode **a_res) {
+clib_error_code_t UTDataAVL_find(const UTDataAVL *a_avl, const Data *a_value,
+                                 const UTDataAVLNode **a_res) {
   if (a_res == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   *a_res = ((void *)0);
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_value == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   *a_res = UTDataAVLNode_find(a_avl->root, a_value);
   if (*a_res == ((void *)0)) {
-    return ((avl_error_code_t)2);
+    return ((clib_error_code_t)2);
   }
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_findType(const UTDataAVL *a_avl, const Data *a_value,
-                                    const Data **a_res) {
+clib_error_code_t UTDataAVL_findType(const UTDataAVL *a_avl,
+                                     const Data *a_value, const Data **a_res) {
   if (a_res == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   *a_res = ((void *)0);
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_value == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   const UTDataAVLNode *node = UTDataAVLNode_find(a_avl->root, a_value);
   if (node == ((void *)0)) {
-    return ((avl_error_code_t)2);
+    return ((clib_error_code_t)2);
   }
   *a_res = &node->data;
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
-                                              const Data *a_value,
-                                              const UTDataAVLNode **a_res) {
+clib_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
+                                               const Data *a_value,
+                                               const UTDataAVLNode **a_res) {
   if (a_res == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   *a_res = ((void *)0);
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_value == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_avl->root == ((void *)0)) {
-    return ((avl_error_code_t)2);
+    return ((clib_error_code_t)2);
   }
   unsigned int score;
   (&a_avl->root->data)->data >= a_value->data
@@ -895,42 +897,42 @@ avl_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
       : (*(&score) = 0xFFFFFFFF);
   *a_res = UTDataAVLNode_findGreaterOrEqual(a_avl->root, a_value, &score);
   if (*a_res == ((void *)0)) {
-    return ((avl_error_code_t)2);
+    return ((clib_error_code_t)2);
   }
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
-                                          UTDataAVLForeachCbk_t a_cbk) {
-  if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
-  }
-  if (a_cbk == ((void *)0)) {
-    return ((avl_error_code_t)6);
-  }
-  UTDataAVLNode_foreachInorder(a_avl->root, a_cbk);
-  return ((avl_error_code_t)0);
-}
-avl_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
+clib_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
                                            UTDataAVLForeachCbk_t a_cbk) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_cbk == ((void *)0)) {
-    return ((avl_error_code_t)6);
+    return ((clib_error_code_t)6);
   }
-  UTDataAVLNode_foreachPreorder(a_avl->root, a_cbk);
-  return ((avl_error_code_t)0);
+  UTDataAVLNode_foreachInorder(a_avl->root, a_cbk);
+  return ((clib_error_code_t)0);
 }
-avl_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
+clib_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
                                             UTDataAVLForeachCbk_t a_cbk) {
   if (a_avl == ((void *)0)) {
-    return ((avl_error_code_t)1);
+    return ((clib_error_code_t)1);
   }
   if (a_cbk == ((void *)0)) {
-    return ((avl_error_code_t)6);
+    return ((clib_error_code_t)6);
+  }
+  UTDataAVLNode_foreachPreorder(a_avl->root, a_cbk);
+  return ((clib_error_code_t)0);
+}
+clib_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
+                                             UTDataAVLForeachCbk_t a_cbk) {
+  if (a_avl == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_cbk == ((void *)0)) {
+    return ((clib_error_code_t)6);
   }
   UTDataAVLNode_foreachPostorder(a_avl->root, a_cbk);
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 };
 static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;
@@ -958,14 +960,14 @@ void AVLDestroyData(Data *a_data) {
   a_data->data = 0;
 }
 void AVLCopyDataSetError() { g_copyError = 1; }
-avl_error_code_t AVLCopyData(Data *dest, const Data *src) {
+clib_error_code_t AVLCopyData(Data *dest, const Data *src) {
   if (g_copyError == 1) {
     g_copyError = 0;
-    return ((avl_error_code_t)4);
+    return ((clib_error_code_t)4);
   }
   g_objectsInUsage++;
   dest->data = src->data;
-  return ((avl_error_code_t)0);
+  return ((clib_error_code_t)0);
 }
 size_t GetMemoryInUsage() { return g_memInUsage; }
 void ResetMemoryInUsage() { g_memInUsage = 0; }
