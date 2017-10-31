@@ -12,34 +12,34 @@
 #endif
 
 #define DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                      \
-avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            \
+clib_error_code_t AVLFunc(name, findGreaterOrEqual) (                            \
     const AVLStruct(name) *a_avl,                                               \
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res                                           \
 );
 
 #define IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                    \
-avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            \
+clib_error_code_t AVLFunc(name, findGreaterOrEqual) (                           \
     const AVLStruct(name) *a_avl,                                               \
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res)                                          \
 {                                                                               \
     if (a_res == CLIB_NULLPTR) {                                                \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     *a_res = CLIB_NULLPTR;                                                      \
                                                                                 \
     if (a_avl == CLIB_NULLPTR) {                                                \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     if (a_value == CLIB_NULLPTR) {                                              \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     if (a_avl->root == CLIB_NULLPTR) {                                          \
-        return AVL_ERROR_NOT_FOUND;                                             \
+        return CLIB_ERROR_NOT_FOUND;                                            \
     }                                                                           \
                                                                                 \
     AVL_TYPE_SCORE_GREATER_OR_EQUAL score;                                      \
@@ -56,10 +56,10 @@ avl_error_code_t AVLFunc(name, findGreaterOrEqual) (                            
     );                                                                          \
                                                                                 \
     if (*a_res == CLIB_NULLPTR) {                                               \
-        return AVL_ERROR_NOT_FOUND;                                             \
+        return CLIB_ERROR_NOT_FOUND;                                            \
     }                                                                           \
                                                                                 \
-    return AVL_ERROR_SUCCESS;                                                   \
+    return CLIB_ERROR_SUCCESS;                                                  \
 }
 
 #else // AVL_USE_FIND_GREATER_OR_EQUAL is not defined

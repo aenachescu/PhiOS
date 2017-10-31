@@ -8,7 +8,7 @@
 #error "alloc function is mandatory"
 #endif
 
-// avl_error_code_t copyType(type *a_dest, const type *a_src)
+// clib_error_code_t copyType(type *a_dest, const type *a_src)
 #ifndef AVL_COPY_TYPE_FUNC
 #error "copy function is mandatory"
 #endif
@@ -19,40 +19,40 @@
 #endif
 
 #define DECLARE_AVL_NODE_FUNC_CREATE(type, name)                                \
-avl_error_code_t AVLNodeFunc(name, create) (                                    \
+clib_error_code_t AVLNodeFunc(name, create) (                                   \
     AVLNodeStruct(name) **a_node,                                               \
     const type *a_data                                                          \
 );
 
 #define IMPLEMENT_AVL_NODE_FUNC_CREATE(type, name)                              \
-avl_error_code_t AVLNodeFunc(name, create) (                                    \
+clib_error_code_t AVLNodeFunc(name, create) (                                   \
     AVLNodeStruct(name) **a_node,                                               \
     const type *a_data)                                                         \
 {                                                                               \
     if (a_node == CLIB_NULLPTR) {                                               \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     if (a_data == CLIB_NULLPTR) {                                               \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     *a_node = (AVLNodeStruct(name)*) AVL_ALLOC_FUNC((sizeof(**a_node)));        \
     if (*a_node == CLIB_NULLPTR) {                                              \
-        return AVL_ERROR_NO_FREE_MEMORY;                                        \
+        return CLIB_ERROR_NO_FREE_MEMORY;                                       \
     }                                                                           \
                                                                                 \
     (*a_node)->left = CLIB_NULLPTR;                                             \
     (*a_node)->right = CLIB_NULLPTR;                                            \
     (*a_node)->height = 1;                                                      \
                                                                                 \
-    avl_error_code_t err = AVL_COPY_TYPE_FUNC((&(*a_node)->data), a_data);      \
-    if (err != AVL_ERROR_SUCCESS) {                                             \
+    clib_error_code_t err = AVL_COPY_TYPE_FUNC((&(*a_node)->data), a_data);     \
+    if (err != CLIB_ERROR_SUCCESS) {                                            \
         AVL_FREE_FUNC((*a_node));                                               \
         return err;                                                             \
     }                                                                           \
                                                                                 \
-    return AVL_ERROR_SUCCESS;                                                   \
+    return CLIB_ERROR_SUCCESS;                                                  \
 }
 
 #else // AVL_USE_AVL_NODE_CREATE is not defined

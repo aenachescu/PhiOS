@@ -23,8 +23,8 @@
  *       Brief: return CLIB_TRUE if a < b, otherwise CLIB_FALSE.
  *
  *    3. AVL_COPY_TYPE_FUNC
- *       Signature: avl_error_code_t copyType(type *a_dest, const type *a_src)
- *       Brief: return AVL_ERROR_SUCCESS if the a_src was copied into a_dest, otherwise error.
+ *       Signature: clib_error_code_t copyType(type *a_dest, const type *a_src)
+ *       Brief: return CLIB_ERROR_SUCCESS if the a_src was copied into a_dest, otherwise error.
  *
  *    4. AVL_ALLOC_FUNC
  *       Signature: void* avlAlloc(size_t a_size)
@@ -108,7 +108,7 @@
  */
 
 // include basic headers
-#include "kernel/include/dataStructs/avl/avl_errors.h"
+#include "kernel/include/dataStructs/errors.h"
 #include "kernel/include/dataStructs/preprocessor.h"
 #include "kernel/include/dataStructs/nullptr.h"
 #include "kernel/include/dataStructs/bool.h"

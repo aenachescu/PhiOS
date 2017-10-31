@@ -4,16 +4,16 @@
 #ifdef AVL_USE_AVL_NODE_FREE
 
 #define DECLARE_AVL_FUNC_FREE(type, name)                                       \
-avl_error_code_t AVLFunc(name, free) (                                          \
+clib_error_code_t AVLFunc(name, free) (                                         \
     AVLStruct(name) *a_avl                                                      \
 );
 
 #define IMPLEMENT_AVL_FUNC_FREE(type, name)                                     \
-avl_error_code_t AVLFunc(name, free) (                                          \
+clib_error_code_t AVLFunc(name, free) (                                         \
     AVLStruct(name) *a_avl)                                                     \
 {                                                                               \
     if (a_avl == CLIB_NULLPTR) {                                                \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     if (a_avl->root != CLIB_NULLPTR) {                                          \
@@ -21,7 +21,7 @@ avl_error_code_t AVLFunc(name, free) (                                          
         a_avl->root = CLIB_NULLPTR;                                             \
     }                                                                           \
                                                                                 \
-    return AVL_ERROR_SUCCESS;                                                   \
+    return CLIB_ERROR_SUCCESS;                                                  \
 }
 
 #else // AVL_USE_AVL_NODE_FREE is not defined

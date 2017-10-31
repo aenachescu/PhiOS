@@ -2,27 +2,27 @@
 #define CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INSERT_NODE
 
 #define DECLARE_AVL_FUNC_INSERT_NODE(type, name)                                \
-avl_error_code_t AVLFunc(name, insertNode) (                                    \
+clib_error_code_t AVLFunc(name, insertNode) (                                   \
     AVLStruct(name) *a_avl,                                                     \
     AVLNodeStruct(name) *a_node                                                 \
 );
 
 #define IMPLEMENT_AVL_FUNC_INSERT_NODE(type, name)                              \
-avl_error_code_t AVLFunc(name, insertNode) (                                    \
+clib_error_code_t AVLFunc(name, insertNode) (                                   \
     AVLStruct(name) *a_avl,                                                     \
     AVLNodeStruct(name) *a_node)                                                \
 {                                                                               \
     if (a_avl == CLIB_NULLPTR) {                                                \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     if (a_node == CLIB_NULLPTR) {                                               \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     a_avl->root = AVLNodeFunc(name, insert) (a_avl->root, a_node);              \
                                                                                 \
-    return AVL_ERROR_SUCCESS;                                                   \
+    return CLIB_ERROR_SUCCESS;                                                  \
 }
 
 #endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_INSERT_NODE

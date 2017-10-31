@@ -4,33 +4,33 @@
 #ifdef AVL_USE_AVL_NODE_CREATE
 
 #define DECLARE_AVL_FUNC_INSERT(type, name)                                     \
-avl_error_code_t AVLFunc(name, insert) (                                        \
+clib_error_code_t AVLFunc(name, insert) (                                       \
     AVLStruct(name) *a_avl,                                                     \
     const type *a_value                                                         \
 );
 
 #define IMPLEMENT_AVL_FUNC_INSERT(type, name)                                   \
-avl_error_code_t AVLFunc(name, insert) (                                        \
+clib_error_code_t AVLFunc(name, insert) (                                       \
     AVLStruct(name) *a_avl,                                                     \
     const type *a_value)                                                        \
 {                                                                               \
     if (a_avl == CLIB_NULLPTR) {                                                \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     if (a_value == CLIB_NULLPTR) {                                              \
-        return AVL_ERROR_NULL_POINTER;                                          \
+        return CLIB_ERROR_NULL_POINTER;                                         \
     }                                                                           \
                                                                                 \
     AVLNodeStruct(name) *node = CLIB_NULLPTR;                                   \
-    avl_error_code_t err = AVLNodeFunc(name, create) (&node, a_value);          \
-    if (err != AVL_ERROR_SUCCESS) {                                             \
+    clib_error_code_t err = AVLNodeFunc(name, create) (&node, a_value);         \
+    if (err != CLIB_ERROR_SUCCESS) {                                            \
         return err;                                                             \
     }                                                                           \
                                                                                 \
     a_avl->root = AVLNodeFunc(name, insert) (a_avl->root, node);                \
                                                                                 \
-    return AVL_ERROR_SUCCESS;                                                   \
+    return CLIB_ERROR_SUCCESS;                                                  \
 }
 
 #else // AVL_USE_AVL_NODE_CREATE is not defined
