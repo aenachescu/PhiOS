@@ -41,7 +41,8 @@ void AVLDestroyData(Data *a_data)
 {
     g_objectsInUsage--;
 
-    a_data->data = 0;
+    a_data->start = 0;
+    a_data->end   = 0;
 }
 
 void AVLCopyDataSetError()
@@ -58,7 +59,8 @@ clib_error_code_t AVLCopyData(Data *dest, const Data *src)
 
     g_objectsInUsage++;
 
-    dest->data = src->data;
+    dest->start = src->start;
+    dest->end   = src->end;
 
     return CLIB_ERROR_SUCCESS;
 }

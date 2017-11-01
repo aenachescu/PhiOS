@@ -525,7 +525,8 @@ extern int getloadavg(double __loadavg[], int __nelem)
 typedef unsigned int clib_error_code_t;
 typedef unsigned char clib_bool_t;
 typedef struct _Data {
-  unsigned int data;
+  unsigned int start;
+  unsigned int end;
 } Data;
 void AVLAllocNodeSetError();
 void *AVLAllocNode(size_t a_size);
@@ -646,7 +647,7 @@ static UTDataAVLNode *UTDataAVLNode_insert(UTDataAVLNode *a_parent,
   if (a_parent == ((void *)0)) {
     return a_node;
   }
-  if (((&a_node->data)->data < (&a_parent->data)->data)) {
+  if (((&a_node->data)->start < (&a_parent->data)->start)) {
     a_parent->left = UTDataAVLNode_insert(a_parent->left, a_node);
   } else {
     a_parent->right = UTDataAVLNode_insert(a_parent->right, a_node);
@@ -717,10 +718,10 @@ static const UTDataAVLNode *UTDataAVLNode_find(const UTDataAVLNode *a_parent,
   if (a_parent == ((void *)0)) {
     return ((void *)0);
   }
-  if ((a_value->data < (&a_parent->data)->data)) {
+  if ((a_value->start < (&a_parent->data)->start)) {
     return UTDataAVLNode_find(a_parent->left, a_value);
   }
-  if ((a_value->data > (&a_parent->data)->data)) {
+  if ((a_value->start > (&a_parent->data)->start)) {
     return UTDataAVLNode_find(a_parent->right, a_value);
   }
   return a_parent;
@@ -736,8 +737,8 @@ UTDataAVLNode_findGreaterOrEqual(const UTDataAVLNode *a_parent,
     if (a_parent->right == ((void *)0)) {
       return ((void *)0);
     }
-    (&a_parent->right->data)->data >= a_value->data
-        ? (*a_currentScore = (&a_parent->right->data)->data - a_value->data)
+    (&a_parent->right->data)->start >= a_value->start
+        ? (*a_currentScore = (&a_parent->right->data)->start - a_value->start)
         : (*a_currentScore = 0xFFFFFFFF);
     return UTDataAVLNode_findGreaterOrEqual(a_parent->right, a_value,
                                             a_currentScore);
@@ -746,8 +747,8 @@ UTDataAVLNode_findGreaterOrEqual(const UTDataAVLNode *a_parent,
     return a_parent;
   }
   unsigned int scoreLeft;
-  (&a_parent->left->data)->data >= a_value->data
-      ? (*(&scoreLeft) = (&a_parent->left->data)->data - a_value->data)
+  (&a_parent->left->data)->start >= a_value->start
+      ? (*(&scoreLeft) = (&a_parent->left->data)->start - a_value->start)
       : (*(&scoreLeft) = 0xFFFFFFFF);
   const UTDataAVLNode *result =
       UTDataAVLNode_findGreaterOrEqual(a_parent->left, a_value, (&scoreLeft));
@@ -892,8 +893,8 @@ clib_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
     return ((clib_error_code_t)2);
   }
   unsigned int score;
-  (&a_avl->root->data)->data >= a_value->data
-      ? (*(&score) = (&a_avl->root->data)->data - a_value->data)
+  (&a_avl->root->data)->start >= a_value->start
+      ? (*(&score) = (&a_avl->root->data)->start - a_value->start)
       : (*(&score) = 0xFFFFFFFF);
   *a_res = UTDataAVLNode_findGreaterOrEqual(a_avl->root, a_value, &score);
   if (*a_res == ((void *)0)) {
@@ -957,7 +958,8 @@ void AVLFreeNode(void *a_node) {
 }
 void AVLDestroyData(Data *a_data) {
   g_objectsInUsage--;
-  a_data->data = 0;
+  a_data->start = 0;
+  a_data->end = 0;
 }
 void AVLCopyDataSetError() { g_copyError = 1; }
 clib_error_code_t AVLCopyData(Data *dest, const Data *src) {
@@ -966,7 +968,8 @@ clib_error_code_t AVLCopyData(Data *dest, const Data *src) {
     return ((clib_error_code_t)4);
   }
   g_objectsInUsage++;
-  dest->data = src->data;
+  dest->start = src->start;
+  dest->end = src->end;
   return ((clib_error_code_t)0);
 }
 size_t GetMemoryInUsage() { return g_memInUsage; }

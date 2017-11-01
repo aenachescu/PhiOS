@@ -20,8 +20,8 @@
     ((*a) = (*b))
 
 #define AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE(current, value, result)       \
-    current->data >= value->data ?                                              \
-        (*result = current->data - value->data) : (*result = 0xFFFFFFFF)
+    current->start >= value->start ?                                            \
+        (*result = current->start - value->start) : (*result = 0xFFFFFFFF)
 
 #define AVL_USE_AVL_NODE_FREE
 #define AVL_USE_AVL_NODE_CREATE
@@ -32,14 +32,15 @@
 #define AVL_FREE_FUNC(x)                    AVLFreeNode(x)
 #define AVL_ALLOC_FUNC(x)                   AVLAllocNode(x)
 #define AVL_COPY_TYPE_FUNC(dest, src)       AVLCopyData(dest, src)
-#define AVL_TYPE_OPERATOR_GREATER(a, b)     (a->data > b->data)
-#define AVL_TYPE_OPERATOR_LESS(a, b)        (a->data < b->data)
+#define AVL_TYPE_OPERATOR_GREATER(a, b)     (a->start > b->start)
+#define AVL_TYPE_OPERATOR_LESS(a, b)        (a->start < b->start)
 
 #include "kernel/include/dataStructs/avl/avl.h"
 
 typedef struct _Data
 {
-    unsigned int data;
+    unsigned int start;
+    unsigned int end;
 } Data;
 
 void AVLAllocNodeSetError();
