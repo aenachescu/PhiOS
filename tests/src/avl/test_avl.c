@@ -290,7 +290,7 @@ static struct AvlInsertTestCase g_insertTestCases[] = {
     { {  216 }, 9 }, { {  227 }, 9 }, { {  616 }, 9 }, { {    1 }, 9 }, { {  260 }, 9 },
 };
 
-static char avlInorderBuffer[2048];
+static char g_avlTraversalsBuffer[2048];
 
 int DataSortCmp(const void *a, const void *b)
 {
@@ -314,18 +314,18 @@ void getSubarraySortedAsString(char *buffer, size_t pos)
 
 	char numBuf[64];
 	for (size_t i = 0; i <= pos; i++) {
-		snprintf(numBuf, 64, "%u ", vec[i]);
+		snprintf(numBuf, 64, "%2u ", vec[i]);
 		strcat(buffer, numBuf);
 	}
 
 	free(vec);
 }
 
-void avlInorderToString(const Data *data)
+void DataToString(const Data *data)
 {
     char buf[64];
-    snprintf(buf, 64, "%u ", data->data);
-    strcat(avlInorderBuffer, buf);
+    snprintf(buf, 64, "%2u ", data->data);
+    strcat(g_avlTraversalsBuffer, buf);
 }
 
 CUT_DEFINE_TEST(test_avl_insert)
@@ -360,10 +360,10 @@ CUT_DEFINE_TEST(test_avl_insert)
         CUT_CHECK(UTDataAVL_findType(&tree, &g_insertTestCases[i].data, &data) == CLIB_ERROR_SUCCESS);
 
         getSubarraySortedAsString(buffer, i);
-        avlInorderBuffer[0] = 0;
+        g_avlTraversalsBuffer[0] = 0;
 
-        CUT_CHECK(UTDataAVL_foreachInorder(&tree, avlInorderToString) == CLIB_ERROR_SUCCESS);
-        CUT_CHECK_OPERATOR_STRING(avlInorderBuffer, ==, buffer);
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, buffer);
     }
 
     CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
@@ -401,10 +401,208 @@ CUT_DEFINE_TEST(test_avl_insertNode)
         CUT_CHECK(UTDataAVL_findType(&tree, &g_insertTestCases[i].data, &data) == CLIB_ERROR_SUCCESS);
 
         getSubarraySortedAsString(buffer, i);
-        avlInorderBuffer[0] = 0;
+        g_avlTraversalsBuffer[0] = 0;
 
-        CUT_CHECK(UTDataAVL_foreachInorder(&tree, avlInorderToString) == CLIB_ERROR_SUCCESS);
-        CUT_CHECK_OPERATOR_STRING(avlInorderBuffer, ==, buffer);
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, buffer);
+    }
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_inorder)
+{
+    RESET_STATISTICS;
+
+    static struct AvlInorderTestCase {
+        Data data;
+        const char *expectedString;
+    } testCases[] = {
+        { { 70 }, "70 " },
+        { { 75 }, "70 75 " },
+        { { 32 }, "32 70 75 " },
+        { { 12 }, "12 32 70 75 " },
+        { { 79 }, "12 32 70 75 79 " },
+        { { 55 }, "12 32 55 70 75 79 " },
+        { { 98 }, "12 32 55 70 75 79 98 " },
+        { { 42 }, "12 32 42 55 70 75 79 98 " },
+        { {  5 }, " 5 12 32 42 55 70 75 79 98 " },
+        { { 38 }, " 5 12 32 38 42 55 70 75 79 98 " },
+        { { 60 }, " 5 12 32 38 42 55 60 70 75 79 98 " },
+        { { 66 }, " 5 12 32 38 42 55 60 66 70 75 79 98 " },
+        { { 69 }, " 5 12 32 38 42 55 60 66 69 70 75 79 98 " },
+        { { 36 }, " 5 12 32 36 38 42 55 60 66 69 70 75 79 98 " },
+        { { 87 }, " 5 12 32 36 38 42 55 60 66 69 70 75 79 87 98 " },
+        { { 14 }, " 5 12 14 32 36 38 42 55 60 66 69 70 75 79 87 98 " },
+        { { 23 }, " 5 12 14 23 32 36 38 42 55 60 66 69 70 75 79 87 98 " },
+        { { 95 }, " 5 12 14 23 32 36 38 42 55 60 66 69 70 75 79 87 95 98 " },
+        { { 96 }, " 5 12 14 23 32 36 38 42 55 60 66 69 70 75 79 87 95 96 98 " },
+        { { 52 }, " 5 12 14 23 32 36 38 42 52 55 60 66 69 70 75 79 87 95 96 98 " },
+        { { 22 }, " 5 12 14 22 23 32 36 38 42 52 55 60 66 69 70 75 79 87 95 96 98 " },
+        { { 21 }, " 5 12 14 21 22 23 32 36 38 42 52 55 60 66 69 70 75 79 87 95 96 98 " },
+        { { 59 }, " 5 12 14 21 22 23 32 36 38 42 52 55 59 60 66 69 70 75 79 87 95 96 98 " },
+        { { 82 }, " 5 12 14 21 22 23 32 36 38 42 52 55 59 60 66 69 70 75 79 82 87 95 96 98 " },
+        { { 19 }, " 5 12 14 19 21 22 23 32 36 38 42 52 55 59 60 66 69 70 75 79 82 87 95 96 98 " },
+        { { 10 }, " 5 10 12 14 19 21 22 23 32 36 38 42 52 55 59 60 66 69 70 75 79 82 87 95 96 98 " },
+        { { 45 }, " 5 10 12 14 19 21 22 23 32 36 38 42 45 52 55 59 60 66 69 70 75 79 82 87 95 96 98 " },
+        { { 46 }, " 5 10 12 14 19 21 22 23 32 36 38 42 45 46 52 55 59 60 66 69 70 75 79 82 87 95 96 98 " },
+        { { 92 }, " 5 10 12 14 19 21 22 23 32 36 38 42 45 46 52 55 59 60 66 69 70 75 79 82 87 92 95 96 98 " },
+        { { 20 }, " 5 10 12 14 19 20 21 22 23 32 36 38 42 45 46 52 55 59 60 66 69 70 75 79 82 87 92 95 96 98 " },
+        { { 31 }, " 5 10 12 14 19 20 21 22 23 31 32 36 38 42 45 46 52 55 59 60 66 69 70 75 79 82 87 92 95 96 98 " },
+        { { 43 }, " 5 10 12 14 19 20 21 22 23 31 32 36 38 42 43 45 46 52 55 59 60 66 69 70 75 79 82 87 92 95 96 98 " },
+    };
+
+    UTDataAVL tree;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_foreachInorder(&tree, NULL) == CLIB_ERROR_INVALID_FUNCTION);
+    CUT_CHECK(UTDataAVL_foreachInorder(NULL, DataToString) == CLIB_ERROR_NULL_POINTER);
+
+    for (size_t i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK(UTDataAVL_insert(&tree, &testCases[i].data) == CLIB_ERROR_SUCCESS);
+
+        g_avlTraversalsBuffer[0] = 0;
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
+
+        CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, testCases[i].expectedString);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
+    }
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_postorder)
+{
+    RESET_STATISTICS;
+
+    static struct AvlPostorderTestCase {
+        Data data;
+        const char *expectedString;
+    } testCases[] = {
+        { { 70 }, "70 " },
+        { { 75 }, "75 70 " },
+        { { 32 }, "32 75 70 " },
+        { { 12 }, "12 32 75 70 " },
+        { { 79 }, "12 32 79 75 70 " },
+        { { 55 }, "12 55 32 79 75 70 " },
+        { { 98 }, "12 55 32 75 98 79 70 " },
+        { { 42 }, "12 42 55 32 75 98 79 70 " },
+        { {  5 }, " 5 12 42 55 32 75 98 79 70 " },
+        { { 38 }, " 5 12 38 55 42 32 75 98 79 70 " },
+        { { 60 }, " 5 12 38 32 60 55 75 98 79 70 42 " },
+        { { 66 }, " 5 12 38 32 55 66 60 75 98 79 70 42 " },
+        { { 69 }, " 5 12 38 32 55 69 66 60 75 98 79 70 42 " },
+        { { 36 }, " 5 12 36 38 32 55 69 66 60 75 98 79 70 42 " },
+        { { 87 }, " 5 12 36 38 32 55 69 66 60 75 87 98 79 70 42 " },
+        { { 14 }, " 5 14 12 36 38 32 55 69 66 60 75 87 98 79 70 42 " },
+        { { 23 }, " 5 23 14 12 36 38 32 55 69 66 60 75 87 98 79 70 42 " },
+        { { 95 }, " 5 23 14 12 36 38 32 55 69 66 60 75 87 98 95 79 70 42 " },
+        { { 96 }, " 5 23 14 12 36 38 32 55 69 66 60 75 87 79 96 98 95 70 42 " },
+        { { 52 }, " 5 23 14 12 36 38 32 52 55 69 66 60 75 87 79 96 98 95 70 42 " },
+        { { 22 }, " 5 14 23 22 12 36 38 32 52 55 69 66 60 75 87 79 96 98 95 70 42 " },
+        { { 21 }, " 5 12 21 23 22 14 36 38 32 52 55 69 66 60 75 87 79 96 98 95 70 42 " },
+        { { 59 }, " 5 12 21 23 22 14 36 38 32 52 59 55 69 66 60 75 87 79 96 98 95 70 42 " },
+        { { 82 }, " 5 12 21 23 22 14 36 38 32 52 59 55 69 66 60 75 82 87 79 96 98 95 70 42 " },
+        { { 19 }, " 5 12 19 21 14 23 36 38 32 22 52 59 55 69 66 60 75 82 87 79 96 98 95 70 42 " },
+        { { 10 }, " 5 12 10 19 21 14 23 36 38 32 22 52 59 55 69 66 60 75 82 87 79 96 98 95 70 42 " },
+        { { 45 }, " 5 12 10 19 21 14 23 36 38 32 22 45 52 59 55 69 66 60 75 82 87 79 96 98 95 70 42 " },
+        { { 46 }, " 5 12 10 19 21 14 23 36 38 32 22 45 52 46 59 55 69 66 60 75 82 87 79 96 98 95 70 42 " },
+        { { 92 }, " 5 12 10 19 21 14 23 36 38 32 22 45 52 46 59 55 69 66 60 75 82 92 87 79 96 98 95 70 42 " },
+        { { 20 }, " 5 12 10 19 21 20 14 23 36 38 32 22 45 52 46 59 55 69 66 60 75 82 92 87 79 96 98 95 70 42 " },
+        { { 31 }, " 5 12 10 19 21 20 14 31 23 36 38 32 22 45 52 46 59 55 69 66 60 75 82 92 87 79 96 98 95 70 42 " },
+        { { 43 }, " 5 12 10 19 21 20 14 31 23 36 38 32 22 43 45 52 59 55 46 69 66 60 75 82 92 87 79 96 98 95 70 42 " },
+    };
+
+    UTDataAVL tree;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_foreachPostorder(&tree, NULL) == CLIB_ERROR_INVALID_FUNCTION);
+    CUT_CHECK(UTDataAVL_foreachPostorder(NULL, DataToString) == CLIB_ERROR_NULL_POINTER);
+
+    for (size_t i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK(UTDataAVL_insert(&tree, &testCases[i].data) == CLIB_ERROR_SUCCESS);
+
+        g_avlTraversalsBuffer[0] = 0;
+        CUT_CHECK(UTDataAVL_foreachPostorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
+
+        CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, testCases[i].expectedString);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
+    }
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_preorder)
+{
+    RESET_STATISTICS;
+
+    static struct AvlPreorderTestCase {
+        Data data;
+        const char *expectedString;
+    } testCases[] = {
+        { { 70 }, "70 " },
+        { { 75 }, "70 75 " },
+        { { 32 }, "70 32 75 " },
+        { { 12 }, "70 32 12 75 " },
+        { { 79 }, "70 32 12 75 79 " },
+        { { 55 }, "70 32 12 55 75 79 " },
+        { { 98 }, "70 32 12 55 79 75 98 " },
+        { { 42 }, "70 32 12 55 42 79 75 98 " },
+        { {  5 }, "70 32 12  5 55 42 79 75 98 " },
+        { { 38 }, "70 32 12  5 42 38 55 79 75 98 " },
+        { { 60 }, "42 32 12  5 38 70 55 60 79 75 98 " },
+        { { 66 }, "42 32 12  5 38 70 60 55 66 79 75 98 " },
+        { { 69 }, "42 32 12  5 38 70 60 55 66 69 79 75 98 " },
+        { { 36 }, "42 32 12  5 38 36 70 60 55 66 69 79 75 98 " },
+        { { 87 }, "42 32 12  5 38 36 70 60 55 66 69 79 75 98 87 " },
+        { { 14 }, "42 32 12  5 14 38 36 70 60 55 66 69 79 75 98 87 " },
+        { { 23 }, "42 32 12  5 14 23 38 36 70 60 55 66 69 79 75 98 87 " },
+        { { 95 }, "42 32 12  5 14 23 38 36 70 60 55 66 69 79 75 95 87 98 " },
+        { { 96 }, "42 32 12  5 14 23 38 36 70 60 55 66 69 95 79 75 87 98 96 " },
+        { { 52 }, "42 32 12  5 14 23 38 36 70 60 55 52 66 69 95 79 75 87 98 96 " },
+        { { 22 }, "42 32 12  5 22 14 23 38 36 70 60 55 52 66 69 95 79 75 87 98 96 " },
+        { { 21 }, "42 32 14 12  5 22 21 23 38 36 70 60 55 52 66 69 95 79 75 87 98 96 " },
+        { { 59 }, "42 32 14 12  5 22 21 23 38 36 70 60 55 52 59 66 69 95 79 75 87 98 96 " },
+        { { 82 }, "42 32 14 12  5 22 21 23 38 36 70 60 55 52 59 66 69 95 79 75 87 82 98 96 " },
+        { { 19 }, "42 22 14 12  5 21 19 32 23 38 36 70 60 55 52 59 66 69 95 79 75 87 82 98 96 " },
+        { { 10 }, "42 22 14 10  5 12 21 19 32 23 38 36 70 60 55 52 59 66 69 95 79 75 87 82 98 96 " },
+        { { 45 }, "42 22 14 10  5 12 21 19 32 23 38 36 70 60 55 52 45 59 66 69 95 79 75 87 82 98 96 " },
+        { { 46 }, "42 22 14 10  5 12 21 19 32 23 38 36 70 60 55 46 45 52 59 66 69 95 79 75 87 82 98 96 " },
+        { { 92 }, "42 22 14 10  5 12 21 19 32 23 38 36 70 60 55 46 45 52 59 66 69 95 79 75 87 82 92 98 96 " },
+        { { 20 }, "42 22 14 10  5 12 20 19 21 32 23 38 36 70 60 55 46 45 52 59 66 69 95 79 75 87 82 92 98 96 " },
+        { { 31 }, "42 22 14 10  5 12 20 19 21 32 23 31 38 36 70 60 55 46 45 52 59 66 69 95 79 75 87 82 92 98 96 " },
+        { { 43 }, "42 22 14 10  5 12 20 19 21 32 23 31 38 36 70 60 46 45 43 55 52 59 66 69 95 79 75 87 82 92 98 96 " },
+    };
+
+    UTDataAVL tree;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_foreachPreorder(&tree, NULL) == CLIB_ERROR_INVALID_FUNCTION);
+    CUT_CHECK(UTDataAVL_foreachPreorder(NULL, DataToString) == CLIB_ERROR_NULL_POINTER);
+
+    for (size_t i = 0; i < _countof(testCases); i++) {
+        CUT_CHECK(UTDataAVL_insert(&tree, &testCases[i].data) == CLIB_ERROR_SUCCESS);
+
+        g_avlTraversalsBuffer[0] = 0;
+        CUT_CHECK(UTDataAVL_foreachPreorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
+
+        CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, testCases[i].expectedString);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, i + 1);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, i + 1);
     }
 
     CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
@@ -426,4 +624,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_insert);
     CUT_CALL_TEST(test_avl_insertNode);
 
+    CUT_CALL_TEST(test_avl_inorder);
+    CUT_CALL_TEST(test_avl_postorder);
+    CUT_CALL_TEST(test_avl_preorder);
 CUT_END_MAIN
