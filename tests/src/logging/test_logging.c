@@ -109,10 +109,26 @@ CUT_DEFINE_TEST(test_logging_write)
     logging_uninit();
 }
 
+CUT_DEFINE_TEST(test_logging_adjustPointers)
+{
+    logging_writePfn *oldValue = malloc(g_numOfPfn * sizeof(logging_writePfn));
+    for (uint32 i = 0 ; i < g_numOfPfn; i++) {
+        oldValue[i] = g_pfn[i];
+    }
+
+    logging_adjustPointers(100);
+
+    for (uint32 i = 0; i < g_numOfPfn; i++) {
+        CUT_CHECK_OPERATOR_ADDRESS(g_pfn[i], ==, oldValue[i] + 100);
+    }
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_logging_init);
     CUT_CALL_TEST(test_logging_uninit);
     CUT_CALL_TEST(test_logging_isInitialized);
     CUT_CALL_TEST(test_logging_addPfn);
     CUT_CALL_TEST(test_logging_write);
+
+    CUT_CALL_TEST(test_logging_adjustPointers);
 CUT_END_MAIN
