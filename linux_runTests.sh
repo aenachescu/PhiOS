@@ -60,32 +60,62 @@ function build_tests_x86_32 {
 function running_tests {
     # running all tests
     echo -e "\n${green}*****${reset} Running tests"
-    rc=0
+    test_paa_rc = 0
+    test_bitmapPMA_rc = 0
+    test_kstdlib_rc = 0
+    test_logging_rc = 0
+    test_avl_rc = 0
+    rc = 0
 
     # running PAA tests
     echo -e "${blue}***${reset} Running test_PAA"
     ./test_paa
-    rc=$((rc + $?))
+    test_paa_rc=$?
 
     # running BitmapPMA tests
     echo -e "\n${blue}***${reset} Running test_BitmapPMA"
     ./test_bitmap
-    rc=$((rc + $?))
+    test_bitmapPMA_rc=$?
 
     # running kstdlib tests
     echo -e "\n${blue}***${reset} Running test_kstdlib"
     ./test_kstdlib
-    rc=$((rc + $?))
+    test_kstdlib_rc=$?
 
     # running logging tests
     echo -e "\n${blue}***${reset} Running test_logging"
     ./test_logging
-    rc=$((rc + $?))
+    test_logging_rc=$?
 
     # running avl tests
     echo -e "\n${blue}***${reset} Running test_avl"
     ./test_avl
-    rc=$((rc + $?))
+    test_avl_rc=$?
+
+    if [[ $test_paa_rc != 0 ]]; then
+        echo -e "${red}test_paa failed${reset}"
+        rc=1
+    fi
+
+    if [[ $test_bitmapPMA_rc != 0 ]]; then
+        echo -e "${red}test_bitmapPMA failed${reset}"
+        rc=1
+    fi
+
+    if [[ $test_kstdlib_rc != 0 ]]; then
+        echo -e "${red}test_kstdlib failed${reset}"
+        rc=1
+    fi
+
+    if [[ $test_logging_rc != 0 ]]; then
+        echo -e "${red}test_logging failed${reset}"
+        rc=1
+    fi
+
+    if [[ $test_avl_rc != 0 ]]; then
+        echo -e "${red}test_avl failed${reset}"
+        rc=1
+    fi
 
     exit $rc
 }
