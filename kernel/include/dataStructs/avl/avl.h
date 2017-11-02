@@ -127,6 +127,7 @@
 #include "kernel/include/dataStructs/avl/avlnode_free.h"
 #include "kernel/include/dataStructs/avl/avlnode_findGreaterOrEqual.h"
 #include "kernel/include/dataStructs/avl/avlnode_traversals.h"
+#include "kernel/include/dataStructs/avl/avlnode_isBalanced.h"
 
 // include avl headers
 #include "kernel/include/dataStructs/avl/avl_struct.h"
@@ -139,6 +140,7 @@
 #include "kernel/include/dataStructs/avl/avl_insertNode.h"
 #include "kernel/include/dataStructs/avl/avl_findGreaterOrEqual.h"
 #include "kernel/include/dataStructs/avl/avl_traversals.h"
+#include "kernel/include/dataStructs/avl/avl_isBalanced.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
@@ -165,7 +167,8 @@
     DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                          \
     DECLARE_AVL_FUNC_FOR_EACH_INORDER(type, name)                               \
     DECLARE_AVL_FUNC_FOR_EACH_PREORDER(type, name)                              \
-    DECLARE_AVL_FUNC_FOR_EACH_POSTORDER(type, name)
+    DECLARE_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                             \
+    DECLARE_AVL_FUNC_IS_BALANCED(type, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -188,7 +191,8 @@
     IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)                   \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_INORDER(type, name)                        \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_PREORDER(type, name)                       \
-    IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_POSTORDER(type, name)
+    IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_POSTORDER(type, name)                      \
+    IMPLEMENT_AVL_NODE_FUNC_IS_BALANCED(type, name)
 
 // implement avl functions
 #define IMPLEMENT_AVL_FUNC(type, name)                                          \
@@ -202,7 +206,8 @@
     IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                        \
     IMPLEMENT_AVL_FUNC_FOR_EACH_INORDER(type, name)                             \
     IMPLEMENT_AVL_FUNC_FOR_EACH_PREORDER(type, name)                            \
-    IMPLEMENT_AVL_FUNC_FOR_EACH_POSTORDER(type, name)
+    IMPLEMENT_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                           \
+    IMPLEMENT_AVL_FUNC_IS_BALANCED(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \

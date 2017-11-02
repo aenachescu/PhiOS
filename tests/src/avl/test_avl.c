@@ -347,6 +347,7 @@ CUT_DEFINE_TEST(test_avl_insert)
     unsigned int height;
     const Data *data = NULL;
     char buffer[2048];
+    clib_bool_t isBalanced;
 
     CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
@@ -375,6 +376,9 @@ CUT_DEFINE_TEST(test_avl_insert)
 
         CUT_CHECK(UTDataAVL_foreachInorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, buffer);
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(isBalanced == CLIB_TRUE);
     }
 
     CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
@@ -392,6 +396,7 @@ CUT_DEFINE_TEST(test_avl_insertNode)
     UTDataAVLNode *node = NULL;
     UTDataAVLNode unusedNode;
     char buffer[2048];
+    clib_bool_t isBalanced;
 
     CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
@@ -416,6 +421,9 @@ CUT_DEFINE_TEST(test_avl_insertNode)
 
         CUT_CHECK(UTDataAVL_foreachInorder(&tree, DataToString) == CLIB_ERROR_SUCCESS);
         CUT_CHECK_OPERATOR_STRING(g_avlTraversalsBuffer, ==, buffer);
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(isBalanced == CLIB_TRUE);
     }
 
     CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);

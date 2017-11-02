@@ -576,6 +576,8 @@ clib_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
                                             UTDataAVLForeachCbk_t a_cbk);
 clib_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
                                              UTDataAVLForeachCbk_t a_cbk);
+clib_error_code_t UTDataAVL_isBalanced(const UTDataAVL *a_avl,
+                                       clib_bool_t *a_result);
 ;
 static inline unsigned int
 UTDataAVLNode_getHeight(const UTDataAVLNode *a_node) {
@@ -785,6 +787,24 @@ static void UTDataAVLNode_foreachPostorder(const UTDataAVLNode *a_parent,
   UTDataAVLNode_foreachPostorder(a_parent->right, a_cbk);
   a_cbk((&a_parent->data));
 }
+static clib_bool_t UTDataAVLNode_isBalanced(const UTDataAVLNode *a_parent) {
+  if (a_parent == ((void *)0)) {
+    return ((clib_bool_t)1);
+  }
+  if (UTDataAVLNode_diffHeight(a_parent->left, a_parent->right) > 1) {
+    return ((clib_bool_t)0);
+  }
+  if (UTDataAVLNode_diffHeight(a_parent->right, a_parent->left) > 1) {
+    return ((clib_bool_t)0);
+  }
+  if (UTDataAVLNode_isBalanced(a_parent->left) == ((clib_bool_t)0)) {
+    return ((clib_bool_t)0);
+  }
+  if (UTDataAVLNode_isBalanced(a_parent->right) == ((clib_bool_t)0)) {
+    return ((clib_bool_t)0);
+  }
+  return ((clib_bool_t)1);
+}
 clib_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
     return ((clib_error_code_t)1);
@@ -933,6 +953,17 @@ clib_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
     return ((clib_error_code_t)6);
   }
   UTDataAVLNode_foreachPostorder(a_avl->root, a_cbk);
+  return ((clib_error_code_t)0);
+}
+clib_error_code_t UTDataAVL_isBalanced(const UTDataAVL *a_avl,
+                                       clib_bool_t *a_result) {
+  if (a_avl == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_result == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  *a_result = UTDataAVLNode_isBalanced(a_avl->root);
   return ((clib_error_code_t)0);
 };
 static size_t g_memInUsage = 0;
