@@ -195,7 +195,7 @@ uint32 ku64toa(
     return ERROR_SUCCESS;
 }
 
-static size_t g_seed;
+PhiOS_STATIC size_t g_seed;
 
 uint32 krand(
     size_t *a_value)
