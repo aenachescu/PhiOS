@@ -321,9 +321,46 @@ CUT_DEFINE_TEST(test_ku64toa)
     }
 }
 
+CUT_DEFINE_TEST(test_krand)
+{
+    size_t value = 0;
+
+    CUT_CHECK_OPERATOR_UINT32(krand(NULL), ==, ERROR_NULL_POINTER);
+    CUT_CHECK_OPERATOR_UINT32(krand(&value), ==, ERROR_SUCCESS);
+}
+
+CUT_DEFINE_TEST(test_kranduint)
+{
+    size_t value = 0, start = 0, end = 0;
+
+    CUT_CHECK_OPERATOR_UINT32(kranduint(NULL, start, end), ==, ERROR_NULL_POINTER);
+
+    start = 20;
+    end = 10;
+    CUT_CHECK_OPERATOR_UINT32(kranduint(&value, start, end), ==, ERROR_INVALID_PARAMETER);
+
+    start = 10;
+    end = 20;
+    CUT_CHECK_OPERATOR_UINT32(kranduint(&value, start, end), ==, ERROR_SUCCESS);
+}
+
+extern size_t g_seed;
+
+CUT_DEFINE_TEST(test_ksrand)
+{
+    uint64 seed = 10;
+
+    CUT_CHECK_OPERATOR_UINT32(ksrand(seed), ==, ERROR_SUCCESS);
+    CUT_CHECK_OPERATOR_UINT64(g_seed, ==, seed);
+}
+
 CUT_DEFINE_MODULE(module_kstdlib)
     CUT_CALL_TEST(test_kitoa);
     CUT_CALL_TEST(test_kutoa);
     CUT_CALL_TEST(test_ki64toa);
     CUT_CALL_TEST(test_ku64toa);
+
+    CUT_CALL_TEST(test_krand);
+    CUT_CALL_TEST(test_kranduint);
+    CUT_CALL_TEST(test_ksrand);
 CUT_END_MODULE
