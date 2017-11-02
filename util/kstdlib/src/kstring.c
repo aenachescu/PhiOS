@@ -1,5 +1,9 @@
 #include "util/kstdlib/include/kstring.h"
 
+#ifdef PhiOS_UNIT_TESTING_CONFIG
+PhiOS_STATIC uint32 g_kstring_error = 0;
+#endif
+
 uint32 kmemchr(
     const void *a_buffer, 
     uint8 a_value,
@@ -237,6 +241,13 @@ uint32 kstrlen(
     const char *a_str, 
     size_t *a_length)
 {
+#ifdef PhiOS_UNIT_TESTING_CONFIG
+    if (g_kstring_error != 0) {
+        g_kstring_error = 0;
+        return ERROR_INTERNAL_ERROR;
+    }
+#endif
+
     if (a_str == NULL || a_length == NULL) {
         return ERROR_NULL_POINTER;
     }

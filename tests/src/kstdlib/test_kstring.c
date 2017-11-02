@@ -8,6 +8,8 @@
 
 #define MIN(a, b) (a < b ? a : b)
 
+extern uint32 g_kstring_error;
+
 CUT_DEFINE_TEST(test_kmemchr)
 {
     struct TestCase {
@@ -411,6 +413,9 @@ CUT_DEFINE_TEST(test_kstrrev)
     sint32 result;
 
     CUT_CHECK_OPERATOR_UINT32(kstrrev(NULL, 0), ==, ERROR_NULL_POINTER);
+
+    g_kstring_error = 1;
+    CUT_CHECK_OPERATOR_UINT32(kstrrev("asd", 0), ==, ERROR_INTERNAL_ERROR);
 
     for (uint32 i = 0; i < _countof(testCases); i++) {
         CUT_CHECK_OPERATOR_UINT32(
