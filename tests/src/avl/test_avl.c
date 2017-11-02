@@ -629,6 +629,195 @@ CUT_DEFINE_TEST(test_avl_preorder)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_find)
+{
+    RESET_STATISTICS;
+
+    static unsigned int elements[] = { 32, 89, 26, 31, 33, 42, 34, 94, 84, 43, 86, 13, 20, 71, 4, 96, 48, 64, 77, 62 };
+
+    UTDataAVL tree;
+    const UTDataAVLNode *result = NULL;
+    Data value;
+
+    value.start = 1;
+    value.end = 0;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_find(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(elements); i++) {
+        Data tmp;
+        tmp.start = elements[i];
+        tmp.end = 0;
+
+        CUT_CHECK(UTDataAVL_insert(&tree, &tmp) == CLIB_ERROR_SUCCESS);
+    }
+
+    CUT_CHECK(UTDataAVL_find(NULL, &value, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_find(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_find(&tree, &value, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    for (size_t i = 0; i < (size_t) 100; i++) {
+        value.start = i;
+        value.end = 0;
+
+        int exists = 0;
+        for (size_t j = 0; j < _countof(elements); j++) {
+            if (i == elements[j]) {
+                exists = 1;
+                break;
+            }
+        }
+
+        if (exists == 1) {
+            CUT_CHECK(UTDataAVL_find(&tree, &value, &result) == CLIB_ERROR_SUCCESS);
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK(result->data.start == i);
+            CUT_CHECK(result->data.end == 0);
+        } else {
+            CUT_CHECK(UTDataAVL_find(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+        }
+    }
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(elements));
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, _countof(elements));
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, _countof(elements) * sizeof(UTDataAVLNode));
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_findType)
+{
+    RESET_STATISTICS;
+
+    static unsigned int elements[] = { 30, 24, 18, 6, 49, 51, 52, 97, 79, 39, 41, 73, 67, 12, 87, 10, 72, 46, 91, 57 };
+
+    UTDataAVL tree;
+    const Data *result = NULL;
+    Data value;
+
+    value.start = 1;
+    value.end = 0;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_findType(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(elements); i++) {
+        Data tmp;
+        tmp.start = elements[i];
+        tmp.end = 0;
+
+        CUT_CHECK(UTDataAVL_insert(&tree, &tmp) == CLIB_ERROR_SUCCESS);
+    }
+
+    CUT_CHECK(UTDataAVL_findType(NULL, &value, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_findType(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_findType(&tree, &value, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    for (size_t i = 0; i < (size_t) 100; i++) {
+        value.start = i;
+        value.end = 0;
+
+        int exists = 0;
+        for (size_t j = 0; j < _countof(elements); j++) {
+            if (i == elements[j]) {
+                exists = 1;
+                break;
+            }
+        }
+
+        if (exists == 1) {
+            CUT_CHECK(UTDataAVL_findType(&tree, &value, &result) == CLIB_ERROR_SUCCESS);
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK(result->start == i);
+            CUT_CHECK(result->end == 0);
+        } else {
+            CUT_CHECK(UTDataAVL_findType(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+        }
+    }
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(elements));
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, _countof(elements));
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, _countof(elements) * sizeof(UTDataAVLNode));
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
+CUT_DEFINE_TEST(test_avl_findGreaterOrEqual)
+{
+    RESET_STATISTICS;
+
+    static unsigned int elements[] = { 70, 76, 83, 69, 60, 14, 92, 22, 61, 38, 53, 21, 63, 74, 3, 2, 78, 35, 58, 68 };
+
+    UTDataAVL tree;
+    const UTDataAVLNode *result = NULL;
+    Data value;
+
+    value.start = 1;
+    value.end = 0;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_findGreaterOrEqual(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(elements); i++) {
+        Data tmp;
+        tmp.start = elements[i];
+        tmp.end = 0;
+
+        CUT_CHECK(UTDataAVL_insert(&tree, &tmp) == CLIB_ERROR_SUCCESS);
+    }
+
+    CUT_CHECK(UTDataAVL_findGreaterOrEqual(NULL, &value, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_findGreaterOrEqual(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_findGreaterOrEqual(&tree, &value, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    qsort(elements, _countof(elements), sizeof(unsigned int), DataSortCmp);
+
+    for (size_t i = 0; i < (size_t) 100; i++) {
+        value.start = i;
+        value.end = 0;
+
+        int exists = 0;
+        size_t j;
+        for (j = 0; j < _countof(elements); j++) {
+            if (elements[j] >= i) {
+                exists = 1;
+                break;
+            }
+        }
+
+        if (exists == 1) {
+            CUT_CHECK(UTDataAVL_findGreaterOrEqual(&tree, &value, &result) == CLIB_ERROR_SUCCESS);
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK(result->data.start == elements[j]);
+            CUT_CHECK(result->data.end == 0);
+        } else {
+            CUT_CHECK(UTDataAVL_findGreaterOrEqual(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+        }
+    }
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(elements));
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, _countof(elements));
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, _countof(elements) * sizeof(UTDataAVLNode));
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_init);
     CUT_CALL_TEST(test_avl_free);
@@ -646,4 +835,8 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_inorder);
     CUT_CALL_TEST(test_avl_postorder);
     CUT_CALL_TEST(test_avl_preorder);
+
+    CUT_CALL_TEST(test_avl_find);
+    CUT_CALL_TEST(test_avl_findType);
+    CUT_CALL_TEST(test_avl_findGreaterOrEqual);
 CUT_END_MAIN
