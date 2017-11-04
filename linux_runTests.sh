@@ -23,6 +23,11 @@ function build_tests_x86_64 {
     create_dir bin
     create_dir x86_64
 
+    # update avl implementation
+    cd ../../src/avl
+    ./updateAvl.sh
+    cd ../../bin/x86_64
+
     cmake ../.. -DARCH:STRING=x86_64
     rc=$?
     if [[ $rc != 0 ]]; then
@@ -42,6 +47,11 @@ function build_tests_x86_32 {
     create_dir bin
     create_dir x86_32
 
+    # update avl implementation
+    cd ../../src/avl
+    ./updateAvl.sh
+    cd ../../bin/x86_32
+
     cmake ../.. -DARCH:STRING=x86_32
     rc=$?
     if [[ $rc != 0 ]]; then
@@ -60,12 +70,12 @@ function build_tests_x86_32 {
 function running_tests {
     # running all tests
     echo -e "\n${green}*****${reset} Running tests"
-    test_paa_rc = 0
-    test_bitmapPMA_rc = 0
-    test_kstdlib_rc = 0
-    test_logging_rc = 0
-    test_avl_rc = 0
-    rc = 0
+    test_paa_rc=0
+    test_bitmapPMA_rc=0
+    test_kstdlib_rc=0
+    test_logging_rc=0
+    test_avl_rc=0
+    rc=0
 
     # running PAA tests
     echo -e "${blue}***${reset} Running test_PAA"
