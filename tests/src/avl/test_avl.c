@@ -264,31 +264,31 @@ static struct AvlInsertTestCase g_insertTestCases[] = {
     { {  274, 0 }, 4 }, { {  250, 0 }, 4 }, { {  281, 0 }, 5 }, { {   19, 0 }, 5 }, { {  841, 0 }, 5 },
     { {  153, 0 }, 5 }, { {  699, 0 }, 5 }, { {  939, 0 }, 5 }, { {   72, 0 }, 5 }, { {  920, 0 }, 5 },
     { {  744, 0 }, 5 }, { {  654, 0 }, 5 }, { {  346, 0 }, 5 }, { {  705, 0 }, 5 }, { {   94, 0 }, 6 },
-    { {  573, 0 }, 6 }, { {   33, 0 }, 6 }, { {  190, 0 }, 6 }, { {  886, 0 }, 6 }, { {  472, 0 }, 6 },
+    { {  573, 0 }, 6 }, { {   33, 0 }, 6 }, { {  192, 0 }, 6 }, { {  886, 0 }, 6 }, { {  472, 0 }, 6 },
     { {  494, 0 }, 6 }, { {  410, 0 }, 6 }, { {  717, 0 }, 6 }, { {  532, 0 }, 6 }, { {  954, 0 }, 6 },
     { {  883, 0 }, 6 }, { {  838, 0 }, 6 }, { {  847, 0 }, 7 }, { {  553, 0 }, 7 }, { {   30, 0 }, 7 },
     { {  190, 0 }, 7 }, { {  248, 0 }, 7 }, { {  426, 0 }, 7 }, { {  216, 0 }, 7 }, { {  721, 0 }, 7 },
     { {  196, 0 }, 7 }, { {  365, 0 }, 7 }, { {  548, 0 }, 7 }, { {   85, 0 }, 7 }, { {  748, 0 }, 7 },
-    { {  737, 0 }, 7 }, { {  864, 0 }, 7 }, { {  987, 0 }, 7 }, { {  886, 0 }, 7 }, { {  948, 0 }, 7 },
+    { {  737, 0 }, 7 }, { {  864, 0 }, 7 }, { {  987, 0 }, 7 }, { {  889, 0 }, 7 }, { {  948, 0 }, 7 },
     { {   70, 0 }, 7 }, { {  433, 0 }, 7 }, { {  975, 0 }, 7 }, { {   76, 0 }, 7 }, { {  759, 0 }, 7 },
-    { {  320, 0 }, 7 }, { {  892, 0 }, 7 }, { {  213, 0 }, 7 }, { {   79, 0 }, 7 }, { {  819, 0 }, 7 },
+    { {  320, 0 }, 7 }, { {  892, 0 }, 7 }, { {  219, 0 }, 7 }, { {   79, 0 }, 7 }, { {  819, 0 }, 7 },
     { {  829, 0 }, 7 }, { {  899, 0 }, 7 }, { {  999, 0 }, 7 }, { {  992, 0 }, 7 }, { {  405, 0 }, 8 },
     { {  683, 0 }, 8 }, { {  594, 0 }, 8 }, { {  148, 0 }, 8 }, { {  122, 0 }, 8 }, { {   61, 0 }, 8 },
-    { {  699, 0 }, 8 }, { {  499, 0 }, 8 }, { {   42, 0 }, 8 }, { {  231, 0 }, 8 }, { {  215, 0 }, 8 },
-    { {  475, 0 }, 8 }, { {  539, 0 }, 8 }, { {  100, 0 }, 8 }, { {  291, 0 }, 8 }, { {  153, 0 }, 8 },
+    { {  695, 0 }, 8 }, { {  499, 0 }, 8 }, { {   42, 0 }, 8 }, { {  231, 0 }, 8 }, { {  215, 0 }, 8 },
+    { {  475, 0 }, 8 }, { {  539, 0 }, 8 }, { {  100, 0 }, 8 }, { {  291, 0 }, 8 }, { {  158, 0 }, 8 },
     { {  128, 0 }, 8 }, { {  572, 0 }, 8 }, { {  497, 0 }, 8 }, { {  623, 0 }, 8 }, { {  449, 0 }, 8 },
-    { {  553, 0 }, 8 }, { {  944, 0 }, 8 }, { {  456, 0 }, 8 }, { {  553, 0 }, 8 }, { {  935, 0 }, 8 },
+    { {  550, 0 }, 8 }, { {  944, 0 }, 8 }, { {  456, 0 }, 8 }, { {  559, 0 }, 8 }, { {  935, 0 }, 8 },
     { {  199, 0 }, 8 }, { {  756, 0 }, 8 }, { {    7, 0 }, 8 }, { {  184, 0 }, 8 }, { {  617, 0 }, 8 },
-    { {  380, 0 }, 8 }, { {  799, 0 }, 8 }, { {  497, 0 }, 8 }, { {  962, 0 }, 8 }, { {  120, 0 }, 8 },
+    { {  380, 0 }, 8 }, { {  799, 0 }, 8 }, { {  490, 0 }, 8 }, { {  962, 0 }, 8 }, { {  120, 0 }, 8 },
     { {  746, 0 }, 8 }, { {  121, 0 }, 8 }, { {  798, 0 }, 8 }, { {  395, 0 }, 8 }, { {  154, 0 }, 8 },
     { {  201, 0 }, 8 }, { {  171, 0 }, 8 }, { {  601, 0 }, 8 }, { {  188, 0 }, 8 }, { {  926, 0 }, 8 },
-    { {  609, 0 }, 8 }, { {  870, 0 }, 8 }, { {  716, 0 }, 8 }, { {  902, 0 }, 8 }, { {  901, 0 }, 8 },
-    { {  809, 0 }, 8 }, { {  483, 0 }, 8 }, { {  809, 0 }, 8 }, { {  969, 0 }, 8 }, { {  495, 0 }, 8 },
+    { {  609, 0 }, 8 }, { {  877, 0 }, 8 }, { {  716, 0 }, 8 }, { {  902, 0 }, 8 }, { {  901, 0 }, 8 },
+    { {  809, 0 }, 8 }, { {  483, 0 }, 8 }, { {  801, 0 }, 8 }, { {  969, 0 }, 8 }, { {  495, 0 }, 8 },
     { {    9, 0 }, 8 }, { {   13, 0 }, 8 }, { {  704, 0 }, 8 }, { {  476, 0 }, 8 }, { {  189, 0 }, 8 },
-    { {  594, 0 }, 8 }, { {  162, 0 }, 8 }, { {  951, 0 }, 8 }, { {   36, 0 }, 8 }, { {  738, 0 }, 8 },
-    { {  747, 0 }, 8 }, { {   15, 0 }, 8 }, { {  717, 0 }, 8 }, { {  659, 0 }, 8 }, { {  648, 0 }, 8 },
-    { {  341, 0 }, 8 }, { {  981, 0 }, 9 }, { {  394, 0 }, 9 }, { {  150, 0 }, 9 }, { {  740, 0 }, 9 },
-    { {  261, 0 }, 9 }, { {  654, 0 }, 9 }, { {  963, 0 }, 9 }, { {  355, 0 }, 9 }, { {   91, 0 }, 9 },
+    { {  599, 0 }, 8 }, { {  162, 0 }, 8 }, { {  951, 0 }, 8 }, { {   36, 0 }, 8 }, { {  738, 0 }, 8 },
+    { {  747, 0 }, 8 }, { {   15, 0 }, 8 }, { {  710, 0 }, 8 }, { {  659, 0 }, 8 }, { {  648, 0 }, 8 },
+    { {  341, 0 }, 8 }, { {  981, 0 }, 9 }, { {  399, 0 }, 9 }, { {  150, 0 }, 9 }, { {  740, 0 }, 9 },
+    { {  261, 0 }, 9 }, { {  650, 0 }, 9 }, { {  963, 0 }, 9 }, { {  355, 0 }, 9 }, { {   91, 0 }, 9 },
     { {  933, 0 }, 9 }, { {  316, 0 }, 9 }, { {  308, 0 }, 9 }, { {  461, 0 }, 9 }, { {  228, 0 }, 9 },
     { {  354, 0 }, 9 }, { {  941, 0 }, 9 }, { {  618, 0 }, 9 }, { {  554, 0 }, 9 }, { {  796, 0 }, 9 },
     { {  638, 0 }, 9 }, { {  502, 0 }, 9 }, { {  868, 0 }, 9 }, { {  168, 0 }, 9 }, { {  692, 0 }, 9 },
@@ -296,9 +296,9 @@ static struct AvlInsertTestCase g_insertTestCases[] = {
     { {  455, 0 }, 9 }, { {  909, 0 }, 9 }, { {  272, 0 }, 9 }, { {  575, 0 }, 9 }, { {   46, 0 }, 9 },
     { {  544, 0 }, 9 }, { {  998, 0 }, 9 }, { {  412, 0 }, 9 }, { {   57, 0 }, 9 }, { {  388, 0 }, 9 },
     { {  132, 0 }, 9 }, { {  249, 0 }, 9 }, { {  549, 0 }, 9 }, { {   84, 0 }, 9 }, { {  394, 0 }, 9 },
-    { {  459, 0 }, 9 }, { {  548, 0 }, 9 }, { {  156, 0 }, 9 }, { {  870, 0 }, 9 }, { {  774, 0 }, 9 },
-    { {  939, 0 }, 9 }, { {  108, 0 }, 9 }, { {  663, 0 }, 9 }, { {  832, 0 }, 9 }, { {  891, 0 }, 9 },
-    { {  216, 0 }, 9 }, { {  227, 0 }, 9 }, { {  616, 0 }, 9 }, { {    1, 0 }, 9 }, { {  260, 0 }, 9 },
+    { {  459, 0 }, 9 }, { {  540, 0 }, 9 }, { {  156, 0 }, 9 }, { {  873, 0 }, 9 }, { {  774, 0 }, 9 },
+    { {  940, 0 }, 9 }, { {  108, 0 }, 9 }, { {  663, 0 }, 9 }, { {  832, 0 }, 9 }, { {  891, 0 }, 9 },
+    { {  210, 0 }, 9 }, { {  227, 0 }, 9 }, { {  616, 0 }, 9 }, { {    1, 0 }, 9 }, { {  260, 0 }, 9 },
 };
 
 static char g_avlTraversalsBuffer[2048];
@@ -818,6 +818,95 @@ CUT_DEFINE_TEST(test_avl_findGreaterOrEqual)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_remove)
+{
+    RESET_STATISTICS;
+
+    UTDataAVL tree;
+    UTDataAVLNode *result = NULL;
+    Data value;
+    const Data *findResult = NULL;
+    clib_bool_t isBalanced;
+    size_t freeCalls = 0;
+    size_t objectsInUsage;
+
+    value.start = 1;
+    value.end = 0;
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_remove(&tree, &value, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_remove(NULL, &value, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_remove(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_remove(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    // create tree
+    for (size_t i = 0; i < _countof(g_insertTestCases); i++) {
+        value.start = g_insertTestCases[i].data.start;
+        CUT_CHECK(UTDataAVL_insert(&tree, &value) == CLIB_ERROR_SUCCESS);
+    }
+    objectsInUsage = _countof(g_insertTestCases);
+
+    for (size_t i = 0; i < (size_t) 1000; i++) {
+        int exists = 0;
+        for (size_t j = 0; j < _countof(g_insertTestCases); j++) {
+            if (i == g_insertTestCases[j].data.start) {
+                exists = 1;
+                break;
+            }
+        }
+
+        value.start = i;
+
+        if (exists == 1) {
+            result = NULL;
+            CUT_CHECK(UTDataAVL_remove(&tree, &value, &result) == CLIB_ERROR_SUCCESS);
+
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK(result->data.start == i);
+
+            findResult = (const Data*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_findType(&tree, &value, &findResult) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(findResult == NULL);
+
+            isBalanced = CLIB_FALSE;
+            CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+            CUT_CHECK(isBalanced == CLIB_TRUE);
+
+            CUT_CHECK(UTDataAVLNode_free(result) == CLIB_ERROR_SUCCESS);
+
+            freeCalls++;
+            objectsInUsage--;
+        } else {
+            result = (UTDataAVLNode*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_remove(&tree, &value, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+
+            isBalanced = CLIB_FALSE;
+            CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+            CUT_CHECK(isBalanced == CLIB_TRUE);
+        }
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(g_insertTestCases));
+        CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, freeCalls);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, objectsInUsage);
+        CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, objectsInUsage * sizeof(UTDataAVLNode));
+    }
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_init);
     CUT_CALL_TEST(test_avl_free);
@@ -839,4 +928,6 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_find);
     CUT_CALL_TEST(test_avl_findType);
     CUT_CALL_TEST(test_avl_findGreaterOrEqual);
+
+    CUT_CALL_TEST(test_avl_remove);
 CUT_END_MAIN
