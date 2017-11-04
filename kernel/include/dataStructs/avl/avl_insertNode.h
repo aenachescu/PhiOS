@@ -12,13 +12,8 @@ clib_error_code_t AVLFunc(name, insertNode) (                                   
     AVLStruct(name) *a_avl,                                                     \
     AVLNodeStruct(name) *a_node)                                                \
 {                                                                               \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_node == CLIB_NULLPTR) {                                               \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_node == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                \
                                                                                 \
     a_avl->root = AVLNodeFunc(name, insert) (a_avl->root, a_node);              \
                                                                                 \

@@ -12,7 +12,7 @@
 #endif
 
 #define DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                      \
-clib_error_code_t AVLFunc(name, findGreaterOrEqual) (                            \
+clib_error_code_t AVLFunc(name, findGreaterOrEqual) (                           \
     const AVLStruct(name) *a_avl,                                               \
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res                                           \
@@ -24,19 +24,12 @@ clib_error_code_t AVLFunc(name, findGreaterOrEqual) (                           
     const type *a_value,                                                        \
     const AVLNodeStruct(name) **a_res)                                          \
 {                                                                               \
-    if (a_res == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_res == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
                                                                                 \
     *a_res = CLIB_NULLPTR;                                                      \
                                                                                 \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_value == CLIB_NULLPTR) {                                              \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_value == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)               \
                                                                                 \
     if (a_avl->root == CLIB_NULLPTR) {                                          \
         return CLIB_ERROR_NOT_FOUND;                                            \

@@ -10,9 +10,7 @@ clib_error_code_t AVLFunc(name, init) (                                         
 clib_error_code_t AVLFunc(name, init) (                                         \
     AVLStruct(name) *a_avl)                                                     \
 {                                                                               \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
                                                                                 \
     a_avl->root = CLIB_NULLPTR;                                                 \
                                                                                 \

@@ -25,13 +25,8 @@ clib_error_code_t AVLFunc(name, foreachInorder) (                               
     const AVLStruct(name) *a_avl,                                               \
     AVL_FOREACH_CBK(name) a_cbk)                                                \
 {                                                                               \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_cbk == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_INVALID_FUNCTION;                                     \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_cbk == CLIB_NULLPTR, CLIB_ERROR_INVALID_FUNCTION)             \
                                                                                 \
     AVLNodeFunc(name, foreachInorder) (a_avl->root, a_cbk);                     \
                                                                                 \
@@ -51,13 +46,8 @@ clib_error_code_t AVLFunc(name, foreachPreorder) (                              
     const AVLStruct(name) *a_avl,                                               \
     AVL_FOREACH_CBK(name) a_cbk)                                                \
 {                                                                               \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_cbk == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_INVALID_FUNCTION;                                     \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_cbk == CLIB_NULLPTR, CLIB_ERROR_INVALID_FUNCTION)             \
                                                                                 \
     AVLNodeFunc(name, foreachPreorder) (a_avl->root, a_cbk);                    \
                                                                                 \
@@ -77,13 +67,8 @@ clib_error_code_t AVLFunc(name, foreachPostorder) (                             
     const AVLStruct(name) *a_avl,                                               \
     AVL_FOREACH_CBK(name) a_cbk)                                                \
 {                                                                               \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_cbk == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_INVALID_FUNCTION;                                     \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_cbk == CLIB_NULLPTR, CLIB_ERROR_INVALID_FUNCTION)             \
                                                                                 \
     AVLNodeFunc(name, foreachPostorder) (a_avl->root, a_cbk);                   \
                                                                                 \

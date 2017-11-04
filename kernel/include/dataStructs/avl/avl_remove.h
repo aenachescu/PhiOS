@@ -14,19 +14,12 @@ clib_error_code_t AVLFunc(name, remove) (                                       
     const type *a_value,                                                        \
     AVLNodeStruct(name) **a_result)                                             \
 {                                                                               \
-    if (a_result == CLIB_NULLPTR) {                                             \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_result == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)              \
                                                                                 \
     *a_result = CLIB_NULLPTR;                                                   \
                                                                                 \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_value == CLIB_NULLPTR) {                                              \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_value == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)               \
                                                                                 \
     if (a_avl->root == CLIB_NULLPTR) {                                          \
         return CLIB_ERROR_NOT_FOUND;                                            \

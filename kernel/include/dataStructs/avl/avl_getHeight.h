@@ -12,13 +12,8 @@ clib_error_code_t AVLFunc(name, getHeight) (                                    
     const AVLStruct(name) *a_avl,                                               \
     unsigned int *a_res)                                                        \
 {                                                                               \
-    if (a_avl == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
-                                                                                \
-    if (a_res == CLIB_NULLPTR) {                                                \
-        return CLIB_ERROR_NULL_POINTER;                                         \
-    }                                                                           \
+    INPUT_CHECK(a_avl == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
+    INPUT_CHECK(a_res == CLIB_NULLPTR, CLIB_ERROR_NULL_POINTER)                 \
                                                                                 \
     *a_res = AVLNodeFunc(name, getHeight) (a_avl->root);                        \
                                                                                 \
