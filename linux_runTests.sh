@@ -146,7 +146,7 @@ if [ "$1" == "run" ];then
 
         echo -e "\n${green}*****${reset} Building tests for x86_64"
         build_tests_x86_64
-        echo "${green}builded tests for x86_64 successfully${reset}"
+        echo "${green}built tests for x86_64 successfully${reset}"
 
         running_tests
     fi
@@ -156,7 +156,7 @@ if [ "$1" == "run" ];then
 
         echo -e "\n${green}*****${reset} Building tests for x86_32"
         build_tests_x86_32
-        echo "${green}builded tests for x86_32 successfully${reset}"
+        echo "${green}built tests for x86_32 successfully${reset}"
 
         running_tests
     fi
