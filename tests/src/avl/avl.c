@@ -578,6 +578,8 @@ clib_error_code_t UTDataAVL_foreachPostorder(const UTDataAVL *a_avl,
                                              UTDataAVLForeachCbk_t a_cbk);
 clib_error_code_t UTDataAVL_isBalanced(const UTDataAVL *a_avl,
                                        clib_bool_t *a_result);
+clib_error_code_t UTDataAVL_remove(UTDataAVL *a_avl, const Data *a_value,
+                                   UTDataAVLNode **a_result);
 ;
 static inline unsigned int
 UTDataAVLNode_getHeight(const UTDataAVLNode *a_node) {
@@ -805,6 +807,53 @@ static clib_bool_t UTDataAVLNode_isBalanced(const UTDataAVLNode *a_parent) {
   }
   return ((clib_bool_t)1);
 }
+static UTDataAVLNode *UTDataAVLNode_removeMin(UTDataAVLNode *a_parent,
+                                              UTDataAVLNode **a_min) {
+  if (a_parent->left == ((void *)0)) {
+    *a_min = a_parent;
+    return a_parent->right;
+  }
+  a_parent->left = UTDataAVLNode_removeMin(a_parent->left, a_min);
+  return UTDataAVLNode_balance(a_parent);
+}
+static UTDataAVLNode *UTDataAVLNode_remove(UTDataAVLNode *a_parent,
+                                           const Data *a_value,
+                                           UTDataAVLNode **a_result) {
+  if ((a_value->start < (&a_parent->data)->start)) {
+    if (a_parent->left == ((void *)0)) {
+      return a_parent;
+    }
+    a_parent->left = UTDataAVLNode_remove(a_parent->left, a_value, a_result);
+    if (*a_result == ((void *)0)) {
+      return a_parent;
+    }
+    return UTDataAVLNode_balance(a_parent);
+  }
+  if ((a_value->start > (&a_parent->data)->start)) {
+    if (a_parent->right == ((void *)0)) {
+      return a_parent;
+    }
+    a_parent->right = UTDataAVLNode_remove(a_parent->right, a_value, a_result);
+    if (*a_result == ((void *)0)) {
+      return a_parent;
+    }
+    return UTDataAVLNode_balance(a_parent);
+  }
+  *a_result = a_parent;
+  UTDataAVLNode *auxNode;
+  if (a_parent->right == ((void *)0)) {
+    auxNode = a_parent->left;
+    a_parent->left = ((void *)0);
+    return auxNode;
+  }
+  UTDataAVLNode *minNode = ((void *)0);
+  auxNode = UTDataAVLNode_removeMin(a_parent->right, &minNode);
+  minNode->right = auxNode;
+  minNode->left = a_parent->left;
+  a_parent->left = ((void *)0);
+  a_parent->right = ((void *)0);
+  return UTDataAVLNode_balance(minNode);
+}
 clib_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
     return ((clib_error_code_t)1);
@@ -964,6 +1013,27 @@ clib_error_code_t UTDataAVL_isBalanced(const UTDataAVL *a_avl,
     return ((clib_error_code_t)1);
   }
   *a_result = UTDataAVLNode_isBalanced(a_avl->root);
+  return ((clib_error_code_t)0);
+}
+clib_error_code_t UTDataAVL_remove(UTDataAVL *a_avl, const Data *a_value,
+                                   UTDataAVLNode **a_result) {
+  if (a_result == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  *a_result = ((void *)0);
+  if (a_avl == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_value == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_avl->root == ((void *)0)) {
+    return ((clib_error_code_t)2);
+  }
+  a_avl->root = UTDataAVLNode_remove(a_avl->root, a_value, a_result);
+  if (*a_result == ((void *)0)) {
+    return ((clib_error_code_t)2);
+  }
   return ((clib_error_code_t)0);
 };
 static size_t g_memInUsage = 0;
