@@ -74,8 +74,8 @@
  *
  * Global requirements:
  *   1. you must define the following macro functions:
- *        - AVL_TYPE_OPERATOR_GREATER - is used by the AVLNode_find function.
- *        - AVL_TYPE_OPERATOR_LESS - is used by the AVLNode_find, AVLNode_insert functions.
+ *        - AVL_TYPE_OPERATOR_GREATER - is used by the AVLNode_find, AVLNode_remove functions.
+ *        - AVL_TYPE_OPERATOR_LESS - is used by the AVLNode_find, AVLNode_insert, AVLNode_remove functions.
  *        - AVL_COPY_TYPE_FUNC - is used by the AVLNode_init, AVLNode_create functions.
  *
  * Optional functions:
@@ -128,6 +128,8 @@
 #include "kernel/include/dataStructs/avl/avlnode_findGreaterOrEqual.h"
 #include "kernel/include/dataStructs/avl/avlnode_traversals.h"
 #include "kernel/include/dataStructs/avl/avlnode_isBalanced.h"
+#include "kernel/include/dataStructs/avl/avlnode_remove.h"
+#include "kernel/include/dataStructs/avl/avlnode_removeMin.h"
 
 // include avl headers
 #include "kernel/include/dataStructs/avl/avl_struct.h"
@@ -141,6 +143,7 @@
 #include "kernel/include/dataStructs/avl/avl_findGreaterOrEqual.h"
 #include "kernel/include/dataStructs/avl/avl_traversals.h"
 #include "kernel/include/dataStructs/avl/avl_isBalanced.h"
+#include "kernel/include/dataStructs/avl/avl_remove.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
@@ -168,7 +171,8 @@
     DECLARE_AVL_FUNC_FOR_EACH_INORDER(type, name)                               \
     DECLARE_AVL_FUNC_FOR_EACH_PREORDER(type, name)                              \
     DECLARE_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                             \
-    DECLARE_AVL_FUNC_IS_BALANCED(type, name)
+    DECLARE_AVL_FUNC_IS_BALANCED(type, name)                                    \
+    DECLARE_AVL_FUNC_REMOVE(type, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -192,7 +196,9 @@
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_INORDER(type, name)                        \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_PREORDER(type, name)                       \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_POSTORDER(type, name)                      \
-    IMPLEMENT_AVL_NODE_FUNC_IS_BALANCED(type, name)
+    IMPLEMENT_AVL_NODE_FUNC_IS_BALANCED(type, name)                             \
+    IMPLEMENT_AVL_NODE_FUNC_REMOVE_MIN(type, name)                              \
+    IMPLEMENT_AVL_NODE_FUNC_REMOVE(type, name)
 
 // implement avl functions
 #define IMPLEMENT_AVL_FUNC(type, name)                                          \
@@ -207,7 +213,8 @@
     IMPLEMENT_AVL_FUNC_FOR_EACH_INORDER(type, name)                             \
     IMPLEMENT_AVL_FUNC_FOR_EACH_PREORDER(type, name)                            \
     IMPLEMENT_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                           \
-    IMPLEMENT_AVL_FUNC_IS_BALANCED(type, name)
+    IMPLEMENT_AVL_FUNC_IS_BALANCED(type, name)                                  \
+    IMPLEMENT_AVL_FUNC_REMOVE(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
