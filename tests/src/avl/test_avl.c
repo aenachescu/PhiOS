@@ -1111,6 +1111,174 @@ CUT_DEFINE_TEST(test_avl_remove_random)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_isBalanced)
+{
+    RESET_STATISTICS;
+
+    {
+        UTDataAVL tree;
+        clib_bool_t result = CLIB_FALSE;
+
+        CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, NULL) == CLIB_ERROR_NULL_POINTER);
+        CUT_CHECK(UTDataAVL_isBalanced(NULL, &result) == CLIB_ERROR_NULL_POINTER);
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &result) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(result == CLIB_TRUE);
+    }
+
+    {
+        UTDataAVL tree;
+        clib_bool_t result = CLIB_TRUE;
+        UTDataAVLNode parent, left, right;
+
+        parent.height = 0;
+        parent.data.start = 0;
+        parent.data.end = 0;
+        parent.left = &left;
+        parent.right = &right;
+
+        left.height = 5;
+        left.data.start = 0;
+        left.data.end = 0;
+        left.left = CLIB_NULLPTR;
+        left.right = CLIB_NULLPTR;
+
+        right.height = 1;
+        right.data.start = 0;
+        right.data.end = 0;
+        right.left = CLIB_NULLPTR;
+        right.right = CLIB_NULLPTR;
+
+        CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+        tree.root = &parent;
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &result) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(result == CLIB_FALSE);
+    }
+
+    {
+        UTDataAVL tree;
+        clib_bool_t result = CLIB_TRUE;
+        UTDataAVLNode parent, left, right;
+
+        parent.height = 0;
+        parent.data.start = 0;
+        parent.data.end = 0;
+        parent.left = &left;
+        parent.right = &right;
+
+        left.height = 50;
+        left.data.start = 0;
+        left.data.end = 0;
+        left.left = CLIB_NULLPTR;
+        left.right = CLIB_NULLPTR;
+
+        right.height = 100;
+        right.data.start = 0;
+        right.data.end = 0;
+        right.left = CLIB_NULLPTR;
+        right.right = CLIB_NULLPTR;
+
+        CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+        tree.root = &parent;
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &result) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(result == CLIB_FALSE);
+    }
+
+    {
+        UTDataAVL tree;
+        clib_bool_t result = CLIB_TRUE;
+        UTDataAVLNode parent, left, right, leftLeft, leftRight;
+
+        parent.height = 2;
+        parent.data.start = 0;
+        parent.data.end = 0;
+        parent.left = &left;
+        parent.right = &right;
+
+        left.height = 2;
+        left.data.start = 0;
+        left.data.end = 0;
+        left.left = &leftLeft;
+        left.right = &leftRight;
+
+        right.height = 1;
+        right.data.start = 0;
+        right.data.end = 0;
+        right.left = CLIB_NULLPTR;
+        right.right = CLIB_NULLPTR;
+
+        leftLeft.height = 5;
+        leftLeft.data.start = 0;
+        leftLeft.data.end = 0;
+        leftLeft.left = CLIB_NULLPTR;
+        leftLeft.right = CLIB_NULLPTR;
+
+        leftRight.height = 7;
+        leftRight.data.start = 0;
+        leftRight.data.end = 0;
+        leftRight.left = CLIB_NULLPTR;
+        leftRight.right = CLIB_NULLPTR;
+
+        CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+        tree.root = &parent;
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &result) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(result == CLIB_FALSE);
+    }
+
+    {
+        UTDataAVL tree;
+        clib_bool_t result = CLIB_TRUE;
+        UTDataAVLNode parent, left, right, rightLeft, rightRight;
+
+        parent.height = 2;
+        parent.data.start = 0;
+        parent.data.end = 0;
+        parent.left = &left;
+        parent.right = &right;
+
+        left.height = 1;
+        left.data.start = 0;
+        left.data.end = 0;
+        left.left = CLIB_NULLPTR;
+        left.right = CLIB_NULLPTR;
+
+        right.height = 2;
+        right.data.start = 0;
+        right.data.end = 0;
+        right.left = &rightLeft;
+        right.right = &rightRight;
+
+        rightLeft.height = 19;
+        rightLeft.data.start = 0;
+        rightLeft.data.end = 0;
+        rightLeft.left = CLIB_NULLPTR;
+        rightLeft.right = CLIB_NULLPTR;
+
+        rightRight.height = 15;
+        rightRight.data.start = 0;
+        rightRight.data.end = 0;
+        rightRight.left = CLIB_NULLPTR;
+        rightRight.right = CLIB_NULLPTR;
+
+        CUT_CHECK(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+        tree.root = &parent;
+
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &result) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(result == CLIB_FALSE);
+    }
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_init);
     CUT_CALL_TEST(test_avl_free);
@@ -1136,4 +1304,6 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_remove);
     CUT_CALL_TEST(test_avl_remove_reverse);
     CUT_CALL_TEST(test_avl_remove_random);
+
+    CUT_CALL_TEST(test_avl_isBalanced);
 CUT_END_MAIN
