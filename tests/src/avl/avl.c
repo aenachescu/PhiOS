@@ -572,6 +572,9 @@ clib_error_code_t UTDataAVL_findType(const UTDataAVL *a_avl,
 clib_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
                                                const Data *a_value,
                                                const UTDataAVLNode **a_res);
+clib_error_code_t UTDataAVL_findLessOrEqual(const UTDataAVL *a_avl,
+                                            const Data *a_value,
+                                            const UTDataAVLNode **a_res);
 clib_error_code_t UTDataAVL_foreachInorder(const UTDataAVL *a_avl,
                                            UTDataAVLForeachCbk_t a_cbk);
 clib_error_code_t UTDataAVL_foreachPreorder(const UTDataAVL *a_avl,
@@ -763,6 +766,38 @@ UTDataAVLNode_findGreaterOrEqual(const UTDataAVLNode *a_parent,
       UTDataAVLNode_findGreaterOrEqual(a_parent->left, a_value, (&scoreLeft));
   if (((*(&scoreLeft)) < (*a_currentScore))) {
     ((*a_currentScore) = (*(&scoreLeft)));
+    return result;
+  }
+  return a_parent;
+}
+static const UTDataAVLNode *
+UTDataAVLNode_findLessOrEqual(const UTDataAVLNode *a_parent,
+                              const Data *a_value,
+                              unsigned int *a_currentScore) {
+  if (((*a_currentScore) == 0)) {
+    return a_parent;
+  }
+  if (((*a_currentScore) == 0xFFFFFFFF)) {
+    if (a_parent->left == ((void *)0)) {
+      return ((void *)0);
+    }
+    (&a_parent->left->data)->start <= a_value->start
+        ? (*a_currentScore = a_value->start - (&a_parent->left->data)->start)
+        : (*a_currentScore = 0xFFFFFFFF);
+    return UTDataAVLNode_findLessOrEqual(a_parent->left, a_value,
+                                         a_currentScore);
+  }
+  if (a_parent->right == ((void *)0)) {
+    return a_parent;
+  }
+  unsigned int scoreRight;
+  (&a_parent->right->data)->start <= a_value->start
+      ? (*(&scoreRight) = a_value->start - (&a_parent->right->data)->start)
+      : (*(&scoreRight) = 0xFFFFFFFF);
+  const UTDataAVLNode *result =
+      UTDataAVLNode_findLessOrEqual(a_parent->right, a_value, (&scoreRight));
+  if (((*(&scoreRight)) < (*a_currentScore))) {
+    ((*a_currentScore) = (*(&scoreRight)));
     return result;
   }
   return a_parent;
@@ -992,6 +1027,32 @@ clib_error_code_t UTDataAVL_findGreaterOrEqual(const UTDataAVL *a_avl,
       ? (*(&score) = (&a_avl->root->data)->start - a_value->start)
       : (*(&score) = 0xFFFFFFFF);
   *a_res = UTDataAVLNode_findGreaterOrEqual(a_avl->root, a_value, &score);
+  if (*a_res == ((void *)0)) {
+    return ((clib_error_code_t)2);
+  }
+  return ((clib_error_code_t)0);
+}
+clib_error_code_t UTDataAVL_findLessOrEqual(const UTDataAVL *a_avl,
+                                            const Data *a_value,
+                                            const UTDataAVLNode **a_res) {
+  if (a_res == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  *a_res = ((void *)0);
+  if (a_avl == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_value == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_avl->root == ((void *)0)) {
+    return ((clib_error_code_t)2);
+  }
+  unsigned int score;
+  (&a_avl->root->data)->start <= a_value->start
+      ? (*(&score) = a_value->start - (&a_avl->root->data)->start)
+      : (*(&score) = 0xFFFFFFFF);
+  *a_res = UTDataAVLNode_findLessOrEqual(a_avl->root, a_value, &score);
   if (*a_res == ((void *)0)) {
     return ((clib_error_code_t)2);
   }

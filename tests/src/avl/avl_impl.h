@@ -5,23 +5,25 @@
 
 // defines for findGreaterOrEqual
 #define AVL_USE_FIND_GREATER_OR_EQUAL
-#define AVL_TYPE_SCORE_GREATER_OR_EQUAL unsigned int
-
-#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID(x)                           \
-    ((*x) == 0xFFFFFFFF)
-
-#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT(x)                           \
-    ((*x) == 0)
-
-#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER(a, b)                         \
-    ((*a) < (*b))
-
-#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_COPY(a, b)                              \
-    ((*a) = (*b))
-
+#define AVL_TYPE_SCORE_GREATER_OR_EQUAL                                         unsigned int
+#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID(x)                           ((*x) == 0xFFFFFFFF)
+#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT(x)                           ((*x) == 0)
+#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_BETTER(a, b)                         ((*a) < (*b))
+#define AVL_TYPE_SCORE_GREATER_OR_EQUAL_COPY(a, b)                              ((*a) = (*b))
 #define AVL_TYPE_SCORE_GREATER_OR_EQUAL_GET_SCORE(current, value, result)       \
     current->start >= value->start ?                                            \
         (*result = current->start - value->start) : (*result = 0xFFFFFFFF)
+
+// defines for findLessOrEqual
+#define AVL_USE_FIND_LESS_OR_EQUAL
+#define AVL_TYPE_SCORE_LESS_OR_EQUAL                                            unsigned int
+#define AVL_TYPE_SCORE_LESS_OR_EQUAL_IS_INVALID(x)                              ((*x) == 0xFFFFFFFF)
+#define AVL_TYPE_SCORE_LESS_OR_EQUAL_IS_PERFECT(x)                              ((*x) == 0)
+#define AVL_TYPE_SCORE_LESS_OR_EQUAL_IS_BETTER(a, b)                            ((*a) < (*b))
+#define AVL_TYPE_SCORE_LESS_OR_EQUAL_COPY(a, b)                                 ((*a) = (*b))
+#define AVL_TYPE_SCORE_LESS_OR_EQUAL_GET_SCORE(current, value, result)          \
+    current->start <= value->start ?                                            \
+        (*result = value->start - current->start) : (*result = 0xFFFFFFFF)
 
 #define AVL_USE_AVL_NODE_FREE
 #define AVL_USE_AVL_NODE_CREATE

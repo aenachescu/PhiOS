@@ -310,6 +310,8 @@ int DataSortCmp(const void *a, const void *b)
 
 void getSubarraySortedAsString(char *buffer, size_t pos)
 {
+	buffer[0] = 0;
+    
 	unsigned int *vec = (unsigned int*)malloc(sizeof(unsigned int) * (pos + 1));
 	if (vec == NULL) {
 		return;
@@ -320,8 +322,6 @@ void getSubarraySortedAsString(char *buffer, size_t pos)
 	}
 
 	qsort(vec, pos + 1, sizeof(unsigned int), DataSortCmp);
-
-	buffer[0] = 0;
 
 	char numBuf[64];
 	for (size_t i = 0; i <= pos; i++) {
@@ -1420,6 +1420,79 @@ CUT_DEFINE_TEST(test_avl_findIf)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_findLessOrEqual)
+{
+    RESET_STATISTICS;
+
+    unsigned int values[200] = { 0 };
+    UTDataAVL tree;
+    Data data;
+    const UTDataAVLNode *result = NULL;
+
+    data.start = 0;
+    data.end = 0;
+
+    GenerateRandomArray(values, _countof(values), 50, 950);
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_findLessOrEqual(&tree, &data, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    result = (const UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findLessOrEqual(NULL, &data, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (const UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findLessOrEqual(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (const UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findLessOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(values); i++) {
+        data.start = values[i];
+        CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+    }
+
+    qsort(values, _countof(values), sizeof(unsigned int), DataSortCmp);
+
+    for (unsigned int i = 0; i < 1000; i++) {
+        data.start = i;
+        data.end = 0;
+
+        int exists = 0;
+        size_t j;
+        for (j = _countof(values); j > 0; j--) {
+            if (i >= values[j - 1]) {
+                exists = 1;
+                break;
+            }
+        }
+
+        if (exists == 1) {
+            result = NULL;
+            CUT_CHECK(UTDataAVL_findLessOrEqual(&tree, &data, &result) == CLIB_ERROR_SUCCESS);
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK(result->data.start == values[j - 1]);
+            CUT_CHECK(result->data.end == 0);
+        } else {
+            result = (const UTDataAVLNode*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_findLessOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+        }
+    }
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(values));
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, _countof(values));
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, _countof(values) * sizeof(UTDataAVLNode));
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
 
     // initializes with a constant value to always generate the same values.
@@ -1445,6 +1518,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_find);
     CUT_CALL_TEST(test_avl_findType);
     CUT_CALL_TEST(test_avl_findGreaterOrEqual);
+    CUT_CALL_TEST(test_avl_findLessOrEqual);
     CUT_CALL_TEST(test_avl_findIf);
 
     CUT_CALL_TEST(test_avl_remove);

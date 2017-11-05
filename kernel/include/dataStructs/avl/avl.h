@@ -127,6 +127,7 @@
 #include "kernel/include/dataStructs/avl/avlnode_create.h"
 #include "kernel/include/dataStructs/avl/avlnode_free.h"
 #include "kernel/include/dataStructs/avl/avlnode_findGreaterOrEqual.h"
+#include "kernel/include/dataStructs/avl/avlnode_findLessOrEqual.h"
 #include "kernel/include/dataStructs/avl/avlnode_traversals.h"
 #include "kernel/include/dataStructs/avl/avlnode_isBalanced.h"
 #include "kernel/include/dataStructs/avl/avlnode_remove.h"
@@ -143,6 +144,7 @@
 #include "kernel/include/dataStructs/avl/avl_insert.h"
 #include "kernel/include/dataStructs/avl/avl_insertNode.h"
 #include "kernel/include/dataStructs/avl/avl_findGreaterOrEqual.h"
+#include "kernel/include/dataStructs/avl/avl_findLessOrEqual.h"
 #include "kernel/include/dataStructs/avl/avl_traversals.h"
 #include "kernel/include/dataStructs/avl/avl_isBalanced.h"
 #include "kernel/include/dataStructs/avl/avl_remove.h"
@@ -172,6 +174,7 @@
     DECLARE_AVL_FUNC_FIND(type, name)                                           \
     DECLARE_AVL_FUNC_FIND_TYPE(type, name)                                      \
     DECLARE_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                          \
+    DECLARE_AVL_FUNC_FIND_LESS_OR_EQUAL(type, name)                             \
     DECLARE_AVL_FUNC_FOR_EACH_INORDER(type, name)                               \
     DECLARE_AVL_FUNC_FOR_EACH_PREORDER(type, name)                              \
     DECLARE_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                             \
@@ -198,6 +201,7 @@
     IMPLEMENT_AVL_NODE_FUNC_FREE(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_FIND(type, name)                                    \
     IMPLEMENT_AVL_NODE_FUNC_FIND_GREATER_OR_EQUAL(type, name)                   \
+    IMPLEMENT_AVL_NODE_FUNC_FIND_LESS_OR_EQUAL(type, name)                      \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_INORDER(type, name)                        \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_PREORDER(type, name)                       \
     IMPLEMENT_AVL_NODE_FUNC_FOR_EACH_POSTORDER(type, name)                      \
@@ -216,6 +220,7 @@
     IMPLEMENT_AVL_FUNC_FIND(type, name)                                         \
     IMPLEMENT_AVL_FUNC_FIND_TYPE(type, name)                                    \
     IMPLEMENT_AVL_FUNC_FIND_GREATER_OR_EQUAL(type, name)                        \
+    IMPLEMENT_AVL_FUNC_FIND_LESS_OR_EQUAL(type, name)                           \
     IMPLEMENT_AVL_FUNC_FOR_EACH_INORDER(type, name)                             \
     IMPLEMENT_AVL_FUNC_FOR_EACH_PREORDER(type, name)                            \
     IMPLEMENT_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                           \
