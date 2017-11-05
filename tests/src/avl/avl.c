@@ -552,6 +552,8 @@ typedef struct UTDataAVL_t {
   UTDataAVLNode *root;
 } UTDataAVL;
 typedef void (*UTDataAVLForeachCbk_t)(const Data *a_value);
+typedef clib_bool_t (*UTDataAVLFindIfCbk_t)(const Data *a_value,
+                                            void *a_context);
 clib_error_code_t UTDataAVLNode_init(UTDataAVLNode *a_node, const Data *a_data);
 clib_error_code_t UTDataAVLNode_uninit(UTDataAVLNode *a_node);
 clib_error_code_t UTDataAVLNode_create(UTDataAVLNode **a_node,
@@ -580,6 +582,9 @@ clib_error_code_t UTDataAVL_isBalanced(const UTDataAVL *a_avl,
                                        clib_bool_t *a_result);
 clib_error_code_t UTDataAVL_remove(UTDataAVL *a_avl, const Data *a_value,
                                    UTDataAVLNode **a_result);
+clib_error_code_t UTDataAVL_findIf(const UTDataAVL *a_avl,
+                                   UTDataAVLFindIfCbk_t a_cbk, void *a_context,
+                                   const UTDataAVLNode **a_result);
 ;
 static inline unsigned int
 UTDataAVLNode_getHeight(const UTDataAVLNode *a_node) {
@@ -854,6 +859,27 @@ static UTDataAVLNode *UTDataAVLNode_remove(UTDataAVLNode *a_parent,
   a_parent->right = ((void *)0);
   return UTDataAVLNode_balance(minNode);
 }
+static const UTDataAVLNode *UTDataAVLNode_findIf(const UTDataAVLNode *a_parent,
+                                                 UTDataAVLFindIfCbk_t a_cbk,
+                                                 void *a_context) {
+  const UTDataAVLNode *result;
+  if (a_parent->left != ((void *)0)) {
+    result = UTDataAVLNode_findIf(a_parent->left, a_cbk, a_context);
+    if (result != ((void *)0)) {
+      return result;
+    }
+  }
+  if (a_cbk(&a_parent->data, a_context) == ((clib_bool_t)1)) {
+    return a_parent;
+  }
+  if (a_parent->right != ((void *)0)) {
+    result = UTDataAVLNode_findIf(a_parent->right, a_cbk, a_context);
+    if (result != ((void *)0)) {
+      return result;
+    }
+  }
+  return ((void *)0);
+}
 clib_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
     return ((clib_error_code_t)1);
@@ -1035,6 +1061,27 @@ clib_error_code_t UTDataAVL_remove(UTDataAVL *a_avl, const Data *a_value,
     return ((clib_error_code_t)2);
   }
   return ((clib_error_code_t)0);
+}
+clib_error_code_t UTDataAVL_findIf(const UTDataAVL *a_avl,
+                                   UTDataAVLFindIfCbk_t a_cbk, void *a_context,
+                                   const UTDataAVLNode **a_result) {
+  if (a_result == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  *a_result = ((void *)0);
+  if (a_avl == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  }
+  if (a_cbk == ((void *)0)) {
+    return ((clib_error_code_t)6);
+  }
+  if (a_avl->root != ((void *)0)) {
+    *a_result = UTDataAVLNode_findIf(a_avl->root, a_cbk, a_context);
+    if (*a_result != ((void *)0)) {
+      return ((clib_error_code_t)0);
+    }
+  }
+  return ((clib_error_code_t)2);
 };
 static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;

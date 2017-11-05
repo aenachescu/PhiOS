@@ -1310,7 +1310,121 @@ CUT_DEFINE_TEST(test_avl_isBalanced)
     CHECK_STATISTICS;
 }
 
+void GenerateRandomArray(unsigned int *a_array, size_t a_length, unsigned int a_start, unsigned int a_end)
+{
+    unsigned int diff = a_end - a_start;
+    int state;
+
+    for (size_t i = 0; i < a_length; i++) {
+        state = 1;
+        do {
+            unsigned int num = (unsigned int) rand();
+            num %= diff;
+            num += a_start;
+
+            for (size_t j = 0; j < i; j++) {
+                if (a_array[j] == num) {
+                    state++;
+                    break;
+                }
+            }
+
+            if (state == 2) {
+                state = 1;
+            } else {
+                state = 0;
+                a_array[i] = num;
+            }
+
+        } while (state);
+    }
+}
+
+clib_bool_t TestFindIfCbk(const Data *a_value, void *a_context)
+{
+    Data *expectedData = (Data*) a_context;
+    if (a_value->start == expectedData->start) {
+        return CLIB_TRUE;
+    }
+
+    return CLIB_FALSE;
+}
+
+CUT_DEFINE_TEST(test_avl_findIf)
+{
+    RESET_STATISTICS;
+
+    unsigned int values[200] = { 0 };
+    UTDataAVL tree;
+    Data data;
+    const UTDataAVLNode *result = NULL;
+
+    data.start = 0;
+    data.end = 0;
+
+    GenerateRandomArray(values, _countof(values), 0, 1000);
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_findIf(&tree, TestFindIfCbk, &data, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findIf(NULL, TestFindIfCbk, &data, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findIf(&tree, NULL, &data, &result) == CLIB_ERROR_INVALID_FUNCTION);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findIf(&tree, TestFindIfCbk, &data, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(values); i++) {
+        data.start = values[i];
+        CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+    }
+
+    for (size_t i = 0; i < (size_t) 1000; i++) {
+        data.start = (unsigned int) i;
+
+        int exists = 0;
+        for (size_t j = 0; j < _countof(values); j++) {
+            if (data.start == values[j]) {
+                exists = 1;
+                break;
+            }
+        }
+
+        if (exists == 1) {
+            result = NULL;
+            CUT_CHECK(UTDataAVL_findIf(&tree, TestFindIfCbk, &data, &result) == CLIB_ERROR_SUCCESS);
+            CUT_ASSERT(result != NULL);
+
+            CUT_CHECK(result->data.start == data.start);
+            CUT_CHECK(result->data.end == data.end);
+        } else {
+            result = (const UTDataAVLNode*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_findIf(&tree, TestFindIfCbk, &data, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+        }
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(values));
+        CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 0);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, _countof(values));
+        CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, _countof(values) * sizeof(UTDataAVLNode));
+    }
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
+
+    // initializes with a constant value to always generate the same values.
+    srand(100);
+
     CUT_CALL_TEST(test_avl_init);
     CUT_CALL_TEST(test_avl_free);
 
@@ -1331,6 +1445,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_find);
     CUT_CALL_TEST(test_avl_findType);
     CUT_CALL_TEST(test_avl_findGreaterOrEqual);
+    CUT_CALL_TEST(test_avl_findIf);
 
     CUT_CALL_TEST(test_avl_remove);
     CUT_CALL_TEST(test_avl_remove_reverse);
