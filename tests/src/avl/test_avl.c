@@ -818,6 +818,22 @@ CUT_DEFINE_TEST(test_avl_findGreaterOrEqual)
     CHECK_STATISTICS;
 }
 
+static unsigned int g_testRemove_lastValue;
+static int g_testRemove_sorted;
+
+void TestRmoveCheckValue(const Data *data)
+{
+    if (data == NULL) {
+        g_testRemove_sorted = 0;
+        return;
+    }
+
+    if (data->start < g_testRemove_lastValue) {
+        g_testRemove_sorted = 0;
+        return;
+    }
+}
+
 CUT_DEFINE_TEST(test_avl_remove)
 {
     RESET_STATISTICS;
@@ -895,6 +911,11 @@ CUT_DEFINE_TEST(test_avl_remove)
             CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
             CUT_CHECK(isBalanced == CLIB_TRUE);
         }
+
+        g_testRemove_lastValue = 0;
+        g_testRemove_sorted = 1;
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, TestRmoveCheckValue) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(g_testRemove_sorted == 1);
 
         CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(g_insertTestCases));
         CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, freeCalls);
@@ -984,6 +1005,11 @@ CUT_DEFINE_TEST(test_avl_remove_reverse)
             CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
             CUT_CHECK(isBalanced == CLIB_TRUE);
         }
+
+        g_testRemove_lastValue = 0;
+        g_testRemove_sorted = 1;
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, TestRmoveCheckValue) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(g_testRemove_sorted == 1);
 
         CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(g_insertTestCases));
         CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, freeCalls);
@@ -1099,6 +1125,11 @@ CUT_DEFINE_TEST(test_avl_remove_random)
             CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
             CUT_CHECK(isBalanced == CLIB_TRUE);
         }
+
+        g_testRemove_lastValue = 0;
+        g_testRemove_sorted = 1;
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, TestRmoveCheckValue) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(g_testRemove_sorted == 1);
 
         CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(g_insertTestCases));
         CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, freeCalls);
