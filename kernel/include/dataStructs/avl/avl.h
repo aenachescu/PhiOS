@@ -133,6 +133,7 @@
 #include "kernel/include/dataStructs/avl/avlnode_remove.h"
 #include "kernel/include/dataStructs/avl/avlnode_removeMin.h"
 #include "kernel/include/dataStructs/avl/avlnode_findIf.h"
+#include "kernel/include/dataStructs/avl/avlnode_removeIf.h"
 
 // include avl headers
 #include "kernel/include/dataStructs/avl/avl_struct.h"
@@ -149,13 +150,15 @@
 #include "kernel/include/dataStructs/avl/avl_isBalanced.h"
 #include "kernel/include/dataStructs/avl/avl_remove.h"
 #include "kernel/include/dataStructs/avl/avl_findIf.h"
+#include "kernel/include/dataStructs/avl/avl_removeIf.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
     DECLARE_AVL_NODE_STRUCT(type, name)                                         \
     DECLARE_AVL_STRUCT(type, name)                                              \
     DECLARE_AVL_FOR_EACH_CALLBACK_TYPE(type, name)                              \
-    DECLARE_AVL_FIND_IF_CALLBACK_TYPE(type, name)
+    DECLARE_AVL_FIND_IF_CALLBACK_TYPE(type, name)                               \
+    DECLARE_AVL_REMOVE_IF_CALLBACK_TYPE(type, name)
 
 // declare avl node public functions
 #define DECLARE_AVL_NODE_FUNC(type, name)                                       \
@@ -180,7 +183,8 @@
     DECLARE_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                             \
     DECLARE_AVL_FUNC_IS_BALANCED(type, name)                                    \
     DECLARE_AVL_FUNC_REMOVE(type, name)                                         \
-    DECLARE_AVL_FUNC_FIND_IF(type, name)
+    DECLARE_AVL_FUNC_FIND_IF(type, name)                                        \
+    DECLARE_AVL_FUNC_REMOVE_IF(tpye, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -208,7 +212,8 @@
     IMPLEMENT_AVL_NODE_FUNC_IS_BALANCED(type, name)                             \
     IMPLEMENT_AVL_NODE_FUNC_REMOVE_MIN(type, name)                              \
     IMPLEMENT_AVL_NODE_FUNC_REMOVE(type, name)                                  \
-    IMPLEMENT_AVL_NODE_FUNC_FIND_IF(type, name)
+    IMPLEMENT_AVL_NODE_FUNC_FIND_IF(type, name)                                 \
+    IMPLEMENT_AVL_NODE_FUNC_REMOVE_IF(type, name)
 
 // implement avl functions
 #define IMPLEMENT_AVL_FUNC(type, name)                                          \
@@ -226,7 +231,8 @@
     IMPLEMENT_AVL_FUNC_FOR_EACH_POSTORDER(type, name)                           \
     IMPLEMENT_AVL_FUNC_IS_BALANCED(type, name)                                  \
     IMPLEMENT_AVL_FUNC_REMOVE(type, name)                                       \
-    IMPLEMENT_AVL_FUNC_FIND_IF(type, name)
+    IMPLEMENT_AVL_FUNC_FIND_IF(type, name)                                      \
+    IMPLEMENT_AVL_FUNC_REMOVE_IF(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \

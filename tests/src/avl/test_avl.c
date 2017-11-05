@@ -1493,6 +1493,115 @@ CUT_DEFINE_TEST(test_avl_findLessOrEqual)
     CHECK_STATISTICS;
 }
 
+clib_bool_t TestRemoveIfCbk(const Data *a_value, void *a_context)
+{
+    Data *expectedData = (Data*) a_context;
+    if (a_value->start == expectedData->start) {
+        return CLIB_TRUE;
+    }
+
+    return CLIB_FALSE;
+}
+
+CUT_DEFINE_TEST(test_avl_removeIf)
+{
+    RESET_STATISTICS;
+
+    unsigned int values[200] = { 0 };
+    unsigned int randomValues[1000] = { 0 };
+    UTDataAVL tree;
+    Data data = { 0, 0 };
+    const Data *findResult;
+    UTDataAVLNode *result;
+    clib_bool_t isBalanced;
+    size_t objectsInUsage, freeCalls = 0;
+
+    GenerateRandomArray(values, 200, 0, 1000);
+
+    for (unsigned int i = 0; i < 1000; i++) {
+        randomValues[i] = i;
+    }
+    shuffle(randomValues, 1000);
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_removeIf(&tree, TestRemoveIfCbk, &data, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_removeIf(NULL, TestRemoveIfCbk, &data, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_removeIf(&tree, NULL, &data, &result) == CLIB_ERROR_INVALID_FUNCTION);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_removeIf(&tree, TestRemoveIfCbk, &data, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(values); i++) {
+        data.start = values[i];
+        CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+    }
+    objectsInUsage = _countof(values);
+
+    for (size_t i = 0; i < (size_t) 1000; i++) {
+        int exists = 0;
+        for (size_t j = 0; j < _countof(values); j++) {
+            if (randomValues[i] == values[j]) {
+                exists = 1;
+                break;
+            }
+        }
+
+        data.start = randomValues[i];
+
+        if (exists == 1) {
+            result = NULL;
+            CUT_CHECK(UTDataAVL_removeIf(&tree, TestRemoveIfCbk, &data, &result) == CLIB_ERROR_SUCCESS);
+
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK(result->data.start == randomValues[i]);
+
+            findResult = (const Data*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_findType(&tree, &data, &findResult) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(findResult == NULL);
+
+            isBalanced = CLIB_FALSE;
+            CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+            CUT_CHECK(isBalanced == CLIB_TRUE);
+
+            CUT_CHECK(UTDataAVLNode_free(result) == CLIB_ERROR_SUCCESS);
+
+            freeCalls++;
+            objectsInUsage--;
+        } else {
+            result = (UTDataAVLNode*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_removeIf(&tree, TestRemoveIfCbk, &data, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+
+            isBalanced = CLIB_FALSE;
+            CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+            CUT_CHECK(isBalanced == CLIB_TRUE);
+        }
+
+        g_testRemove_lastValue = 0;
+        g_testRemove_sorted = 1;
+        CUT_CHECK(UTDataAVL_foreachInorder(&tree, TestRmoveCheckValue) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(g_testRemove_sorted == 1);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(g_insertTestCases));
+        CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, freeCalls);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, objectsInUsage);
+        CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, objectsInUsage * sizeof(UTDataAVLNode));
+    }
+
+    CUT_CHECK(tree.root == NULL);
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
 
     // initializes with a constant value to always generate the same values.
@@ -1524,6 +1633,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_remove);
     CUT_CALL_TEST(test_avl_remove_reverse);
     CUT_CALL_TEST(test_avl_remove_random);
+    CUT_CALL_TEST(test_avl_removeIf);
 
     CUT_CALL_TEST(test_avl_isBalanced);
 CUT_END_MAIN
