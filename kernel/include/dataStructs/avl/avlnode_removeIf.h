@@ -57,11 +57,7 @@ static AVLNodeStruct(name)* AVLNodeFunc(name, removeIf) (                       
         }                                                                       \
     }                                                                           \
                                                                                 \
-    if (*a_result == CLIB_NULLPTR) {                                            \
-        return a_parent;                                                        \
-    }                                                                           \
-                                                                                \
-    return AVLNodeFunc(name, balance) (a_parent);                               \
+    return a_parent;                                                            \
 }
 
 #endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_NODE_REMOVE_IF
