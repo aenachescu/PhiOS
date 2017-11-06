@@ -25,6 +25,17 @@
     current->start <= value->start ?                                            \
         (*result = value->start - current->start) : (*result = 0xFFFFFFFF)
 
+// defines for findNearOrEqual
+#define AVL_USE_FIND_NEAR_OR_EQUAL
+#define AVL_TYPE_SCORE_NEAR_OR_EQUAL                                            unsigned int
+#define AVL_TYPE_SCORE_NEAR_OR_EQUAL_IS_PERFECT(x)                              ((*x) == 0)
+#define AVL_TYPE_SCORE_NEAR_OR_EQUAL_IS_BETTER(a, b)                            ((*a) < (*b))
+#define AVL_TYPE_SCORE_NEAR_OR_EQUAL_COPY(a, b)                                 ((*a) = (*b))
+#define AVL_TYPE_SCORE_NEAR_OR_EQUAL_GET_SCORE(current, value, result)          \
+    current->start <= value->start ?                                            \
+        (*result = value->start - current->start) :                             \
+        (*result = current->start - value->start)
+
 #define AVL_USE_AVL_NODE_FREE
 #define AVL_USE_AVL_NODE_CREATE
 

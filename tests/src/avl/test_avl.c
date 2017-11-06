@@ -1602,6 +1602,86 @@ CUT_DEFINE_TEST(test_avl_removeIf)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_findNearOrEqual)
+{
+    RESET_STATISTICS;
+
+    unsigned int values[200] = { 0 };
+    UTDataAVL tree;
+    Data data;
+    const UTDataAVLNode *result;
+
+    data.start = 0;
+    data.end = 0;
+
+    GenerateRandomArray(values, 200, 50, 950);
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_findNearOrEqual(&tree, &data, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findNearOrEqual(NULL, &data, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findNearOrEqual(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_findNearOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(values); i++) {
+        data.start = values[i];
+        CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+    }
+
+    qsort(values, _countof(values), sizeof(unsigned int), DataSortCmp);
+
+    for (unsigned int i = 0; i < (unsigned int) 1000; i++) {
+        data.start = i;
+        data.end = 0;
+
+        unsigned int expectedValue;
+        for (size_t j = 0; j < _countof(values); j++) {
+            if (i <= values[j] && j == 0) {
+                expectedValue = values[j];
+                break;
+            }
+
+            if (i >= values[j] && j == (_countof(values) - 1)) {
+                expectedValue = values[j];
+                break;
+            }
+
+            if (i >= values[j] && i <= values[j + 1]) {
+                if (i - values[j] <= values[j + 1] - i) {
+                    expectedValue = values[j];
+                } else {
+                    expectedValue = values[j + 1];
+                }
+                break;
+            }
+        }
+
+        result = NULL;
+        CUT_CHECK(UTDataAVL_findNearOrEqual(&tree, &data, &result) == CLIB_ERROR_SUCCESS);
+        CUT_ASSERT(result != NULL);
+        CUT_CHECK(result->data.start == expectedValue);
+        CUT_CHECK(result->data.end == 0);
+    }
+
+    CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, 0);
+    CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(values));
+    CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, _countof(values));
+    CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, _countof(values) * sizeof(UTDataAVLNode));
+
+    CUT_CHECK(UTDataAVL_free(&tree) == CLIB_ERROR_SUCCESS);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
 
     // initializes with a constant value to always generate the same values.
@@ -1628,6 +1708,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_findType);
     CUT_CALL_TEST(test_avl_findGreaterOrEqual);
     CUT_CALL_TEST(test_avl_findLessOrEqual);
+    CUT_CALL_TEST(test_avl_findNearOrEqual);
     CUT_CALL_TEST(test_avl_findIf);
 
     CUT_CALL_TEST(test_avl_remove);
