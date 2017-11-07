@@ -1118,11 +1118,10 @@ UTDataAVLNode_findNearOrEqual(const UTDataAVLNode *a_parent,
     (&a_parent->right->data)->start <= a_value->start
         ? (*(&score) = a_value->start - (&a_parent->right->data)->start)
         : (*(&score) = (&a_parent->right->data)->start - a_value->start);
-    const UTDataAVLNode *tmp =
-        UTDataAVLNode_findNearOrEqual(a_parent->right, a_value, &score);
+    a_parent = UTDataAVLNode_findNearOrEqual(a_parent->right, a_value, &score);
     if (((*(&score)) < (*a_currentScore))) {
       ((*a_currentScore) = (*(&score)));
-      result = tmp;
+      result = a_parent;
     }
   }
   return result;
