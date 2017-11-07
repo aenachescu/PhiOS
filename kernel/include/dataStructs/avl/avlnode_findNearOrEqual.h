@@ -33,7 +33,7 @@
 #ifndef AVL_TYPE_SCORE_NEAR_OR_EQUAL_COPY
 #error "score near or equal copy undefined"
 #endif
-#include <stdio.h>
+
 #define IMPLEMENT_AVL_NODE_FUNC_FIND_NEAR_OR_EQUAL(type, name)                  \
 static const AVLNodeStruct(name)* AVLNodeFunc(name, findNearOrEqual) (          \
     const AVLNodeStruct(name) *a_parent,                                        \
@@ -90,7 +90,7 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findNearOrEqual) (          
             (&score)                                                            \
         );                                                                      \
                                                                                 \
-        const AVLNodeStruct(name) *tmp = AVLNodeFunc(name, findNearOrEqual) (   \
+        a_parent = AVLNodeFunc(name, findNearOrEqual) (                         \
             a_parent->right,                                                    \
             a_value,                                                            \
             &score                                                              \
@@ -101,7 +101,7 @@ static const AVLNodeStruct(name)* AVLNodeFunc(name, findNearOrEqual) (          
                 a_currentScore,                                                 \
                 (&score)                                                        \
             );                                                                  \
-            result = tmp;                                                       \
+            result = a_parent;                                                  \
         }                                                                       \
     }                                                                           \
                                                                                 \
