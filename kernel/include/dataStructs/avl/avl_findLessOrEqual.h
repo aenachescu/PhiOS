@@ -57,6 +57,7 @@ clib_error_code_t AVLFunc(name, findLessOrEqual) (                              
 
 #else // AVL_USE_FIND_LESS_OR_EQUAL is not defined
 
+#define DECLARE_AVL_FUNC_FIND_LESS_OR_EQUAL(type, name)
 #define IMPLEMENT_AVL_FUNC_FIND_LESS_OR_EQUAL(type, name)
 
 #endif // end if AVL_USE_FIND_LESS_OR_EQUAL

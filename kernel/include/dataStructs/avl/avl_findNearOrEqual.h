@@ -53,6 +53,7 @@ clib_error_code_t AVLFunc(name, findNearOrEqual) (                              
 
 #else // AVL_USE_FIND_NEAR_OR_EQUAL is not defined
 
+#define DECLARE_AVL_FUNC_FIND_NEAR_OR_EQUAL(type, name)
 #define IMPLEMENT_AVL_FUNC_FIND_NEAR_OR_EQUAL(type, name)
 
 #endif // end if AVL_USE_FIND_NEAR_OR_EQUAL

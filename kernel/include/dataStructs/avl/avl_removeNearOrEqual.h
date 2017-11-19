@@ -45,6 +45,11 @@ clib_error_code_t AVLFunc(name, removeNearOrEqual) (                            
     return err;                                                                 \
 }
 
+#else // AVL_USE_REMOVE_NEAR_OR_EQUAL is not defined
+
+#define DECLARE_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)
+#define IMPLEMENT_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)
+
 #endif // end if AVL_USE_REMOVE_NEAR_OR_EQUAL
 
 #endif // end if CLIB_TEMPLATE_DATA_STRUCTURES_AVL_REMOVE_NEAR_OR_EQUAL
