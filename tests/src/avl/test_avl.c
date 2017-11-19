@@ -1800,18 +1800,18 @@ CUT_DEFINE_TEST(test_avl_removeGreaterOrEqual)
 
     CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
 
-    CUT_CHECK(UTDataAVL_removeNearOrEqual(&tree, &data, NULL) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_removeGreaterOrEqual(&tree, &data, NULL) == CLIB_ERROR_NULL_POINTER);
 
     result = (UTDataAVLNode*) 0x0000FFFF;
-    CUT_CHECK(UTDataAVL_removeNearOrEqual(NULL, &data, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_removeGreaterOrEqual(NULL, &data, &result) == CLIB_ERROR_NULL_POINTER);
     CUT_CHECK(result == NULL);
 
     result = (UTDataAVLNode*) 0x0000FFFF;
-    CUT_CHECK(UTDataAVL_removeNearOrEqual(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(UTDataAVL_removeGreaterOrEqual(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
     CUT_CHECK(result == NULL);
 
     result = (UTDataAVLNode*) 0x0000FFFF;
-    CUT_CHECK(UTDataAVL_removeNearOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(UTDataAVL_removeGreaterOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
     CUT_CHECK(result == NULL);
 
     for (size_t i = 0; i < _countof(values); i++) {
