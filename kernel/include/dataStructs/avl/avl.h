@@ -135,6 +135,7 @@
 #include "kernel/include/dataStructs/avl/avlnode_removeMin.h"
 #include "kernel/include/dataStructs/avl/avlnode_findIf.h"
 #include "kernel/include/dataStructs/avl/avlnode_removeIf.h"
+#include "kernel/include/dataStructs/avl/avlnode_removeGreaterOrEqual.h"
 
 // include avl headers
 #include "kernel/include/dataStructs/avl/avl_struct.h"
@@ -154,6 +155,7 @@
 #include "kernel/include/dataStructs/avl/avl_findIf.h"
 #include "kernel/include/dataStructs/avl/avl_removeIf.h"
 #include "kernel/include/dataStructs/avl/avl_removeNearOrEqual.h"
+#include "kernel/include/dataStructs/avl/avl_removeGreaterOrEqual.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
@@ -189,7 +191,8 @@
     DECLARE_AVL_FUNC_REMOVE(type, name)                                         \
     DECLARE_AVL_FUNC_FIND_IF(type, name)                                        \
     DECLARE_AVL_FUNC_REMOVE_IF(tpye, name)                                      \
-    DECLARE_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)
+    DECLARE_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)                           \
+    DECLARE_AVL_FUNC_REMOVE_GREATER_OR_EQUAL(type, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -219,7 +222,8 @@
     IMPLEMENT_AVL_NODE_FUNC_REMOVE_MIN(type, name)                              \
     IMPLEMENT_AVL_NODE_FUNC_REMOVE(type, name)                                  \
     IMPLEMENT_AVL_NODE_FUNC_FIND_IF(type, name)                                 \
-    IMPLEMENT_AVL_NODE_FUNC_REMOVE_IF(type, name)
+    IMPLEMENT_AVL_NODE_FUNC_REMOVE_IF(type, name)                               \
+    IMPLEMENT_AVL_NODE_FUNC_REMOVE_GREATER_OR_EQUAL(type, name)
 
 // implement avl functions
 #define IMPLEMENT_AVL_FUNC(type, name)                                          \
@@ -240,7 +244,8 @@
     IMPLEMENT_AVL_FUNC_REMOVE(type, name)                                       \
     IMPLEMENT_AVL_FUNC_FIND_IF(type, name)                                      \
     IMPLEMENT_AVL_FUNC_REMOVE_IF(type, name)                                    \
-    IMPLEMENT_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)
+    IMPLEMENT_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)                         \
+    IMPLEMENT_AVL_FUNC_REMOVE_GREATER_OR_EQUAL(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
