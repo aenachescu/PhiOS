@@ -1689,6 +1689,7 @@ CUT_DEFINE_TEST(test_avl_removeNearOrEqual)
     unsigned int values[200] = { 0 };
     unsigned int randomValues[200] = { 0 };
     size_t valuesSize = _countof(values);
+    clib_bool_t isBalanced;
     UTDataAVL tree;
     Data data;
     UTDataAVLNode *result;
@@ -1762,6 +1763,15 @@ CUT_DEFINE_TEST(test_avl_removeNearOrEqual)
         CUT_CHECK_OPERATOR_UINT32(result->data.start, ==, expectedValue);
         CUT_CHECK_OPERATOR_UINT32(result->data.end, ==, 0);
         CUT_CHECK(UTDataAVLNode_free(result) == CLIB_ERROR_SUCCESS);
+
+        isBalanced = CLIB_FALSE;
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(isBalanced == CLIB_TRUE);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, i + 1);
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, _countof(values));
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, valuesSize);
+        CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, valuesSize * sizeof(UTDataAVLNode));
     }
 
     CUT_CHECK(tree.root == NULL);
@@ -1776,6 +1786,8 @@ CUT_DEFINE_TEST(test_avl_removeGreaterOrEqual)
     unsigned int values[200] = { 0 };
     unsigned int randomValues[1000] = { 0 };
     size_t valuesSize = _countof(values);
+    size_t freeCalls = 0;
+    size_t allocCalls = _countof(values);
     clib_bool_t isBalanced;
     UTDataAVL tree;
     Data data;
@@ -1844,6 +1856,7 @@ CUT_DEFINE_TEST(test_avl_removeGreaterOrEqual)
             CUT_CHECK_OPERATOR_UINT32(result->data.start, ==, expectedValue);
             CUT_CHECK_OPERATOR_UINT32(result->data.end, ==, 0);
             CUT_CHECK(UTDataAVLNode_free(result) == CLIB_ERROR_SUCCESS);
+            freeCalls++;
         } else {
             result = (UTDataAVLNode*) 0x0000FFFF;
             CUT_CHECK(UTDataAVL_removeGreaterOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
@@ -1853,11 +1866,17 @@ CUT_DEFINE_TEST(test_avl_removeGreaterOrEqual)
         if (found == 1 && expectedValue != randomValues[i]) {
             data.start = expectedValue;
             CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+            allocCalls++;
         }
 
         isBalanced = CLIB_FALSE;
         CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
         CUT_CHECK(isBalanced == CLIB_TRUE);
+
+        CUT_CHECK_OPERATOR_SIZE_T(GetFreeCalls(), ==, freeCalls);
+        CUT_CHECK_OPERATOR_SIZE_T(GetAllocCalls(), ==, allocCalls);
+        CUT_CHECK_OPERATOR_SIZE_T(GetObjectsInUsage(), ==, valuesSize);
+        CUT_CHECK_OPERATOR_SIZE_T(GetMemoryInUsage(), ==, valuesSize * sizeof(UTDataAVLNode));
     }
 
     CUT_CHECK(tree.root == NULL);
