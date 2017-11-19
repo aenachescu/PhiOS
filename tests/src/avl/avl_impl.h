@@ -36,6 +36,7 @@
         (*result = value->start - current->start) :                             \
         (*result = current->start - value->start)
 
+#define AVL_USE_REMOVE_NEAR_OR_EQUAL
 #define AVL_USE_AVL_NODE_FREE
 #define AVL_USE_AVL_NODE_CREATE
 

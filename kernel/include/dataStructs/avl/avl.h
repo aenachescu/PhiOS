@@ -153,6 +153,7 @@
 #include "kernel/include/dataStructs/avl/avl_remove.h"
 #include "kernel/include/dataStructs/avl/avl_findIf.h"
 #include "kernel/include/dataStructs/avl/avl_removeIf.h"
+#include "kernel/include/dataStructs/avl/avl_removeNearOrEqual.h"
 
 // declare avl structures
 #define DECLARE_AVL_STRUCTS(type, name)                                         \
@@ -187,7 +188,8 @@
     DECLARE_AVL_FUNC_IS_BALANCED(type, name)                                    \
     DECLARE_AVL_FUNC_REMOVE(type, name)                                         \
     DECLARE_AVL_FUNC_FIND_IF(type, name)                                        \
-    DECLARE_AVL_FUNC_REMOVE_IF(tpye, name)
+    DECLARE_AVL_FUNC_REMOVE_IF(tpye, name)                                      \
+    DECLARE_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)
 
 // declare avl type
 #define DECLARE_AVL_TYPE(type, name)                                            \
@@ -237,7 +239,8 @@
     IMPLEMENT_AVL_FUNC_IS_BALANCED(type, name)                                  \
     IMPLEMENT_AVL_FUNC_REMOVE(type, name)                                       \
     IMPLEMENT_AVL_FUNC_FIND_IF(type, name)                                      \
-    IMPLEMENT_AVL_FUNC_REMOVE_IF(type, name)
+    IMPLEMENT_AVL_FUNC_REMOVE_IF(type, name)                                    \
+    IMPLEMENT_AVL_FUNC_REMOVE_NEAR_OR_EQUAL(type, name)
 
 // implement avl type
 #define IMPLEMENT_AVL_TYPE(type, name)                                          \
