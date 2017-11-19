@@ -599,6 +599,9 @@ clib_error_code_t UTDataAVL_removeIf(UTDataAVL *a_avl,
 clib_error_code_t UTDataAVL_removeNearOrEqual(UTDataAVL *a_avl,
                                               const Data *a_value,
                                               UTDataAVLNode **a_res);
+clib_error_code_t UTDataAVL_removeGreaterOrEqual(UTDataAVL *a_avl,
+                                                 const Data *a_value,
+                                                 UTDataAVLNode **a_result);
 ;
 static inline unsigned int
 UTDataAVLNode_getHeight(const UTDataAVLNode *a_node) {
@@ -994,6 +997,52 @@ static UTDataAVLNode *UTDataAVLNode_removeIf(UTDataAVLNode *a_parent,
   }
   return a_parent;
 }
+static UTDataAVLNode *
+UTDataAVLNode_removeGreaterOrEqual(UTDataAVLNode *a_parent, const Data *a_value,
+                                   UTDataAVLNode **a_res) {
+  unsigned int currentScore;
+  (&a_parent->data)->start >= a_value->start
+      ? (*(&currentScore) = (&a_parent->data)->start - a_value->start)
+      : (*(&currentScore) = 0xFFFFFFFF);
+  if (((*(&currentScore)) == 0)) {
+    goto removeNode;
+  }
+  if (((*(&currentScore)) == 0xFFFFFFFF)) {
+    if (a_parent->right == ((void *)0)) {
+      return a_parent;
+    }
+    a_parent->right =
+        UTDataAVLNode_removeGreaterOrEqual(a_parent->right, a_value, a_res);
+    if (*a_res == ((void *)0)) {
+      return a_parent;
+    }
+    return UTDataAVLNode_balance(a_parent);
+  }
+  if (a_parent->left == ((void *)0)) {
+    goto removeNode;
+  }
+  a_parent->left =
+      UTDataAVLNode_removeGreaterOrEqual(a_parent->left, a_value, a_res);
+  if (*a_res == ((void *)0)) {
+    goto removeNode;
+  }
+  return UTDataAVLNode_balance(a_parent);
+removeNode:
+  *a_res = a_parent;
+  UTDataAVLNode *auxNode;
+  if (a_parent->right == ((void *)0)) {
+    auxNode = a_parent->left;
+    a_parent->left = ((void *)0);
+    return auxNode;
+  }
+  UTDataAVLNode *minNode = ((void *)0);
+  auxNode = UTDataAVLNode_removeMin(a_parent->right, &minNode);
+  minNode->right = auxNode;
+  minNode->left = a_parent->left;
+  a_parent->left = ((void *)0);
+  a_parent->right = ((void *)0);
+  return UTDataAVLNode_balance(minNode);
+}
 clib_error_code_t UTDataAVL_init(UTDataAVL *a_avl) {
   if (a_avl == ((void *)0)) {
     return ((clib_error_code_t)1);
@@ -1292,6 +1341,29 @@ clib_error_code_t UTDataAVL_removeNearOrEqual(UTDataAVL *a_avl,
     err = UTDataAVL_remove(a_avl, &node->data, a_res);
   } while (0);
   return err;
+}
+clib_error_code_t UTDataAVL_removeGreaterOrEqual(UTDataAVL *a_avl,
+                                                 const Data *a_value,
+                                                 UTDataAVLNode **a_result) {
+  if (a_result == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  };
+  *a_result = ((void *)0);
+  if (a_avl == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  };
+  if (a_value == ((void *)0)) {
+    return ((clib_error_code_t)1);
+  };
+  if (a_avl->root == ((void *)0)) {
+    return ((clib_error_code_t)2);
+  }
+  a_avl->root =
+      UTDataAVLNode_removeGreaterOrEqual(a_avl->root, a_value, a_result);
+  if (*a_result == ((void *)0)) {
+    return ((clib_error_code_t)2);
+  }
+  return ((clib_error_code_t)0);
 };
 static size_t g_memInUsage = 0;
 static size_t g_objectsInUsage = 0;

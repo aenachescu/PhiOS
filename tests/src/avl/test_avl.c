@@ -1769,6 +1769,102 @@ CUT_DEFINE_TEST(test_avl_removeNearOrEqual)
     CHECK_STATISTICS;
 }
 
+CUT_DEFINE_TEST(test_avl_removeGreaterOrEqual)
+{
+    RESET_STATISTICS;
+
+    unsigned int values[200] = { 0 };
+    unsigned int randomValues[1000] = { 0 };
+    size_t valuesSize = _countof(values);
+    clib_bool_t isBalanced;
+    UTDataAVL tree;
+    Data data;
+    UTDataAVLNode *result;
+
+    data.start = 0;
+    data.end = 0;
+
+    GenerateRandomArray(values, _countof(values), 50, 950);
+
+    CUT_ASSERT(UTDataAVL_init(&tree) == CLIB_ERROR_SUCCESS);
+
+    CUT_CHECK(UTDataAVL_removeNearOrEqual(&tree, &data, NULL) == CLIB_ERROR_NULL_POINTER);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_removeNearOrEqual(NULL, &data, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_removeNearOrEqual(&tree, NULL, &result) == CLIB_ERROR_NULL_POINTER);
+    CUT_CHECK(result == NULL);
+
+    result = (UTDataAVLNode*) 0x0000FFFF;
+    CUT_CHECK(UTDataAVL_removeNearOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
+    CUT_CHECK(result == NULL);
+
+    for (size_t i = 0; i < _countof(values); i++) {
+        data.start = values[i];
+        CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+    }
+
+    qsort(values, _countof(values), sizeof(unsigned int), DataSortCmp);
+
+    for (size_t i = 0; i < _countof(randomValues); i++) {
+        randomValues[i] = (unsigned int) i;
+    }
+    shuffle(randomValues, _countof(randomValues));
+
+    for (size_t i = 0; i < _countof(randomValues); i++) {
+        data.start = randomValues[i];
+        data.end = 0;
+
+        unsigned int expectedValue;
+        int found = 0;
+        size_t j;
+        for (j = 0; j < valuesSize; j++) {
+            if (values[j] >= randomValues[i]) {
+                expectedValue = values[j];
+                found = 1;
+                break;
+            }
+        }
+
+        if (found == 1 && expectedValue == randomValues[i]) {
+            valuesSize--;
+            while (j < valuesSize) {
+                values[j] = values[j + 1];
+                j++;
+            }
+        }
+
+        if (found == 1) {
+            result = NULL;
+            CUT_CHECK(UTDataAVL_removeGreaterOrEqual(&tree, &data, &result) == CLIB_ERROR_SUCCESS);
+            CUT_ASSERT(result != NULL);
+            CUT_CHECK_OPERATOR_UINT32(result->data.start, ==, expectedValue);
+            CUT_CHECK_OPERATOR_UINT32(result->data.end, ==, 0);
+            CUT_CHECK(UTDataAVLNode_free(result) == CLIB_ERROR_SUCCESS);
+        } else {
+            result = (UTDataAVLNode*) 0x0000FFFF;
+            CUT_CHECK(UTDataAVL_removeGreaterOrEqual(&tree, &data, &result) == CLIB_ERROR_NOT_FOUND);
+            CUT_CHECK(result == NULL);
+        }
+
+        if (found == 1 && expectedValue != randomValues[i]) {
+            data.start = expectedValue;
+            CUT_CHECK(UTDataAVL_insert(&tree, &data) == CLIB_ERROR_SUCCESS);
+        }
+
+        isBalanced = CLIB_FALSE;
+        CUT_CHECK(UTDataAVL_isBalanced(&tree, &isBalanced) == CLIB_ERROR_SUCCESS);
+        CUT_CHECK(isBalanced == CLIB_TRUE);
+    }
+
+    CUT_CHECK(tree.root == NULL);
+
+    CHECK_STATISTICS;
+}
+
 CUT_DEFINE_MAIN
 
     // initializes with a constant value to always generate the same values.
@@ -1803,6 +1899,7 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_avl_remove_random);
     CUT_CALL_TEST(test_avl_removeIf);
     CUT_CALL_TEST(test_avl_removeNearOrEqual);
+    CUT_CALL_TEST(test_avl_removeGreaterOrEqual);
 
     CUT_CALL_TEST(test_avl_isBalanced);
 CUT_END_MAIN

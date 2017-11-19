@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 
-// defines for findGreaterOrEqual
+// defines for findGreaterOrEqual & removeGreaterOrEqual
 #define AVL_USE_FIND_GREATER_OR_EQUAL
+#define AVL_USE_REMOVE_GREATER_OR_EQUAL
+
 #define AVL_TYPE_SCORE_GREATER_OR_EQUAL                                         unsigned int
 #define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_INVALID(x)                           ((*x) == 0xFFFFFFFF)
 #define AVL_TYPE_SCORE_GREATER_OR_EQUAL_IS_PERFECT(x)                           ((*x) == 0)
@@ -25,8 +27,10 @@
     current->start <= value->start ?                                            \
         (*result = value->start - current->start) : (*result = 0xFFFFFFFF)
 
-// defines for findNearOrEqual
+// defines for findNearOrEqual & removeNearOrEqual
 #define AVL_USE_FIND_NEAR_OR_EQUAL
+#define AVL_USE_REMOVE_NEAR_OR_EQUAL
+
 #define AVL_TYPE_SCORE_NEAR_OR_EQUAL                                            unsigned int
 #define AVL_TYPE_SCORE_NEAR_OR_EQUAL_IS_PERFECT(x)                              ((*x) == 0)
 #define AVL_TYPE_SCORE_NEAR_OR_EQUAL_IS_BETTER(a, b)                            ((*a) < (*b))
@@ -36,7 +40,6 @@
         (*result = value->start - current->start) :                             \
         (*result = current->start - value->start)
 
-#define AVL_USE_REMOVE_NEAR_OR_EQUAL
 #define AVL_USE_AVL_NODE_FREE
 #define AVL_USE_AVL_NODE_CREATE
 
