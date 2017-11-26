@@ -67,6 +67,20 @@ function build_tests_x86_32 {
     fi   
 }
 
+function running_test {
+    test_rc=0
+
+    echo -e "${blue}***${reset} Running $1"
+    ./$1
+    test_rc=$?
+
+    if [ $test_rc != 0 ]; then
+        echo -e "${red}$1 failed${reset}"
+    fi
+
+    exit $test_rc
+}
+
 function running_tests {
     # running all tests
     echo -e "\n${green}*****${reset} Running tests"
@@ -75,6 +89,7 @@ function running_tests {
     test_kstdlib_rc=0
     test_logging_rc=0
     test_avl_rc=0
+    test_x86_atomic_rc=0
     rc=0
 
     # running PAA tests
@@ -102,6 +117,11 @@ function running_tests {
     ./test_avl
     test_avl_rc=$?
 
+    # running x86 atomic tests
+    echo -e "\n${blue}***${reset} Running test_x86_atomic"
+    ./test_x86_atomic
+    test_x86_atomic_rc=$?
+
     if [[ $test_paa_rc != 0 ]]; then
         echo -e "${red}test_paa failed${reset}"
         rc=1
@@ -127,6 +147,11 @@ function running_tests {
         rc=1
     fi
 
+    if [[ $test_x86_atomic_rc != 0 ]]; then
+        echo -e "${red}test_x86_atomic failed${reset}"
+        rc=1
+    fi
+
     exit $rc
 }
 
@@ -145,7 +170,7 @@ function configEnvironment {
     cd tests
 }
 
-if [ $# -ne 2 ]; then
+if [ $# -gt 3 ]; then
     echo "${red}Illegal number of parameters${reset}"
     exit 1
 fi
@@ -157,25 +182,30 @@ if [ "$1" == "run" ];then
         echo -e "\n${green}*****${reset} Building tests for x86_64"
         build_tests_x86_64
         echo "${green}built tests for x86_64 successfully${reset}"
-
-        running_tests
-    fi
-
-    if [ "$2" == "x86_32" ]; then
+    elif [ "$2" == "x86_32" ]; then
         configEnvironment platform=-m32
 
         echo -e "\n${green}*****${reset} Building tests for x86_32"
         build_tests_x86_32
         echo "${green}built tests for x86_32 successfully${reset}"
-
-        running_tests
+    else
+        echo "${red}invalid parameter for run command${reset}"
+        exit 1
     fi
 
-    echo "${red}invalid parameter for run command${reset}"
-    exit 1
+    if [ $# == 3 ]; then
+        running_test $3
+    fi
+
+    running_tests
 fi
 
 if [ "$1" == "clean" ];then
+    if [ $# -ne 2]; then
+        echo "${red}invalid number of parameters for clean command${reset}"
+        exit 1
+    fi
+
     cd tests
 
     if [ "$2" == "x86_32" ]; then
