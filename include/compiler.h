@@ -8,8 +8,7 @@
 
 #else
 
-#define PhiOS_PACKED_STRUCTURE
-#define PhiOS_ALWAYS_INLINE
+#error "unsupported compiler"
 
 #endif
 
