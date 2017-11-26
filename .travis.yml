@@ -37,4 +37,5 @@ after_success:
         -i util/kstdlib/src/kstring.c
         -i util/kstdlib/src/kvsnprintf.c
         -i tests/src/avl/avl.c
+        -i kernel/include/arch/x86/atomic.h
         --gcov gcov --gcov-options '\-lp'
