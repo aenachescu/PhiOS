@@ -77,3 +77,8 @@ list (APPEND AVL_SOURCES "${PRJ_PATH}/src/avl/avl.c")
 list (APPEND AVL_SOURCES "${PRJ_PATH}/src/avl/test_avl.c")
 add_executable(test_avl ${AVL_SOURCES})
 target_link_libraries(test_avl cut)
+
+# atomic test
+list (APPEND x86_ATOMIC_SOURCES "${PRJ_PATH}/src/test_x86_atomic.c")
+add_executable (test_x86_atomic ${x86_ATOMIC_SOURCES})
+target_link_libraries (test_x86_atomic cut)
