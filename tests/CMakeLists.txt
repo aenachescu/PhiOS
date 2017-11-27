@@ -81,4 +81,4 @@ target_link_libraries(test_avl cut)
 # atomic test
 list (APPEND x86_ATOMIC_SOURCES "${PRJ_PATH}/src/test_x86_atomic.c")
 add_executable (test_x86_atomic ${x86_ATOMIC_SOURCES})
-target_link_libraries (test_x86_atomic cut)
+target_link_libraries (test_x86_atomic cut pthread)
