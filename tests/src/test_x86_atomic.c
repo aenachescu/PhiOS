@@ -905,6 +905,304 @@ CUT_DEFINE_TEST(test_atomic_int32_sub)
     CUT_CHECK_OPERATOR_INT32(atomic_int32_load(&g_int32), ==, expectedValue);
 }
 
+// test atomic_uint64_t
+
+#define ATOMIC_UINT64_THREADS_NUM    (size_t) 4
+#define ATOMIC_UINT64_ITERATIONS     (size_t) 1000001
+
+atomic_uint64_t g_uint64;
+
+// test increment
+
+void* atomic_uint64_inc_thread_fn(void *unused)
+{
+    (void) unused;
+
+    for (size_t i = 0; i < ATOMIC_UINT64_ITERATIONS; i++) {
+        atomic_uint64_inc(&g_uint64);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_uint64_inc)
+{
+    atomic_uint64_store(&g_uint64, 0);
+
+    pthread_t threads[ATOMIC_UINT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_uint64_inc_thread_fn, NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    CUT_CHECK_OPERATOR_UINT64(atomic_uint64_load(&g_uint64), ==, ATOMIC_UINT64_THREADS_NUM * ATOMIC_UINT64_ITERATIONS);
+}
+
+// test decrement
+
+void* atomic_uint64_dec_thread_fn(void *unused)
+{
+    (void) unused;
+
+    for (size_t i = 0; i < ATOMIC_UINT64_ITERATIONS; i++) {
+        atomic_uint64_dec(&g_uint64);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_uint64_dec)
+{
+    atomic_uint64_store(&g_uint64, 0);
+
+    pthread_t threads[ATOMIC_UINT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_uint64_dec_thread_fn, NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    CUT_CHECK_OPERATOR_UINT64(atomic_uint64_load(&g_uint64), ==, ((uint64) 0) - ATOMIC_UINT64_THREADS_NUM * ATOMIC_UINT64_ITERATIONS);
+}
+
+// test add
+
+void* atomic_uint64_add_thread_fn(void *param)
+{
+    uint64 value = (uint64) (size_t) param;
+    for (size_t i = 0; i < ATOMIC_UINT64_ITERATIONS; i++) {
+        atomic_uint64_add(&g_uint64, value);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_uint64_add)
+{
+    atomic_uint64_store(&g_uint64, 0);
+
+    pthread_t threads[ATOMIC_UINT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_uint64_add_thread_fn, (void*) i + 2);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    uint64 expectedValue = 0;
+    expectedValue += (ATOMIC_UINT64_ITERATIONS * 2);
+    expectedValue += (ATOMIC_UINT64_ITERATIONS * 3);
+    expectedValue += (ATOMIC_UINT64_ITERATIONS * 4);
+    expectedValue += (ATOMIC_UINT64_ITERATIONS * 5);
+
+    CUT_CHECK_OPERATOR_UINT64(atomic_uint64_load(&g_uint64), ==, expectedValue);
+}
+
+// test sub
+
+void* atomic_uint64_sub_thread_fn(void *param)
+{
+    uint64 value = (uint64) (size_t) param;
+    for (size_t i = 0; i < ATOMIC_UINT64_ITERATIONS; i++) {
+        atomic_uint64_sub(&g_uint64, value);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_uint64_sub)
+{
+    atomic_uint64_store(&g_uint64, 0);
+
+    pthread_t threads[ATOMIC_UINT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_uint64_sub_thread_fn, (void*) i + 2);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_UINT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    uint64 expectedValue = 0;
+    expectedValue -= (ATOMIC_UINT64_ITERATIONS * 2);
+    expectedValue -= (ATOMIC_UINT64_ITERATIONS * 3);
+    expectedValue -= (ATOMIC_UINT64_ITERATIONS * 4);
+    expectedValue -= (ATOMIC_UINT64_ITERATIONS * 5);
+
+    CUT_CHECK_OPERATOR_UINT64(atomic_uint64_load(&g_uint64), ==, expectedValue);
+}
+
+// test atomic_int64_t
+
+#define ATOMIC_INT64_THREADS_NUM    (size_t) 4
+#define ATOMIC_INT64_ITERATIONS     (size_t) 1000001
+
+atomic_int64_t g_int64;
+
+// test increment
+
+void* atomic_int64_inc_thread_fn(void *unused)
+{
+    (void) unused;
+
+    for (size_t i = 0; i < ATOMIC_INT64_ITERATIONS; i++) {
+        atomic_int64_inc(&g_int64);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_int64_inc)
+{
+    atomic_int64_store(&g_int64, 0);
+
+    pthread_t threads[ATOMIC_INT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_int64_inc_thread_fn, NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    CUT_CHECK_OPERATOR_INT64(atomic_int64_load(&g_int64), ==, ATOMIC_INT64_THREADS_NUM * ATOMIC_INT64_ITERATIONS);
+}
+
+// test decrement
+
+void* atomic_int64_dec_thread_fn(void *unused)
+{
+    (void) unused;
+
+    for (size_t i = 0; i < ATOMIC_INT64_ITERATIONS; i++) {
+        atomic_int64_dec(&g_int64);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_int64_dec)
+{
+    atomic_int64_store(&g_int64, 0);
+
+    pthread_t threads[ATOMIC_INT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_int64_dec_thread_fn, NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    CUT_CHECK_OPERATOR_INT64(atomic_int64_load(&g_int64), ==, ((sint64) 0) - ATOMIC_INT64_THREADS_NUM * ATOMIC_INT64_ITERATIONS);
+}
+
+// test add
+
+void* atomic_int64_add_thread_fn(void *param)
+{
+    sint64 value = (sint64) (size_t) param;
+    for (size_t i = 0; i < ATOMIC_INT64_ITERATIONS; i++) {
+        atomic_int64_add(&g_int64, value);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_int64_add)
+{
+    atomic_int64_store(&g_int64, 0);
+
+    pthread_t threads[ATOMIC_INT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_int64_add_thread_fn, (void*) i + 2);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    sint64 expectedValue = 0;
+    expectedValue += (ATOMIC_INT64_ITERATIONS * 2);
+    expectedValue += (ATOMIC_INT64_ITERATIONS * 3);
+    expectedValue += (ATOMIC_INT64_ITERATIONS * 4);
+    expectedValue += (ATOMIC_INT64_ITERATIONS * 5);
+
+    CUT_CHECK_OPERATOR_INT64(atomic_int64_load(&g_int64), ==, expectedValue);
+}
+
+// test sub
+
+void* atomic_int64_sub_thread_fn(void *param)
+{
+    sint64 value = (sint64) (size_t) param;
+    for (size_t i = 0; i < ATOMIC_INT64_ITERATIONS; i++) {
+        atomic_int64_sub(&g_int64, value);
+    }
+
+    return NULL;
+}
+
+CUT_DEFINE_TEST(test_atomic_int64_sub)
+{
+    atomic_int64_store(&g_int64, 0);
+
+    pthread_t threads[ATOMIC_INT64_THREADS_NUM];
+    int err;
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_create(&threads[i], NULL, atomic_int64_sub_thread_fn, (void*) i + 2);
+        CUT_ASSERT(err == 0);
+    }
+
+    for (size_t i = 0; i < ATOMIC_INT64_THREADS_NUM; i++) {
+        err = pthread_join(threads[i], NULL);
+        CUT_ASSERT(err == 0);
+    }
+
+    sint64 expectedValue = 0;
+    expectedValue -= (ATOMIC_INT64_ITERATIONS * 2);
+    expectedValue -= (ATOMIC_INT64_ITERATIONS * 3);
+    expectedValue -= (ATOMIC_INT64_ITERATIONS * 4);
+    expectedValue -= (ATOMIC_INT64_ITERATIONS * 5);
+
+    CUT_CHECK_OPERATOR_INT64(atomic_int64_load(&g_int64), ==, expectedValue);
+}
+
 CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_atomic_uint8_inc);
     CUT_CALL_TEST(test_atomic_uint8_dec);
@@ -935,5 +1233,15 @@ CUT_DEFINE_MAIN
     CUT_CALL_TEST(test_atomic_int32_dec);
     CUT_CALL_TEST(test_atomic_int32_add);
     CUT_CALL_TEST(test_atomic_int32_sub);
+
+    CUT_CALL_TEST(test_atomic_uint64_inc);
+    CUT_CALL_TEST(test_atomic_uint64_dec);
+    CUT_CALL_TEST(test_atomic_uint64_add);
+    CUT_CALL_TEST(test_atomic_uint64_sub);
+
+    CUT_CALL_TEST(test_atomic_int64_inc);
+    CUT_CALL_TEST(test_atomic_int64_dec);
+    CUT_CALL_TEST(test_atomic_int64_add);
+    CUT_CALL_TEST(test_atomic_int64_sub);
 
 CUT_END_MAIN

@@ -214,4 +214,186 @@ inline sint32 atomic_int32_load(atomic_int32_t *a)
     return *a;
 }
 
+#ifdef PhiOS_ARCH_x86_64
+
+// atomic uint64
+typedef uint64 atomic_uint64_t;
+
+inline void atomic_uint64_add(atomic_uint64_t *a, uint64 b)
+{
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"(b));
+}
+
+inline void atomic_uint64_inc(atomic_uint64_t *a)
+{
+    uint64 b = 1;
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"(b));
+}
+
+inline void atomic_uint64_sub(atomic_uint64_t *a, uint64 b)
+{
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"((uint64) -b));
+}
+
+inline void atomic_uint64_dec(atomic_uint64_t *a)
+{
+    sint64 b = -1;
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"(b));
+}
+
+inline void atomic_uint64_store(atomic_uint64_t *a, uint64 b)
+{
+    *a = b;
+}
+
+inline uint64 atomic_uint64_load(atomic_uint64_t *a)
+{
+    return *a;
+}
+
+// atomic int64
+typedef sint64 atomic_int64_t;
+
+inline void atomic_int64_add(atomic_int64_t *a, sint64 b)
+{
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"(b));
+}
+
+inline void atomic_int64_inc(atomic_int64_t *a)
+{
+    sint64 b = 1;
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"(b));
+}
+
+inline void atomic_int64_sub(atomic_int64_t *a, sint64 b)
+{
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"((sint64) -b));
+}
+
+inline void atomic_int64_dec(atomic_int64_t *a)
+{
+    sint64 b = -1;
+    asm volatile("lock xadd %1, %0" : "=m"(*a) : "r"(b));
+}
+
+inline void atomic_int64_store(atomic_int64_t *a, sint64 b)
+{
+    *a = b;
+}
+
+inline sint64 atomic_int64_load(atomic_int64_t *a)
+{
+    return *a;
+}
+
+#else
+
+#include "kernel/include/arch/x86/synchronization/spinlock.h"
+
+// atomic uint64
+typedef struct {
+    uint64 value;
+    spinlock_t lock;
+} atomic_uint64_t;
+
+inline void atomic_uint64_add(atomic_uint64_t *a, uint64 b)
+{
+    spinlock_acquire(&a->lock);
+    a->value += b;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_uint64_inc(atomic_uint64_t *a)
+{
+    spinlock_acquire(&a->lock);
+    a->value++;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_uint64_sub(atomic_uint64_t *a, uint64 b)
+{
+    spinlock_acquire(&a->lock);
+    a->value -= b;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_uint64_dec(atomic_uint64_t *a)
+{
+    spinlock_acquire(&a->lock);
+    a->value--;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_uint64_store(atomic_uint64_t *a, uint64 b)
+{
+    spinlock_acquire(&a->lock);
+    a->value = b;
+    spinlock_release(&a->lock);
+}
+
+inline uint64 atomic_uint64_load(atomic_uint64_t *a)
+{
+    uint64 res = 0;
+
+    spinlock_acquire(&a->lock);
+    res = a->value;
+    spinlock_release(&a->lock);
+
+    return res;
+}
+
+// atomic int64
+typedef struct {
+    sint64 value;
+    spinlock_t lock;
+} atomic_int64_t;
+
+inline void atomic_int64_add(atomic_int64_t *a, sint64 b)
+{
+    spinlock_acquire(&a->lock);
+    a->value += b;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_int64_inc(atomic_int64_t *a)
+{
+    spinlock_acquire(&a->lock);
+    a->value++;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_int64_sub(atomic_int64_t *a, sint64 b)
+{
+    spinlock_acquire(&a->lock);
+    a->value -= b;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_int64_dec(atomic_int64_t *a)
+{
+    spinlock_acquire(&a->lock);
+    a->value--;
+    spinlock_release(&a->lock);
+}
+
+inline void atomic_int64_store(atomic_int64_t *a, sint64 b)
+{
+    spinlock_acquire(&a->lock);
+    a->value = b;
+    spinlock_release(&a->lock);
+}
+
+inline sint64 atomic_int64_load(atomic_int64_t *a)
+{
+    sint64 res = 0;
+
+    spinlock_acquire(&a->lock);
+    res = a->value;
+    spinlock_release(&a->lock);
+
+    return res;
+}
+
+#endif
+
 #endif
