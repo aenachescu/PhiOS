@@ -82,88 +82,28 @@ function running_test {
 }
 
 function running_tests {
-    # running all tests
+    testsArr=(test_paa test_bitmap test_kstdlib test_logging test_avl test_x86_atomic test_x86_spinlock)
+    failedTestsArr=()
+    err=0
+
     echo -e "\n${green}*****${reset} Running tests"
-    test_paa_rc=0
-    test_bitmapPMA_rc=0
-    test_kstdlib_rc=0
-    test_logging_rc=0
-    test_avl_rc=0
-    test_x86_atomic_rc=0
-    test_x86_spinlock_rc=0
-    rc=0
 
-    # running PAA tests
-    echo -e "${blue}***${reset} Running test_PAA"
-    ./test_paa
-    test_paa_rc=$?
+    for item in ${testsArr[*]}
+    do
+        echo -e "\n${blue}***${reset} Running $item"
+        ./$item
+        if [ $? != 0 ]; then
+            err=1
+            failedTestsArr+=($item)
+        fi
+    done
 
-    # running BitmapPMA tests
-    echo -e "\n${blue}***${reset} Running test_BitmapPMA"
-    ./test_bitmap
-    test_bitmapPMA_rc=$?
+    for item in ${failedTestsArr[*]}
+    do
+        echo -e "${red}$item failed${reset}"
+    done
 
-    # running kstdlib tests
-    echo -e "\n${blue}***${reset} Running test_kstdlib"
-    ./test_kstdlib
-    test_kstdlib_rc=$?
-
-    # running logging tests
-    echo -e "\n${blue}***${reset} Running test_logging"
-    ./test_logging
-    test_logging_rc=$?
-
-    # running avl tests
-    echo -e "\n${blue}***${reset} Running test_avl"
-    ./test_avl
-    test_avl_rc=$?
-
-    # running x86 atomic tests
-    echo -e "\n${blue}***${reset} Running test_x86_atomic"
-    ./test_x86_atomic
-    test_x86_atomic_rc=$?
-
-    # running x86 spinlock tests
-    echo -e "\n${blue}***${reset} Running test_x86_spinlock"
-    ./test_x86_spinlock
-    test_x86_spinlock_rc=$?
-
-    if [[ $test_paa_rc != 0 ]]; then
-        echo -e "${red}test_paa failed${reset}"
-        rc=1
-    fi
-
-    if [[ $test_bitmapPMA_rc != 0 ]]; then
-        echo -e "${red}test_bitmapPMA failed${reset}"
-        rc=1
-    fi
-
-    if [[ $test_kstdlib_rc != 0 ]]; then
-        echo -e "${red}test_kstdlib failed${reset}"
-        rc=1
-    fi
-
-    if [[ $test_logging_rc != 0 ]]; then
-        echo -e "${red}test_logging failed${reset}"
-        rc=1
-    fi
-
-    if [[ $test_avl_rc != 0 ]]; then
-        echo -e "${red}test_avl failed${reset}"
-        rc=1
-    fi
-
-    if [[ $test_x86_atomic_rc != 0 ]]; then
-        echo -e "${red}test_x86_atomic failed${reset}"
-        rc=1
-    fi
-
-    if [[ $test_x86_spinlock_rc != 0 ]]; then
-        echo -e "${red}test_x86_spinlock failed${reset}"
-        rc=1
-    fi
-
-    exit $rc
+    exit $err
 }
 
 function configEnvironment {
