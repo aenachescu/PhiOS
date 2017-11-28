@@ -90,6 +90,7 @@ function running_tests {
     test_logging_rc=0
     test_avl_rc=0
     test_x86_atomic_rc=0
+    test_x86_spinlock_rc=0
     rc=0
 
     # running PAA tests
@@ -122,6 +123,11 @@ function running_tests {
     ./test_x86_atomic
     test_x86_atomic_rc=$?
 
+    # running x86 spinlock tests
+    echo -e "\n${blue}***${reset} Running test_x86_spinlock"
+    ./test_x86_spinlock
+    test_x86_spinlock_rc=$?
+
     if [[ $test_paa_rc != 0 ]]; then
         echo -e "${red}test_paa failed${reset}"
         rc=1
@@ -149,6 +155,11 @@ function running_tests {
 
     if [[ $test_x86_atomic_rc != 0 ]]; then
         echo -e "${red}test_x86_atomic failed${reset}"
+        rc=1
+    fi
+
+    if [[ $test_x86_spinlock_rc != 0 ]]; then
+        echo -e "${red}test_x86_spinlock failed${reset}"
         rc=1
     fi
 
