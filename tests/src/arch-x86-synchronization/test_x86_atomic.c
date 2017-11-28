@@ -7,7 +7,7 @@
 // compiler has a bug and it does not generate the code as it should,
 // because if I enable the O2 flag then everything is fine...
 #define inline
-#include "kernel/include/arch/x86/atomic.h"
+#include "kernel/include/arch/x86/synchronization/atomic.h"
 
 #include <pthread.h>
 
