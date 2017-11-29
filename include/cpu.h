@@ -88,14 +88,6 @@ typedef IntCpuState64 CpuState;
 
 #endif // PhiOS_ARCH_x86_64
 
-void cpu_printState32(
-    IntCpuState32 *
-);
-
-void cpu_printState64(
-    IntCpuState64 *a_state
-);
-
 void cpu_printState(
     CpuState *a_state
 );

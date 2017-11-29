@@ -1,41 +1,85 @@
 #include "include/cpu.h"
+#include "kernel/include/logging.h"
 
-#include "util/kstdlib/include/kstdio.h"
+#if defined PhiOS_ARCH_x86_32
 
-void cpu_printState32(
+static void cpu_printState32(
     IntCpuState32 *a_state)
 {
-    kprintf("--- CPU STATE DUMP---\n");
-    kprintf("cr3 = %x cr2 = %x\n", a_state->cr3, a_state->cr2);
-    kprintf("gs = %x ds = %x fs = %x es = %x ds = %x\n",
-            a_state->gs, a_state->ds, a_state->fs, a_state->es, a_state->ds);
-    kprintf("edi = %x esi = %x \nebp = %x ",
-            a_state->edi, a_state->esi, a_state->ebp);
-    kprintf("kesp = %x\n", a_state->kesp);
-    kprintf("edx = %x ecx = %x ebx = %x eax = %x\n",
-            a_state->edx, a_state->ecx, a_state->ebx, a_state->eax);
-    kprintf("intNo = %x errCode = %x\n", a_state->intNo, a_state->errCode);
-    kprintf("eip = %x eflags = %x uesp = %x ss = %x\n",
-            a_state->eip, a_state->eflags, a_state->uesp, a_state->ss);
-    kprintf("---------------------\n");
+    KLOG_INFO("--- CPU STATE DUMP---");
+
+    KLOG(
+        "eax = %0x, ebx = %0x, ecx = %0x, edx = %0x",
+        a_state->eax,
+        a_state->ebx,
+        a_state->ecx,
+        a_state->edx
+    );
+
+    KLOG(
+        "gs = %0hx, ds = %0hx, fs = %0hx, es = %0hx, ss = %0hx, cs = %0hx",
+        a_state->gs,
+        a_state->ds,
+        a_state->fs,
+        a_state->es,
+        a_state->ss,
+        a_state->cs
+    );
+
+    KLOG(
+        "cr3 = %0x, cr2 = %0x",
+        a_state->cr3,
+        a_state->cr2
+    );
+
+    KLOG(
+        "edi = %0x, esi = %0x",
+        a_state->edi,
+        a_state->esi
+    );
+
+    KLOG(
+        "kesp = %0x, uesp = %0x, ebp = %0x, eip = %0x",
+        a_state->kesp,
+        a_state->uesp,
+        a_state->ebp,
+        a_state->eip
+    );
+
+    KLOG(
+        "intNo = %0x, errCode = %0x, eflags = %0x",
+        a_state->intNo,
+        a_state->errCode,
+        a_state->eflags
+    );
+
+    KLOG_INFO("---------------------");
 }
 
-void cpu_printState64(
-    __attribute__((unused)) IntCpuState64 *a_state)
+#elif defined PhiOS_ARCH_x86_64
+
+static void cpu_printState64(
+    IntCpuState64 *a_state)
 {
-    kprintf("--- CPU STATE DUMP---\n");
-
-    kprintf("---------------------\n");
+    KLOG_INFO("--- CPU STATE DUMP---");
+    KLOG_INFO("unsupported, CpuStateAddr: %p", a_state);
+    KLOG_INFO("---------------------");
 }
+
+#else
+
+#error "unsupported architecture"
+
+#endif
 
 void cpu_printState(
     CpuState *a_state)
 {
-#ifdef PhiOS_ARCH_x86_32
+#if defined PhiOS_ARCH_x86_32
     cpu_printState32(a_state);
-#endif // PhiOS_ARCH_x86_32
-
-#ifdef PhiOS_ARCH_x86_64
+#elif defined PhiOS_ARCH_x86_64
     cpu_printState64(a_state);
-#endif // PhiOS_ARCH_x86_64
+#else
+#error "unsupported architecture"
+#endif
 }
