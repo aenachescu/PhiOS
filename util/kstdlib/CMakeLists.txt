@@ -3,7 +3,6 @@ set(MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Add sources
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/kstring.c")
-list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/kstdio.c")
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/kstdlib.c")
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/ksnprintf_helper.c")
 list(APPEND KSTDLIB_C_SOURCES "${MODULE_PATH}/src/ksnprintf.c")
