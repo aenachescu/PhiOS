@@ -37,5 +37,6 @@ after_success:
         -i util/kstdlib/src/kstring.c
         -i util/kstdlib/src/kvsnprintf.c
         -i tests/src/avl/avl.c
-        -i kernel/include/arch/x86/atomic.h
+        -i kernel/include/arch/x86/synchronization/atomic.h
+        -i kernel/include/arch/x86/synchronization/spinlock.h
         --gcov gcov --gcov-options '\-lp'
