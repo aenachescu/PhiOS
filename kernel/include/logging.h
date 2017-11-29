@@ -12,6 +12,9 @@ void __klog(
 #define PhiOS_LOGGING_DEFAULT_FORMAT  "[%#10s][%5d][%7s]: "
 #define PhiOS_LOGGING_NEW_LINE        "\n"
 
+#define KLOG_RAW(format, ...)                                       \
+    __klog(format, ##__VA_ARGS__)
+
 #define KLOG(format, ...)                                           \
     __klog(format PhiOS_LOGGING_NEW_LINE, ##__VA_ARGS__)
 
