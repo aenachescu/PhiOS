@@ -3,6 +3,8 @@
 #include "kernel/include/arch/x86/asm_io.h"
 #include "kernel/include/arch/x86/idt.h"
 
+#include "kernel/include/logging.h"
+
 static bool g_isInit = false;
 
 static void serial_com1Handler(
@@ -83,7 +85,7 @@ static void serial_com1Handler(
     }
 
     c = serial_read(port);
-    kprintf("Data from port[%x] = %c\n", (uint32)port, (char)c);
+    KLOG_INFO("Data from port[%x] = %c", (uint32)port, (char)c);
 }
 
 static void serial_com2Handler(
@@ -99,7 +101,7 @@ static void serial_com2Handler(
     }
 
     c = serial_read(port);
-    kprintf("Data from port[%x] = %c\n", (uint32)port, (char)c);
+    KLOG_INFO("Data from port[%x] = %c", (uint32)port, (char)c);
 }
 
 uint32 serial_init()
