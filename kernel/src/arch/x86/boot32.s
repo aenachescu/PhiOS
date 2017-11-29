@@ -68,10 +68,6 @@ _higherHalf:
 
     call kernel_main
 
-    sti
-
-    call user_main
-
 1:
     hlt
     jmp 1b
