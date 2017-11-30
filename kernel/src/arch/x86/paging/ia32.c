@@ -1,7 +1,7 @@
 #include "kernel/include/arch/x86/paging/ia32.h"
 #include "kernel/include/memory/pmm.h"
 #include "kernel/include/arch/x86/registers.h"
-#include "include/cpu.h"
+#include "kernel/include/cpu.h"
 #include "kernel/include/arch/x86/paging/paging.h"
 
 extern struct KernelArea g_kernelArea;

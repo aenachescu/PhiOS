@@ -1,4 +1,4 @@
-#include "include/cpu.h"
+#include "kernel/include/cpu.h"
 #include "kernel/include/logging.h"
 
 #if defined PhiOS_ARCH_x86_32

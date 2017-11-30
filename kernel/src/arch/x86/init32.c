@@ -15,8 +15,7 @@
 #include "drivers/serial/include/serial.h"
 
 #include "kernel/include/multiboot2.h"
-
-#include "include/cpu.h"
+#include "kernel/include/cpu.h"
 
 struct KernelArea g_kernelArea;
 

@@ -2,7 +2,7 @@
 #define PhiOS_InterruptDescriptorTable64
 
 #include "include/types.h"
-#include "include/cpu.h"
+#include "kernel/include/cpu.h"
 
 struct IDT64_Entry
 {

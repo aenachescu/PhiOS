@@ -2,8 +2,9 @@
 #define PhiOS_keyboard
 
 #include "include/types.h"
-#include "include/cpu.h"
 #include "include/errors.h"
+
+#include "kernel/include/cpu.h"
 
 #define KEYBOARD_BUFFER_SIZE    256
 #define KEYBOARD_IO_PORT        0x60

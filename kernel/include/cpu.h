@@ -1,7 +1,7 @@
 #ifndef PhiOS_cpu
 #define PhiOS_cpu
 
-#include "types.h"
+#include "include/types.h"
 
 #if defined PhiOS_ARCH_x86_32 || defined PhiOS_ARCH_x86_64
 

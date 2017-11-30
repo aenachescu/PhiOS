@@ -1,6 +1,6 @@
 #include "include/types.h"
-#include "include/cpu.h"
 
+#include "kernel/include/cpu.h"
 #include "kernel/include/logging.h"
 
 // Temporary value until the random one is generated

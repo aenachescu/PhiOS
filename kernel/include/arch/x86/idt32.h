@@ -3,7 +3,7 @@
 
 #include "include/types.h"
 #include "include/errors.h"
-#include "include/cpu.h"
+#include "kernel/include/cpu.h"
 
 #define IDT_ENTRIES 256
 

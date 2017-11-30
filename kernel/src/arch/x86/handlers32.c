@@ -1,5 +1,4 @@
 #include "kernel/include/arch/x86/handlers32.h"
-#include "include/cpu.h"
 #include "kernel/include/logging.h"
 
 void handlers32_default(IntCpuState32 *a_state)

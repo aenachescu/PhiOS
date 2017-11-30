@@ -1,6 +1,6 @@
 #include "drivers/rtc/include/rtc.h"
 #include "kernel/include/arch/x86/asm_io.h"
-#include "include/cpu.h"
+#include "kernel/include/cpu.h"
 #include "util/kstdlib/include/kstring.h"
 
 static RTC g_rtc;
