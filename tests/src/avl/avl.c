@@ -1,11 +1,7 @@
 typedef long unsigned int size_t;
 typedef int wchar_t;
 
-typedef enum {
-  P_ALL,
-  P_PID,
-  P_PGID
-} idtype_t;
+typedef enum { P_ALL, P_PID, P_PGID } idtype_t;
 typedef unsigned char __u_char;
 typedef unsigned short int __u_short;
 typedef unsigned int __u_int;
@@ -30,9 +26,7 @@ typedef unsigned long int __nlink_t;
 typedef long int __off_t;
 typedef long int __off64_t;
 typedef int __pid_t;
-typedef struct {
-  int __val[2];
-} __fsid_t;
+typedef struct { int __val[2]; } __fsid_t;
 typedef long int __clock_t;
 typedef unsigned long int __rlim_t;
 typedef unsigned long int __rlim64_t;
@@ -103,11 +97,11 @@ extern size_t __ctype_get_mb_cur_max(void)
     __attribute__((__nothrow__, __leaf__));
 
 extern double atof(const char *__nptr) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__pure__)) __attribute__((__nonnull__(1)));
+__attribute__((__pure__)) __attribute__((__nonnull__(1)));
 extern int atoi(const char *__nptr) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__pure__)) __attribute__((__nonnull__(1)));
+__attribute__((__pure__)) __attribute__((__nonnull__(1)));
 extern long int atol(const char *__nptr) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__pure__)) __attribute__((__nonnull__(1)));
+__attribute__((__pure__)) __attribute__((__nonnull__(1)));
 
 __extension__ extern long long int atoll(const char *__nptr)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__pure__))
@@ -145,7 +139,7 @@ strtoull(const char *__restrict __nptr, char **__restrict __endptr, int __base)
 
 extern char *l64a(long int __n) __attribute__((__nothrow__, __leaf__));
 extern long int a64l(const char *__s) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__pure__)) __attribute__((__nonnull__(1)));
+__attribute__((__pure__)) __attribute__((__nonnull__(1)));
 
 typedef __u_char u_char;
 typedef __u_short u_short;
@@ -286,7 +280,8 @@ typedef union {
     unsigned int __nr_writers_queued;
     int __writer;
     int __shared;
-    unsigned long int __pad1;
+    signed char __rwelision;
+    unsigned char __pad1[7];
     unsigned long int __pad2;
     unsigned int __flags;
   } __data;
@@ -312,7 +307,7 @@ extern void srandom(unsigned int __seed) __attribute__((__nothrow__, __leaf__));
 extern char *initstate(unsigned int __seed, char *__statebuf, size_t __statelen)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
 extern char *setstate(char *__statebuf) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
 struct random_data {
   int32_t *fptr;
   int32_t *rptr;
@@ -390,7 +385,7 @@ extern int lcong48_r(unsigned short int __param[7],
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1, 2)));
 
 extern void *malloc(size_t __size) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__malloc__));
+__attribute__((__malloc__));
 extern void *calloc(size_t __nmemb, size_t __size)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__));
 
@@ -404,41 +399,48 @@ extern void cfree(void *__ptr) __attribute__((__nothrow__, __leaf__));
 extern void *alloca(size_t __size) __attribute__((__nothrow__, __leaf__));
 
 extern void *valloc(size_t __size) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__malloc__));
+__attribute__((__malloc__));
 extern int posix_memalign(void **__memptr, size_t __alignment, size_t __size)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
+extern void *aligned_alloc(size_t __alignment, size_t __size)
+    __attribute__((__nothrow__, __leaf__)) __attribute__((__malloc__))
+    __attribute__((__alloc_size__(2)));
 
 extern void abort(void) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__noreturn__));
+__attribute__((__noreturn__));
 extern int atexit(void (*__func)(void)) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
+extern int at_quick_exit(void (*__func)(void))
+    __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 
 extern int on_exit(void (*__func)(int __status, void *__arg), void *__arg)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(1)));
 
 extern void exit(int __status) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__noreturn__));
+__attribute__((__noreturn__));
+extern void quick_exit(int __status) __attribute__((__nothrow__, __leaf__))
+__attribute__((__noreturn__));
 
 extern void _Exit(int __status) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__noreturn__));
+__attribute__((__noreturn__));
 
 extern char *getenv(const char *__name) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
 
 extern int putenv(char *__string) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
 extern int setenv(const char *__name, const char *__value, int __replace)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(2)));
 extern int unsetenv(const char *__name) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
 extern int clearenv(void) __attribute__((__nothrow__, __leaf__));
 extern char *mktemp(char *__template) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
 extern int mkstemp(char *__template) __attribute__((__nonnull__(1)));
 extern int mkstemps(char *__template, int __suffixlen)
     __attribute__((__nonnull__(1)));
 extern char *mkdtemp(char *__template) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1)));
 
 extern int system(const char *__command);
 
@@ -453,9 +455,9 @@ extern void *bsearch(const void *__key, const void *__base, size_t __nmemb,
 extern void qsort(void *__base, size_t __nmemb, size_t __size,
                   __compar_fn_t __compar) __attribute__((__nonnull__(1, 4)));
 extern int abs(int __x) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__const__));
+__attribute__((__const__));
 extern long int labs(long int __x) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__const__));
+__attribute__((__const__));
 
 __extension__ extern long long int llabs(long long int __x)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__const__));
@@ -470,10 +472,10 @@ __extension__ extern lldiv_t lldiv(long long int __numer, long long int __denom)
 
 extern char *ecvt(double __value, int __ndigit, int *__restrict __decpt,
                   int *__restrict __sign) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(3, 4)));
+__attribute__((__nonnull__(3, 4)));
 extern char *fcvt(double __value, int __ndigit, int *__restrict __decpt,
                   int *__restrict __sign) __attribute__((__nothrow__, __leaf__))
-    __attribute__((__nonnull__(3, 4)));
+__attribute__((__nonnull__(3, 4)));
 extern char *gcvt(double __value, int __ndigit, char *__buf)
     __attribute__((__nothrow__, __leaf__)) __attribute__((__nonnull__(3)));
 extern char *qecvt(long double __value, int __ndigit, int *__restrict __decpt,
@@ -548,9 +550,7 @@ typedef struct UTDataAVLNode_t {
   unsigned int height;
   Data data;
 } UTDataAVLNode;
-typedef struct UTDataAVL_t {
-  UTDataAVLNode *root;
-} UTDataAVL;
+typedef struct UTDataAVL_t { UTDataAVLNode *root; } UTDataAVL;
 typedef void (*UTDataAVLForeachCbk_t)(const Data *a_value);
 typedef clib_bool_t (*UTDataAVLFindIfCbk_t)(const Data *a_value,
                                             void *a_context);

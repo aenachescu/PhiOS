@@ -10,7 +10,7 @@ addons:
         - libc6-dev-i386
         - gcc-multilib
         - g++-multilib
-        - clang-format-3.4
+        - clang-format
 
 before_install:
     - pip install --user cpp-coveralls
