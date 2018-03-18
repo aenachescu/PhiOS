@@ -10,3 +10,12 @@
 * The binaries of PhiOS are located in `bin/<arch_name>` directory.
 * We recommend using QEMU for testing, the command you should use is `qemu-system-x86_64 -cdrom bin/<arch_name>/phios.iso -device isa-debug-exit,iobase=0xf4,iosize=0x04`.
 * Any other virtual machine should work too, or even on real hardware.
+
+## Dependencies
+* gcc
+* cmake
+* xorriso
+* grub2
+* clang-format
+* gcc-multilib
+* libc6-dev-i386
